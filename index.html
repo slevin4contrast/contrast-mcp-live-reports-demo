@@ -206,20 +206,32 @@
     <div class="container">
         <header>
             <h1>🛡️ Contrast MCP Server</h1>
-            <p>Generated Reports & Visualizations</p>
+            <p>Your security data, answered by tools an AI assistant can call</p>
         </header>
 
         <section class="intro">
-            <h2>About This Repository</h2>
+            <h2>What this is</h2>
             <p>
-                This repository showcases the capabilities of the Contrast Security MCP (Model Context Protocol) Server.
-                The reports and visualizations here are dynamically generated using real security data from Contrast Security's
-                platform, demonstrating the power of integrating security intelligence with AI-powered analysis.
+                An MCP server is a set of tools an AI assistant can call on your behalf. The Contrast MCP server
+                exposes 27 of them, covering vulnerabilities, third-party libraries, CVE exposure, live attacks,
+                route coverage and application inventory. Connect it to Claude and you can ask questions of your
+                own security data in plain language.
             </p>
             <p>
-                Each report provides interactive insights into application security, vulnerability management, attack detection,
-                and more. These examples illustrate how the Contrast MCP Server can be used to create custom security
-                dashboards and reporting solutions.
+                These pages are a different way of making the same point. Every one of them is an ordinary web page
+                that calls those same tools directly and draws the answer. Each carries a panel showing exactly
+                which tools ran, with what arguments, how long they took and how much came back, so the mechanism
+                is visible rather than implied.
+            </p>
+            <p style="margin-top: 15px; padding: 15px 20px; background: rgba(0, 200, 120, 0.12); border-left: 4px solid #00c878; border-radius: 8px;">
+                <strong>No AI tokens are spent here.</strong> MCP is a protocol, not a model. These pages talk to
+                Contrast over HTTPS and no model runs, so refreshing a dashboard costs nothing in Claude usage.
+                The AI was spent <em>building</em> the pages, not running them.
+            </p>
+            <p style="margin-top: 15px; padding: 15px 20px; background: rgba(102, 126, 234, 0.12); border-left: 4px solid #667eea; border-radius: 8px;">
+                <strong>New here?</strong> Open <a href="tool_explorer.html" style="color:#8fa2ff;">What the MCP Can Do</a>
+                first. It lists every tool the server advertises, read from the server itself rather than written by
+                hand, and lets you run the read-only ones against your own organization.
             </p>
             <p style="margin-top: 15px; padding: 15px 20px; background: rgba(0, 200, 120, 0.12); border-left: 4px solid #00c878; border-radius: 8px;">
                 <strong><span class="badge" style="background: #00c878; color: #0a0e27;">LIVE</span> pages pull data on demand.</strong>
