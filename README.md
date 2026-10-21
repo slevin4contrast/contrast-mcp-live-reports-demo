@@ -24,6 +24,14 @@ Authentication reuses the OAuth token Claude Code already stored in the macOS ke
 you connected the MCP server. The server reads that token per request, so a refreshed token is
 picked up automatically. The token never reaches the browser.
 
+### When a page says the session expired
+
+Access tokens last about 15 minutes, and this server deliberately does not refresh them (see
+below). When one lapses, every live page says so and tells you to refresh it from Claude Code.
+The server is still running at that point; it just has no valid token. Running any Contrast
+command in Claude Code renews the token in the keychain, and the next Refresh picks it up. No
+restart needed.
+
 Access tokens last about 15 minutes. Claude Code refreshes them whenever it uses the MCP
 server, and this server re-reads the keychain on every request, so the token stays current as
 long as you are also using the MCP in Claude Code, which is usually the case during a demo. If
