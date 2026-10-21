@@ -58,6 +58,18 @@ async function main() {
     if (reg.status === 401) {
       console.error('Registration rejected (401). The token Claude Code holds has probably expired.');
       console.error('Run any Contrast command in Claude Code to refresh it, then re-run: npm run setup');
+    } else if (reg.status === 403 && /insufficient_scope/.test(text)) {
+      console.error('This tenant will not let you register an OAuth client (403 insufficient_scope).');
+      console.error('Your token carries only the "openid profile" scopes, and this authorization');
+      console.error('server advertises no scope that permits dynamic client registration, so this');
+      console.error('is a tenant policy rather than anything you can fix locally.');
+      console.error('');
+      console.error('Options, in rough order of effort:');
+      console.error('  1. Ask a Contrast admin to pre-create an OAuth client for this tool, then');
+      console.error('     put its id and secret in .contrast-client.json yourself. The format is');
+      console.error('     { clientId, clientSecret, tokenEndpoint, serverUrl }.');
+      console.error('  2. Keep the default. The server borrows the token Claude Code holds, which');
+      console.error('     works fine but lapses roughly every 15 minutes.');
     } else {
       console.error(`Registration failed (${reg.status}): ${text.slice(0, 400)}`);
     }

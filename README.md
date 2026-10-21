@@ -50,6 +50,14 @@ Setup reads Claude Code's current access token once to authorize the registratio
 server needs to be connected and the token valid when you run it. If it reports a 401, run any
 Contrast command in Claude Code and try again.
 
+**This may not be available to you.** On the eval tenant the registration endpoint answers 403
+`insufficient_scope`, because user tokens carry only `openid profile` and the authorization
+server advertises no scope that permits dynamic registration. That is tenant policy, not
+something to fix locally. If you hit it, either ask a Contrast admin to pre-create an OAuth
+client and write `.contrast-client.json` by hand as
+`{ clientId, clientSecret, tokenEndpoint, serverUrl }`, or stay on the default and accept the
+15-minute token.
+
 ### When a page says the session expired
 
 Access tokens last about 15 minutes, and this server deliberately does not refresh them (see
