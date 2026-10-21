@@ -8,7 +8,8 @@
   "scripts": {
     "start": "node server.js",
     "mock": "MOCK=1 node server.js",
-    "setup": "node scripts/register-client.js"
+    "setup": "node scripts/register-client.js",
+    "login": "node scripts/login.js"
   },
   "engines": {
     "node": ">=18"

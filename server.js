@@ -7,7 +7,6 @@ const contrast = require('./lib/mcp');
 
 const PORT = process.env.PORT || 3000;
 const MOCK = process.env.MOCK === '1' || !contrast.configured();
-const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml' };
 
 function summarize(items) {
   const order = ['Critical', 'High', 'Medium', 'Low', 'Note'];
@@ -200,15 +199,18 @@ http.createServer(async (req, res) => {
       return res.end(JSON.stringify({ error: err.message }));
     }
   }
-  const file = path.normalize(path.join(__dirname, pathname === '/' ? 'index.html' : pathname));
-  const rel = path.relative(__dirname, file);
-  const top = rel.split(path.sep)[0];
-  if (rel.startsWith('..') || ['.env', '.git', 'lib', 'server.js', 'fixtures'].includes(top)) {
+  // Allowlist, not a denylist. Every page here is a self-contained .html file in
+  // the repo root, so that is the only thing worth serving. A denylist silently
+  // failed open once already, exposing .contrast-client.json and the OAuth
+  // secret inside it, because adding a new secret file does not update a list of
+  // forbidden names. This cannot leak a file type nobody thought to exclude.
+  const name = pathname === '/' ? 'index.html' : pathname.slice(1);
+  if (!/^[A-Za-z0-9._-]+\.html$/.test(name) || name.startsWith('.')) {
     res.writeHead(404); return res.end('Not found');
   }
-  fs.readFile(file, (err, data) => {
+  fs.readFile(path.join(__dirname, name), (err, data) => {
     if (err) { res.writeHead(404); return res.end('Not found'); }
-    res.writeHead(200, { 'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream' });
+    res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(data);
   });
 }).listen(PORT, '127.0.0.1', () => {
