@@ -94,6 +94,14 @@ const routes = {
       oldest: open.slice().sort((a, b) => (b.ageDays || 0) - (a.ageDays || 0)).slice(0, 15),
     };
   },
+  '/api/vulnerability': async (params) => {
+    const id = params && params.get('id');
+    const appId = params && params.get('appId');
+    if (id && !/^[A-Z0-9-]{4,40}$/i.test(id)) throw new Error(`Not a vulnerability id: ${id}`);
+    if (appId && !/^[a-f0-9-]{36}$/i.test(appId)) throw new Error('Not an application id');
+    const data = MOCK ? contrast.loadFixture('vulnerability') : await contrast.vulnerabilityReport(id || undefined, appId || undefined);
+    return { source: MOCK ? 'mock' : 'live', generatedAt: new Date().toISOString(), ...data };
+  },
   '/api/attacks': async () => {
     const items = MOCK ? contrast.loadFixture('attacks') : await contrast.listAttacks();
     const byStatus = {};

