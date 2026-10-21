@@ -1,135 +1,37 @@
 [
  {
-  "name": "SAML-cargocats-frontgateservice",
-  "appId": "2c2c2998-e96c-4f40-8171-ae2b033f2ddb",
-  "language": "Java",
+  "name": "SAML-cargocats-webhookservice",
+  "appId": "8c909556-4a56-48a1-971c-bf376dc0bbcc",
+  "language": "Python",
   "status": "online",
-  "totalRoutes": 48,
-  "exercised": 32,
-  "discovered": 16,
-  "coveragePercent": 66.67,
-  "vulnerabilities": 5,
+  "totalRoutes": 4,
+  "exercised": 2,
+  "discovered": 2,
+  "coveragePercent": 50,
+  "vulnerabilities": 1,
   "criticalVulnerabilities": 0,
   "routes": [
    {
-    "url": "/login",
-    "verb": "GET",
+    "url": "/testConnection",
+    "verb": "OPTIONS",
     "status": "EXERCISED",
     "vulnerabilities": 1
    },
    {
-    "url": "/register",
-    "verb": "POST",
-    "status": "EXERCISED",
-    "vulnerabilities": 2
-   },
-   {
-    "url": "/api/shipments/track",
-    "verb": "GET",
-    "status": "EXERCISED",
-    "vulnerabilities": 1
-   },
-   {
-    "url": "/api/addresses/import",
-    "verb": "POST",
-    "status": "EXERCISED",
-    "vulnerabilities": 1
-   },
-   {
-    "url": "/api/payments/process",
-    "verb": "POST",
+    "url": "/",
+    "verb": "OPTIONS",
     "status": "EXERCISED",
     "vulnerabilities": 0
    },
    {
-    "url": "/api/ai/openai",
-    "verb": "GET",
+    "url": "/webhookNotify",
+    "verb": "OPTIONS",
     "status": "DISCOVERED",
     "vulnerabilities": 0
    },
    {
-    "url": "/api/webhook/notify",
-    "verb": "POST",
-    "status": "DISCOVERED",
-    "vulnerabilities": 0
-   },
-   {
-    "url": "/api/cats/{id}",
-    "verb": "DELETE",
-    "status": "DISCOVERED",
-    "vulnerabilities": 0
-   },
-   {
-    "url": "/api/addresses/{id}",
-    "verb": "DELETE",
-    "status": "DISCOVERED",
-    "vulnerabilities": 0
-   },
-   {
-    "url": "/api/reports/summarize",
-    "verb": "POST",
-    "status": "DISCOVERED",
-    "vulnerabilities": 0
-   }
-  ]
- },
- {
-  "name": "SAML-cargocats-dataservice",
-  "appId": "84cb3ae3-42bf-41c9-b77b-980319602dad",
-  "language": "Java",
-  "status": "online",
-  "totalRoutes": 33,
-  "exercised": 6,
-  "discovered": 27,
-  "coveragePercent": 18.18,
-  "vulnerabilities": 1,
-  "criticalVulnerabilities": 1,
-  "routes": [
-   {
-    "url": "/payments",
-    "verb": "GET",
-    "status": "EXERCISED",
-    "vulnerabilities": 1
-   },
-   {
-    "url": "/{repository}/search/{search}",
-    "verb": "GET",
-    "status": "EXERCISED",
-    "vulnerabilities": 0
-   },
-   {
-    "url": "/{repository}/{id}",
-    "verb": "GET",
-    "status": "EXERCISED",
-    "vulnerabilities": 0
-   },
-   {
-    "url": "/{repository}/{id}",
-    "verb": "DELETE",
-    "status": "DISCOVERED",
-    "vulnerabilities": 0
-   },
-   {
-    "url": "/{repository}/{id}",
-    "verb": "PATCH",
-    "status": "DISCOVERED",
-    "vulnerabilities": 0
-   },
-   {
-    "url": "/{repository}/{id}/{property}",
-    "verb": "DELETE",
-    "status": "DISCOVERED",
-    "vulnerabilities": 0
-   },
-   {
-    "url": "/profile",
-    "verb": "GET",
-    "status": "DISCOVERED",
-    "vulnerabilities": 0
-   },
-   {
-    "url": "/profile/{repository}",
-    "verb": "GET",
+    "url": "/static/<path:filename>",
+    "verb": "HEAD",
     "status": "DISCOVERED",
     "vulnerabilities": 0
    }
@@ -143,7 +45,7 @@
   "totalRoutes": 4,
   "exercised": 2,
   "discovered": 2,
-  "coveragePercent": 50.0,
+  "coveragePercent": 50,
   "vulnerabilities": 3,
   "criticalVulnerabilities": 0,
   "routes": [
@@ -174,44 +76,6 @@
   ]
  },
  {
-  "name": "SAML-cargocats-webhookservice",
-  "appId": "8c909556-4a56-48a1-971c-bf376dc0bbcc",
-  "language": "Python",
-  "status": "online",
-  "totalRoutes": 4,
-  "exercised": 2,
-  "discovered": 2,
-  "coveragePercent": 50.0,
-  "vulnerabilities": 1,
-  "criticalVulnerabilities": 0,
-  "routes": [
-   {
-    "url": "/testConnection",
-    "verb": "POST",
-    "status": "EXERCISED",
-    "vulnerabilities": 1
-   },
-   {
-    "url": "/",
-    "verb": "GET",
-    "status": "EXERCISED",
-    "vulnerabilities": 0
-   },
-   {
-    "url": "/webhookNotify",
-    "verb": "POST",
-    "status": "DISCOVERED",
-    "vulnerabilities": 0
-   },
-   {
-    "url": "/static/<path:filename>",
-    "verb": "GET",
-    "status": "DISCOVERED",
-    "vulnerabilities": 0
-   }
-  ]
- },
- {
   "name": "SAML-cargocats-labelservice",
   "appId": "bfb73036-2d10-4989-babc-454cd35ee1fb",
   "language": "Node",
@@ -219,7 +83,7 @@
   "totalRoutes": 2,
   "exercised": 1,
   "discovered": 1,
-  "coveragePercent": 50.0,
+  "coveragePercent": 50,
   "vulnerabilities": 3,
   "criticalVulnerabilities": 0,
   "routes": [
@@ -231,7 +95,7 @@
    },
    {
     "url": "/health",
-    "verb": "GET",
+    "verb": "",
     "status": "DISCOVERED",
     "vulnerabilities": 0
    }
@@ -270,6 +134,308 @@
   ]
  },
  {
+  "name": "SAML-cargocats-frontgateservice",
+  "appId": "2c2c2998-e96c-4f40-8171-ae2b033f2ddb",
+  "language": "Java",
+  "status": "online",
+  "totalRoutes": 48,
+  "exercised": 32,
+  "discovered": 16,
+  "coveragePercent": 66.67,
+  "vulnerabilities": 5,
+  "criticalVulnerabilities": 0,
+  "routes": [
+   {
+    "url": "/login",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 1
+   },
+   {
+    "url": "/",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/webhook/test-connection",
+    "verb": "POST",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/shipments/track",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 1
+   },
+   {
+    "url": "/api/reports/generate",
+    "verb": "POST",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/labels/generate",
+    "verb": "POST",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/documents/process",
+    "verb": "POST",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/photos/view",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/photos/upload",
+    "verb": "POST",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/addresses/import",
+    "verb": "POST",
+    "status": "EXERCISED",
+    "vulnerabilities": 1
+   },
+   {
+    "url": "/dashboard",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/payments/process",
+    "verb": "POST",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/cats",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/register",
+    "verb": "POST",
+    "status": "EXERCISED",
+    "vulnerabilities": 2
+   },
+   {
+    "url": "/webhooks/",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/reports",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/shipments/{id}/cat",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/cats/{id}",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/shipments",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/shipments/{id}/fromAddress",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/addresses",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/shipments/",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/addresses/export",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/cats/",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/register",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/shipments/{n}/toAddress",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/addresses/",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/shipments/{id}/status",
+    "verb": "PATCH",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/cats",
+    "verb": "POST",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/shipments",
+    "verb": "POST",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/addresses",
+    "verb": "POST",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/cats/facts",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/ai/health",
+    "verb": "GET",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/webhook/test-shipment-notification",
+    "verb": "POST",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/webhook/notify-form",
+    "verb": "POST",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/reports/summarize",
+    "verb": "POST",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/cats/{id}",
+    "verb": "DELETE",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/webhook/test-connection-form",
+    "verb": "POST",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/labels/example",
+    "verb": "GET",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/shipments/{id}/webhook",
+    "verb": "PATCH",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/addresses/{id}",
+    "verb": "DELETE",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/documents/health",
+    "verb": "GET",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/labels/health",
+    "verb": "GET",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/reports/health",
+    "verb": "GET",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/webhook/notify",
+    "verb": "POST",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/ai/openai",
+    "verb": "GET",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/webhook/health",
+    "verb": "GET",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/api/photos",
+    "verb": "GET",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   }
+  ]
+ },
+ {
   "name": "SAML-cargocats-docservice",
   "appId": "55404d90-2ab9-406a-9ab4-bfec04a68287",
   "language": "Python",
@@ -277,7 +443,7 @@
   "totalRoutes": 4,
   "exercised": 1,
   "discovered": 3,
-  "coveragePercent": 25.0,
+  "coveragePercent": 25,
   "vulnerabilities": 0,
   "criticalVulnerabilities": 0,
   "routes": [
@@ -285,6 +451,12 @@
     "url": "/process-docx",
     "verb": "POST",
     "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/static/<path:filename>",
+    "verb": "OPTIONS",
+    "status": "DISCOVERED",
     "vulnerabilities": 0
    },
    {
@@ -298,10 +470,216 @@
     "verb": "GET",
     "status": "DISCOVERED",
     "vulnerabilities": 0
+   }
+  ]
+ },
+ {
+  "name": "SAML-cargocats-dataservice",
+  "appId": "84cb3ae3-42bf-41c9-b77b-980319602dad",
+  "language": "Java",
+  "status": "online",
+  "totalRoutes": 33,
+  "exercised": 6,
+  "discovered": 27,
+  "coveragePercent": 18.18,
+  "vulnerabilities": 1,
+  "criticalVulnerabilities": 1,
+  "routes": [
+   {
+    "url": "/payments",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 1
    },
    {
-    "url": "/static/<path:filename>",
+    "url": "/shipments/search/findByTrackingId",
     "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/shipments/{n}",
+    "verb": "PUT",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/cats/.htaccess",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/shipments/{n}/toAddress",
+    "verb": "GET",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/{repository}",
+    "verb": "POST",
+    "status": "EXERCISED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/",
+    "verb": "HEAD",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/",
+    "verb": "OPTIONS",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/{repository}/{id}/{property}/{propertyId}",
+    "verb": "DELETE",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/profile",
+    "verb": "OPTIONS",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/profile",
+    "verb": "GET",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/{repository}/{id}/{property}",
+    "verb": "DELETE",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/{repository}/search/{search}",
+    "verb": "HEAD",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/{repository}/{id}/{property}",
+    "verb": "PUT",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/profile/{repository}",
+    "verb": "GET",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/{repository}/{id}",
+    "verb": "DELETE",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/{repository}/search",
+    "verb": "OPTIONS",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/{repository}/search",
+    "verb": "GET",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/profile/{repository}",
+    "verb": "GET",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/{repository}/{id}",
+    "verb": "HEAD",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/{repository}",
+    "verb": "HEAD",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/{repository}/search",
+    "verb": "HEAD",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/{repository}/{id}/{property}/{propertyId}",
+    "verb": "GET",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/",
+    "verb": "GET",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/{repository}",
+    "verb": "OPTIONS",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/{repository}/{id}",
+    "verb": "OPTIONS",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/{repository}",
+    "verb": "GET",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/{repository}",
+    "verb": "GET",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/{repository}/{id}",
+    "verb": "PATCH",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/{repository}/{id}/{property}",
+    "verb": "GET",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/{repository}/search/{search}",
+    "verb": "GET",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/{repository}/search/{search}",
+    "verb": "OPTIONS",
+    "status": "DISCOVERED",
+    "vulnerabilities": 0
+   },
+   {
+    "url": "/profile/{repository}",
+    "verb": "OPTIONS",
     "status": "DISCOVERED",
     "vulnerabilities": 0
    }
@@ -315,7 +693,7 @@
   "totalRoutes": 2,
   "exercised": 0,
   "discovered": 2,
-  "coveragePercent": 0.0,
+  "coveragePercent": 0,
   "vulnerabilities": 0,
   "criticalVulnerabilities": 0,
   "routes": [

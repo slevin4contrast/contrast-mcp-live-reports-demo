@@ -380,6 +380,17 @@
                 grid-template-columns: 1fr;
             }
         }
+        .source-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; font-size: 0.95em; color: rgba(255,255,255,0.8); }
+        .source-badge { padding: 3px 12px; border-radius: 12px; font-weight: bold; font-size: 0.85em; }
+        .source-badge.live { background: #00c878; color: #0a0e27; }
+        .source-badge.mock { background: #ffaa00; color: #0a0e27; }
+        .refresh-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: 0; border-radius: 8px; padding: 8px 18px; cursor: pointer; font-size: 0.95em; }
+        .error-banner { display: none; background: rgba(255, 68, 68, 0.15); border: 2px solid #ff4444; border-radius: 10px; padding: 16px 20px; margin-bottom: 20px; }
+        .route-verb { display: inline-block; min-width: 54px; font-weight: bold; color: #8fa2ff; font-family: 'SF Mono', Menlo, Consolas, monospace; }
+        .route-item.unexercised { opacity: 0.65; border-left-color: #8892b0; }
+        .progress-label { white-space: nowrap; }
+        .route-list { max-height: 420px; overflow-y: auto; }
+        .route-toggle { background: none; border: 1px solid rgba(102,126,234,0.5); color: #8fa2ff; border-radius: 6px; padding: 5px 12px; cursor: pointer; font-size: 0.85em; margin-top: 12px; }
     </style>
 </head>
 <body>
@@ -388,633 +399,179 @@
 
         <header>
             <h1>Route Coverage Analysis</h1>
-            <p>Comprehensive testing coverage across Cargo Cats microservices</p>
+            <p>Live testing coverage across Cargo Cats microservices</p>
         </header>
 
-        <!-- Overall Statistics -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">Total Routes</div>
-                <div class="stat-number">181</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Exercised Routes</div>
-                <div class="stat-number">110</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Discovered Routes</div>
-                <div class="stat-number">71</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Average Coverage</div>
-                <div class="stat-number">60.77%</div>
-            </div>
+        <div class="source-bar">
+            <div><span id="sourceBadge" class="source-badge mock">Loading</span> <span id="updated"></span></div>
+            <button class="refresh-btn" id="refreshBtn">↻ Refresh</button>
         </div>
+        <div class="error-banner" id="errorBanner"></div>
 
-        <!-- Charts Section -->
+        <div class="stats-grid" id="stats"></div>
+
         <div class="charts-section">
             <div class="chart-container">
                 <h2>Coverage Distribution</h2>
-                <div class="chart-wrapper">
-                    <canvas id="coverageChart"></canvas>
-                </div>
+                <div class="chart-wrapper"><canvas id="coverageChart"></canvas></div>
             </div>
             <div class="chart-container">
                 <h2>Routes by Application</h2>
-                <div class="chart-wrapper">
-                    <canvas id="routesChart"></canvas>
-                </div>
+                <div class="chart-wrapper"><canvas id="routesChart"></canvas></div>
             </div>
         </div>
 
-        <!-- Application Cards -->
         <section>
             <h2 class="section-title">Application Route Coverage</h2>
-
-            <div class="app-grid">
-                <!-- CargoCats-frontgateservice (offline) -->
-                <div class="app-card excellent">
-                    <div class="app-header">
-                        <div class="app-name">CargoCats-frontgateservice</div>
-                        <div class="coverage-badge excellent">100%</div>
-                    </div>
-                    <div class="app-metrics">
-                        <div class="metric-item">
-                            <div class="metric-label">Total Routes</div>
-                            <div class="metric-value">43</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Exercised</div>
-                            <div class="metric-value">43</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Discovered</div>
-                            <div class="metric-value">0</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Status</div>
-                            <div class="metric-value" style="font-size: 1em; opacity: 0.7;">offline</div>
-                        </div>
-                    </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar">
-                            <div class="progress-exercised" style="width: 100%;"></div>
-                        </div>
-                        <div class="progress-label">43 exercised / 0 discovered</div>
-                    </div>
-                    <div class="vuln-alert warning">
-                        <span class="vuln-icon">⚠️</span>
-                        <span class="vuln-text">1 vulnerability found in exercised routes</span>
-                    </div>
-                </div>
-
-                <!-- CargoCats-imageservice (offline) -->
-                <div class="app-card excellent">
-                    <div class="app-header">
-                        <div class="app-name">CargoCats-imageservice</div>
-                        <div class="coverage-badge excellent">100%</div>
-                    </div>
-                    <div class="app-metrics">
-                        <div class="metric-item">
-                            <div class="metric-label">Total Routes</div>
-                            <div class="metric-value">3</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Exercised</div>
-                            <div class="metric-value">3</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Discovered</div>
-                            <div class="metric-value">0</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Status</div>
-                            <div class="metric-value" style="font-size: 1em; opacity: 0.7;">offline</div>
-                        </div>
-                    </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar">
-                            <div class="progress-exercised" style="width: 100%;"></div>
-                        </div>
-                        <div class="progress-label">3 exercised / 0 discovered</div>
-                    </div>
-                </div>
-
-                <!-- cargo-cats-frontgateservice (online) -->
-                <div class="app-card good">
-                    <div class="app-header">
-                        <div class="app-name">cargo-cats-frontgateservice</div>
-                        <div class="coverage-badge good">80.95%</div>
-                    </div>
-                    <div class="app-metrics">
-                        <div class="metric-item">
-                            <div class="metric-label">Total Routes</div>
-                            <div class="metric-value">42</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Exercised</div>
-                            <div class="metric-value">34</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Discovered</div>
-                            <div class="metric-value">8</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Status</div>
-                            <div class="metric-value" style="font-size: 1em; color: #00ff88;">online</div>
-                        </div>
-                    </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar">
-                            <div class="progress-exercised" style="width: 80.95%;"></div>
-                            <div class="progress-discovered" style="width: 19.05%;"></div>
-                        </div>
-                        <div class="progress-label">34 exercised / 8 discovered</div>
-                    </div>
-                    <div class="vuln-alert warning">
-                        <span class="vuln-icon">⚠️</span>
-                        <span class="vuln-text">4 vulnerabilities found in exercised routes</span>
-                    </div>
-                </div>
-
-                <!-- CargoCats-webhookservice (offline) -->
-                <div class="app-card good">
-                    <div class="app-header">
-                        <div class="app-name">CargoCats-webhookservice</div>
-                        <div class="coverage-badge good">75%</div>
-                    </div>
-                    <div class="app-metrics">
-                        <div class="metric-item">
-                            <div class="metric-label">Total Routes</div>
-                            <div class="metric-value">4</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Exercised</div>
-                            <div class="metric-value">3</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Discovered</div>
-                            <div class="metric-value">1</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Status</div>
-                            <div class="metric-value" style="font-size: 1em; opacity: 0.7;">offline</div>
-                        </div>
-                    </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar">
-                            <div class="progress-exercised" style="width: 75%;"></div>
-                            <div class="progress-discovered" style="width: 25%;"></div>
-                        </div>
-                        <div class="progress-label">3 exercised / 1 discovered</div>
-                    </div>
-                </div>
-
-                <!-- cargo-cats-webhookservice (online) -->
-                <div class="app-card good">
-                    <div class="app-header">
-                        <div class="app-name">cargo-cats-webhookservice</div>
-                        <div class="coverage-badge good">75%</div>
-                    </div>
-                    <div class="app-metrics">
-                        <div class="metric-item">
-                            <div class="metric-label">Total Routes</div>
-                            <div class="metric-value">4</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Exercised</div>
-                            <div class="metric-value">3</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Discovered</div>
-                            <div class="metric-value">1</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Status</div>
-                            <div class="metric-value" style="font-size: 1em; color: #00ff88;">online</div>
-                        </div>
-                    </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar">
-                            <div class="progress-exercised" style="width: 75%;"></div>
-                            <div class="progress-discovered" style="width: 25%;"></div>
-                        </div>
-                        <div class="progress-label">3 exercised / 1 discovered</div>
-                    </div>
-                    <div class="vuln-alert warning">
-                        <span class="vuln-icon">⚠️</span>
-                        <span class="vuln-text">2 vulnerabilities found in exercised routes</span>
-                    </div>
-                </div>
-
-                <!-- cargo-cats-imageservice (online) -->
-                <div class="app-card medium">
-                    <div class="app-header">
-                        <div class="app-name">cargo-cats-imageservice</div>
-                        <div class="coverage-badge medium">66.67%</div>
-                    </div>
-                    <div class="app-metrics">
-                        <div class="metric-item">
-                            <div class="metric-label">Total Routes</div>
-                            <div class="metric-value">3</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Exercised</div>
-                            <div class="metric-value">2</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Discovered</div>
-                            <div class="metric-value">1</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Status</div>
-                            <div class="metric-value" style="font-size: 1em; color: #00ff88;">online</div>
-                        </div>
-                    </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar">
-                            <div class="progress-exercised" style="width: 66.67%;"></div>
-                            <div class="progress-discovered" style="width: 33.33%;"></div>
-                        </div>
-                        <div class="progress-label">2 exercised / 1 discovered</div>
-                    </div>
-                </div>
-
-                <!-- CargoCats-docservice (offline) -->
-                <div class="app-card medium">
-                    <div class="app-header">
-                        <div class="app-name">CargoCats-docservice</div>
-                        <div class="coverage-badge medium">50%</div>
-                    </div>
-                    <div class="app-metrics">
-                        <div class="metric-item">
-                            <div class="metric-label">Total Routes</div>
-                            <div class="metric-value">4</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Exercised</div>
-                            <div class="metric-value">2</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Discovered</div>
-                            <div class="metric-value">2</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Status</div>
-                            <div class="metric-value" style="font-size: 1em; opacity: 0.7;">offline</div>
-                        </div>
-                    </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar">
-                            <div class="progress-exercised" style="width: 50%;"></div>
-                            <div class="progress-discovered" style="width: 50%;"></div>
-                        </div>
-                        <div class="progress-label">2 exercised / 2 discovered</div>
-                    </div>
-                </div>
-
-                <!-- cargo-cats-docservice (online) -->
-                <div class="app-card medium">
-                    <div class="app-header">
-                        <div class="app-name">cargo-cats-docservice</div>
-                        <div class="coverage-badge medium">50%</div>
-                    </div>
-                    <div class="app-metrics">
-                        <div class="metric-item">
-                            <div class="metric-label">Total Routes</div>
-                            <div class="metric-value">4</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Exercised</div>
-                            <div class="metric-value">2</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Discovered</div>
-                            <div class="metric-value">2</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Status</div>
-                            <div class="metric-value" style="font-size: 1em; color: #00ff88;">online</div>
-                        </div>
-                    </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar">
-                            <div class="progress-exercised" style="width: 50%;"></div>
-                            <div class="progress-discovered" style="width: 50%;"></div>
-                        </div>
-                        <div class="progress-label">2 exercised / 2 discovered</div>
-                    </div>
-                </div>
-
-                <!-- cargo-cats-labelservice (online) -->
-                <div class="app-card medium">
-                    <div class="app-header">
-                        <div class="app-name">cargo-cats-labelservice</div>
-                        <div class="coverage-badge medium">50%</div>
-                    </div>
-                    <div class="app-metrics">
-                        <div class="metric-item">
-                            <div class="metric-label">Total Routes</div>
-                            <div class="metric-value">2</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Exercised</div>
-                            <div class="metric-value">1</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Discovered</div>
-                            <div class="metric-value">1</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Status</div>
-                            <div class="metric-value" style="font-size: 1em; color: #00ff88;">online</div>
-                        </div>
-                    </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar">
-                            <div class="progress-exercised" style="width: 50%;"></div>
-                            <div class="progress-discovered" style="width: 50%;"></div>
-                        </div>
-                        <div class="progress-label">1 exercised / 1 discovered</div>
-                    </div>
-                    <div class="vuln-alert warning">
-                        <span class="vuln-icon">⚠️</span>
-                        <span class="vuln-text">3 vulnerabilities found in exercised routes</span>
-                    </div>
-                </div>
-
-                <!-- CargoCats-labelservice (offline) -->
-                <div class="app-card poor">
-                    <div class="app-header">
-                        <div class="app-name">CargoCats-labelservice</div>
-                        <div class="coverage-badge poor">25%</div>
-                    </div>
-                    <div class="app-metrics">
-                        <div class="metric-item">
-                            <div class="metric-label">Total Routes</div>
-                            <div class="metric-value">4</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Exercised</div>
-                            <div class="metric-value">1</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Discovered</div>
-                            <div class="metric-value">3</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Status</div>
-                            <div class="metric-value" style="font-size: 1em; opacity: 0.7;">offline</div>
-                        </div>
-                    </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar">
-                            <div class="progress-exercised" style="width: 25%;"></div>
-                            <div class="progress-discovered" style="width: 75%;"></div>
-                        </div>
-                        <div class="progress-label">1 exercised / 3 discovered</div>
-                    </div>
-                </div>
-
-                <!-- CargoCats-dataservice (offline) -->
-                <div class="app-card poor">
-                    <div class="app-header">
-                        <div class="app-name">CargoCats-dataservice</div>
-                        <div class="coverage-badge poor">21.21%</div>
-                    </div>
-                    <div class="app-metrics">
-                        <div class="metric-item">
-                            <div class="metric-label">Total Routes</div>
-                            <div class="metric-value">33</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Exercised</div>
-                            <div class="metric-value">7</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Discovered</div>
-                            <div class="metric-value">26</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Status</div>
-                            <div class="metric-value" style="font-size: 1em; opacity: 0.7;">offline</div>
-                        </div>
-                    </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar">
-                            <div class="progress-exercised" style="width: 21.21%;"></div>
-                            <div class="progress-discovered" style="width: 78.79%;"></div>
-                        </div>
-                        <div class="progress-label">7 exercised / 26 discovered</div>
-                    </div>
-                </div>
-
-                <!-- cargo-cats-dataservice (online) -->
-                <div class="app-card critical">
-                    <div class="app-header">
-                        <div class="app-name">cargo-cats-dataservice</div>
-                        <div class="coverage-badge critical">21.21%</div>
-                    </div>
-                    <div class="app-metrics">
-                        <div class="metric-item">
-                            <div class="metric-label">Total Routes</div>
-                            <div class="metric-value">33</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Exercised</div>
-                            <div class="metric-value">7</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Discovered</div>
-                            <div class="metric-value">26</div>
-                        </div>
-                        <div class="metric-item">
-                            <div class="metric-label">Status</div>
-                            <div class="metric-value" style="font-size: 1em; color: #00ff88;">online</div>
-                        </div>
-                    </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar">
-                            <div class="progress-exercised" style="width: 21.21%;"></div>
-                            <div class="progress-discovered" style="width: 78.79%;"></div>
-                        </div>
-                        <div class="progress-label">7 exercised / 26 discovered</div>
-                    </div>
-                    <div class="vuln-alert critical">
-                        <span class="vuln-icon">🚨</span>
-                        <span class="vuln-text"><strong>CRITICAL:</strong> 1 CRITICAL vulnerability found in exercised route /payments</span>
-                    </div>
-                    <div class="route-list">
-                        <div class="route-list-header">Vulnerable Exercised Route:</div>
-                        <div class="route-item has-vuln">
-                            <strong>GET /payments</strong> - executeRawQuery() - 1 CRITICAL SQL Injection vulnerability
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Key Insights -->
-        <section style="margin-top: 40px;">
-            <h2 class="section-title">Key Insights</h2>
-
-            <div class="chart-container">
-                <h2>Coverage Analysis</h2>
-                <div style="padding: 20px; line-height: 1.8;">
-                    <p style="margin-bottom: 15px;"><strong style="color: #00ff88;">Best Performers:</strong></p>
-                    <ul style="margin-left: 20px; margin-bottom: 20px;">
-                        <li>CargoCats-frontgateservice: 100% coverage (43/43 routes exercised)</li>
-                        <li>CargoCats-imageservice: 100% coverage (3/3 routes exercised)</li>
-                        <li>cargo-cats-frontgateservice: 80.95% coverage (34/42 routes exercised)</li>
-                    </ul>
-
-                    <p style="margin-bottom: 15px;"><strong style="color: #ff4444;">Areas Requiring Attention:</strong></p>
-                    <ul style="margin-left: 20px; margin-bottom: 20px;">
-                        <li>cargo-cats-dataservice: 21.21% coverage (7/33 routes) - <strong style="color: #ff0000;">CRITICAL vulnerability in exercised route</strong></li>
-                        <li>CargoCats-dataservice: 21.21% coverage (7/33 routes)</li>
-                        <li>CargoCats-labelservice: 25% coverage (1/4 routes)</li>
-                    </ul>
-
-                    <p style="margin-bottom: 15px;"><strong style="color: #ffaa00;">Security Findings:</strong></p>
-                    <ul style="margin-left: 20px;">
-                        <li><strong style="color: #ff0000;">1 CRITICAL</strong> SQL Injection vulnerability in cargo-cats-dataservice (GET /payments route)</li>
-                        <li>10 total vulnerabilities found across exercised routes in 4 applications</li>
-                        <li>Applications with vulnerabilities need immediate remediation focus</li>
-                        <li>Low coverage in dataservice applications exposes potential untested attack surfaces</li>
-                    </ul>
-                </div>
-            </div>
+            <div class="app-grid" id="appGrid"></div>
         </section>
 
         <footer>
             <p>Generated using Contrast Security MCP Server | <a href="https://www.contrastsecurity.com" target="_blank" style="color: #667eea;">contrastsecurity.com</a></p>
-            <p style="margin-top: 10px; font-size: 0.9em;">Repository: contrast-generated-reports</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Static snapshot: <a href="route_coverage_static.html" style="color: #667eea;">route_coverage_static.html</a></p>
         </footer>
     </div>
 
+    <script>window.FROZEN_DATA = {"capturedAt":"2026-10-21T18:46:30.906Z","payload":{"source":"live","generatedAt":"2026-10-21T18:46:35.769Z","totals":{"totalRoutes":100,"exercised":46,"discovered":54,"coveragePercent":46,"vulnerabilities":13,"criticalVulnerabilities":1},"apps":[{"name":"SAML-cargocats-webhookservice","appId":"8c909556-4a56-48a1-971c-bf376dc0bbcc","language":"Python","status":"online","totalRoutes":4,"exercised":2,"discovered":2,"coveragePercent":50,"vulnerabilities":1,"criticalVulnerabilities":0,"routes":[{"url":"/testConnection","verb":"OPTIONS","status":"EXERCISED","vulnerabilities":1},{"url":"/","verb":"OPTIONS","status":"EXERCISED","vulnerabilities":0},{"url":"/webhookNotify","verb":"OPTIONS","status":"DISCOVERED","vulnerabilities":0},{"url":"/static/\u003cpath:filename>","verb":"HEAD","status":"DISCOVERED","vulnerabilities":0}]},{"name":"SAML-cargocats-reportservice","appId":"3b65e748-6ee5-40e7-9848-b1429d4de613","language":"Java","status":"online","totalRoutes":4,"exercised":2,"discovered":2,"coveragePercent":50,"vulnerabilities":3,"criticalVulnerabilities":0,"routes":[{"url":"/template","verb":"POST","status":"EXERCISED","vulnerabilities":2},{"url":"/health","verb":"GET","status":"EXERCISED","vulnerabilities":1},{"url":"/template","verb":"GET","status":"DISCOVERED","vulnerabilities":0},{"url":"/insight","verb":"POST","status":"DISCOVERED","vulnerabilities":0}]},{"name":"SAML-cargocats-labelservice","appId":"bfb73036-2d10-4989-babc-454cd35ee1fb","language":"Node","status":"online","totalRoutes":2,"exercised":1,"discovered":1,"coveragePercent":50,"vulnerabilities":3,"criticalVulnerabilities":0,"routes":[{"url":"/generate-label","verb":"POST","status":"EXERCISED","vulnerabilities":3},{"url":"/health","verb":"","status":"DISCOVERED","vulnerabilities":0}]},{"name":"SAML-cargocats-imageservice","appId":"ad27510a-9fa4-491c-aea9-831079debf1e","language":".NET Core","status":"online","totalRoutes":3,"exercised":2,"discovered":1,"coveragePercent":66.67,"vulnerabilities":0,"criticalVulnerabilities":0,"routes":[{"url":"/savephoto","verb":"POST","status":"EXERCISED","vulnerabilities":0},{"url":"/getphoto","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/","verb":"GET","status":"DISCOVERED","vulnerabilities":0}]},{"name":"SAML-cargocats-frontgateservice","appId":"2c2c2998-e96c-4f40-8171-ae2b033f2ddb","language":"Java","status":"online","totalRoutes":48,"exercised":32,"discovered":16,"coveragePercent":66.67,"vulnerabilities":5,"criticalVulnerabilities":0,"routes":[{"url":"/login","verb":"GET","status":"EXERCISED","vulnerabilities":1},{"url":"/","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/api/webhook/test-connection","verb":"POST","status":"EXERCISED","vulnerabilities":0},{"url":"/api/shipments/track","verb":"GET","status":"EXERCISED","vulnerabilities":1},{"url":"/api/reports/generate","verb":"POST","status":"EXERCISED","vulnerabilities":0},{"url":"/api/labels/generate","verb":"POST","status":"EXERCISED","vulnerabilities":0},{"url":"/api/documents/process","verb":"POST","status":"EXERCISED","vulnerabilities":0},{"url":"/api/photos/view","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/api/photos/upload","verb":"POST","status":"EXERCISED","vulnerabilities":0},{"url":"/api/addresses/import","verb":"POST","status":"EXERCISED","vulnerabilities":1},{"url":"/dashboard","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/api/payments/process","verb":"POST","status":"EXERCISED","vulnerabilities":0},{"url":"/api/cats","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/register","verb":"POST","status":"EXERCISED","vulnerabilities":2},{"url":"/webhooks/","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/reports","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/api/shipments/{id}/cat","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/api/cats/{id}","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/shipments","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/api/shipments/{id}/fromAddress","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/api/addresses","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/api/shipments/","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/api/addresses/export","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/cats/","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/register","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/api/shipments/{n}/toAddress","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/addresses/","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/api/shipments/{id}/status","verb":"PATCH","status":"EXERCISED","vulnerabilities":0},{"url":"/api/cats","verb":"POST","status":"EXERCISED","vulnerabilities":0},{"url":"/api/shipments","verb":"POST","status":"EXERCISED","vulnerabilities":0},{"url":"/api/addresses","verb":"POST","status":"EXERCISED","vulnerabilities":0},{"url":"/api/cats/facts","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/api/ai/health","verb":"GET","status":"DISCOVERED","vulnerabilities":0},{"url":"/api/webhook/test-shipment-notification","verb":"POST","status":"DISCOVERED","vulnerabilities":0},{"url":"/api/webhook/notify-form","verb":"POST","status":"DISCOVERED","vulnerabilities":0},{"url":"/api/reports/summarize","verb":"POST","status":"DISCOVERED","vulnerabilities":0},{"url":"/api/cats/{id}","verb":"DELETE","status":"DISCOVERED","vulnerabilities":0},{"url":"/api/webhook/test-connection-form","verb":"POST","status":"DISCOVERED","vulnerabilities":0},{"url":"/api/labels/example","verb":"GET","status":"DISCOVERED","vulnerabilities":0},{"url":"/api/shipments/{id}/webhook","verb":"PATCH","status":"DISCOVERED","vulnerabilities":0},{"url":"/api/addresses/{id}","verb":"DELETE","status":"DISCOVERED","vulnerabilities":0},{"url":"/api/documents/health","verb":"GET","status":"DISCOVERED","vulnerabilities":0},{"url":"/api/labels/health","verb":"GET","status":"DISCOVERED","vulnerabilities":0},{"url":"/api/reports/health","verb":"GET","status":"DISCOVERED","vulnerabilities":0},{"url":"/api/webhook/notify","verb":"POST","status":"DISCOVERED","vulnerabilities":0},{"url":"/api/ai/openai","verb":"GET","status":"DISCOVERED","vulnerabilities":0},{"url":"/api/webhook/health","verb":"GET","status":"DISCOVERED","vulnerabilities":0},{"url":"/api/photos","verb":"GET","status":"DISCOVERED","vulnerabilities":0}]},{"name":"SAML-cargocats-docservice","appId":"55404d90-2ab9-406a-9ab4-bfec04a68287","language":"Python","status":"online","totalRoutes":4,"exercised":1,"discovered":3,"coveragePercent":25,"vulnerabilities":0,"criticalVulnerabilities":0,"routes":[{"url":"/process-docx","verb":"POST","status":"EXERCISED","vulnerabilities":0},{"url":"/static/\u003cpath:filename>","verb":"OPTIONS","status":"DISCOVERED","vulnerabilities":0},{"url":"/health","verb":"GET","status":"DISCOVERED","vulnerabilities":0},{"url":"/","verb":"GET","status":"DISCOVERED","vulnerabilities":0}]},{"name":"SAML-cargocats-dataservice","appId":"84cb3ae3-42bf-41c9-b77b-980319602dad","language":"Java","status":"online","totalRoutes":33,"exercised":6,"discovered":27,"coveragePercent":18.18,"vulnerabilities":1,"criticalVulnerabilities":1,"routes":[{"url":"/payments","verb":"GET","status":"EXERCISED","vulnerabilities":1},{"url":"/shipments/search/findByTrackingId","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/shipments/{n}","verb":"PUT","status":"EXERCISED","vulnerabilities":0},{"url":"/cats/.htaccess","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/shipments/{n}/toAddress","verb":"GET","status":"EXERCISED","vulnerabilities":0},{"url":"/{repository}","verb":"POST","status":"EXERCISED","vulnerabilities":0},{"url":"/","verb":"HEAD","status":"DISCOVERED","vulnerabilities":0},{"url":"/","verb":"OPTIONS","status":"DISCOVERED","vulnerabilities":0},{"url":"/{repository}/{id}/{property}/{propertyId}","verb":"DELETE","status":"DISCOVERED","vulnerabilities":0},{"url":"/profile","verb":"OPTIONS","status":"DISCOVERED","vulnerabilities":0},{"url":"/profile","verb":"GET","status":"DISCOVERED","vulnerabilities":0},{"url":"/{repository}/{id}/{property}","verb":"DELETE","status":"DISCOVERED","vulnerabilities":0},{"url":"/{repository}/search/{search}","verb":"HEAD","status":"DISCOVERED","vulnerabilities":0},{"url":"/{repository}/{id}/{property}","verb":"PUT","status":"DISCOVERED","vulnerabilities":0},{"url":"/profile/{repository}","verb":"GET","status":"DISCOVERED","vulnerabilities":0},{"url":"/{repository}/{id}","verb":"DELETE","status":"DISCOVERED","vulnerabilities":0},{"url":"/{repository}/search","verb":"OPTIONS","status":"DISCOVERED","vulnerabilities":0},{"url":"/{repository}/search","verb":"GET","status":"DISCOVERED","vulnerabilities":0},{"url":"/profile/{repository}","verb":"GET","status":"DISCOVERED","vulnerabilities":0},{"url":"/{repository}/{id}","verb":"HEAD","status":"DISCOVERED","vulnerabilities":0},{"url":"/{repository}","verb":"HEAD","status":"DISCOVERED","vulnerabilities":0},{"url":"/{repository}/search","verb":"HEAD","status":"DISCOVERED","vulnerabilities":0},{"url":"/{repository}/{id}/{property}/{propertyId}","verb":"GET","status":"DISCOVERED","vulnerabilities":0},{"url":"/","verb":"GET","status":"DISCOVERED","vulnerabilities":0},{"url":"/{repository}","verb":"OPTIONS","status":"DISCOVERED","vulnerabilities":0},{"url":"/{repository}/{id}","verb":"OPTIONS","status":"DISCOVERED","vulnerabilities":0},{"url":"/{repository}","verb":"GET","status":"DISCOVERED","vulnerabilities":0},{"url":"/{repository}","verb":"GET","status":"DISCOVERED","vulnerabilities":0},{"url":"/{repository}/{id}","verb":"PATCH","status":"DISCOVERED","vulnerabilities":0},{"url":"/{repository}/{id}/{property}","verb":"GET","status":"DISCOVERED","vulnerabilities":0},{"url":"/{repository}/search/{search}","verb":"GET","status":"DISCOVERED","vulnerabilities":0},{"url":"/{repository}/search/{search}","verb":"OPTIONS","status":"DISCOVERED","vulnerabilities":0},{"url":"/profile/{repository}","verb":"OPTIONS","status":"DISCOVERED","vulnerabilities":0}]},{"name":"SAML-cargocats-aiservice","appId":"4c3cb4f9-6d46-438d-9bfe-f4182f515fdf","language":"Java","status":"online","totalRoutes":2,"exercised":0,"discovered":2,"coveragePercent":0,"vulnerabilities":0,"criticalVulnerabilities":0,"routes":[{"url":"/api/ai/openai","verb":"GET","status":"DISCOVERED","vulnerabilities":0},{"url":"/api/ai/health","verb":"GET","status":"DISCOVERED","vulnerabilities":0}]}],"mcp":[{"tool":"search_applications","args":{"pageSize":100},"ms":343,"rows":8,"totalItems":8,"bytes":1846},{"tool":"get_route_coverage","args":{"appId":"8c909556-4a56-48a1-971c-bf376dc0bbcc"},"ms":296,"rows":4,"totalItems":4,"bytes":1696},{"tool":"get_route_coverage","args":{"appId":"3b65e748-6ee5-40e7-9848-b1429d4de613"},"ms":355,"rows":4,"totalItems":4,"bytes":1906},{"tool":"get_route_coverage","args":{"appId":"bfb73036-2d10-4989-babc-454cd35ee1fb"},"ms":322,"rows":2,"totalItems":2,"bytes":996},{"tool":"get_route_coverage","args":{"appId":"ad27510a-9fa4-491c-aea9-831079debf1e"},"ms":323,"rows":3,"totalItems":3,"bytes":1196},{"tool":"get_route_coverage","args":{"appId":"2c2c2998-e96c-4f40-8171-ae2b033f2ddb"},"ms":853,"rows":48,"totalItems":48,"bytes":19312},{"tool":"get_route_coverage","args":{"appId":"55404d90-2ab9-406a-9ab4-bfec04a68287"},"ms":346,"rows":4,"totalItems":4,"bytes":1688},{"tool":"get_route_coverage","args":{"appId":"84cb3ae3-42bf-41c9-b77b-980319602dad"},"ms":745,"rows":33,"totalItems":33,"bytes":17308},{"tool":"get_route_coverage","args":{"appId":"4c3cb4f9-6d46-438d-9bfe-f4182f515fdf"},"ms":277,"rows":2,"totalItems":2,"bytes":936}],"capturedAt":null}};</script>
+    <script src="assets/reports.js"></script>
     <script>
-        // Chart.js configuration
+        // Shared behaviour lives in assets/reports.js so a fix lands once, not eight times.
+        const { esc, shortApp, HOSTED, hostedNotice, failureBanner } = Reports;
+        const charts = {};
         Chart.defaults.color = '#fff';
         Chart.defaults.borderColor = 'rgba(102, 126, 234, 0.3)';
+        function tier(pct) {
+            if (pct >= 90) return 'excellent';
+            if (pct >= 70) return 'good';
+            if (pct >= 50) return 'medium';
+            if (pct >= 25) return 'poor';
+            return 'critical';
+        }
 
-        // Coverage Distribution Doughnut Chart
-        const coverageCtx = document.getElementById('coverageChart').getContext('2d');
-        new Chart(coverageCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Exercised Routes', 'Discovered Routes'],
-                datasets: [{
-                    data: [110, 71],
-                    backgroundColor: [
-                        '#00ff88',
-                        '#667eea'
-                    ],
-                    borderWidth: 2,
-                    borderColor: '#0a0e27'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 20,
-                            font: {
-                                size: 14
-                            }
-                        }
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const label = context.label || '';
-                                const value = context.parsed || 0;
-                                const total = 181;
-                                const percentage = ((value / total) * 100).toFixed(1);
-                                return `${label}: ${value} (${percentage}%)`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
+        function renderStats(t) {
+            document.getElementById('stats').innerHTML = [
+                ['Total Routes', t.totalRoutes],
+                ['Exercised Routes', t.exercised],
+                ['Discovered Routes', t.discovered],
+                ['Average Coverage', t.coveragePercent + '%'],
+            ].map(([label, value]) => `<div class="stat-card"><div class="stat-label">${label}</div><div class="stat-number">${value}</div></div>`).join('');
+        }
 
-        // Routes by Application Bar Chart
-        const routesCtx = document.getElementById('routesChart').getContext('2d');
-        new Chart(routesCtx, {
-            type: 'bar',
-            data: {
-                labels: ['frontgateservice', 'dataservice', 'webhookservice', 'docservice', 'imageservice', 'labelservice'],
-                datasets: [
-                    {
-                        label: 'Exercised',
-                        data: [77, 14, 6, 4, 5, 2],
-                        backgroundColor: '#00ff88'
-                    },
-                    {
-                        label: 'Discovered',
-                        data: [8, 52, 2, 4, 1, 4],
-                        backgroundColor: '#667eea'
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        stacked: true,
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            font: {
-                                size: 12
-                            }
-                        }
-                    },
-                    y: {
-                        stacked: true,
-                        beginAtZero: true,
-                        ticks: {
-                            stepSize: 10,
-                            font: {
-                                size: 12
-                            }
-                        },
-                        grid: {
-                            color: 'rgba(102, 126, 234, 0.2)'
-                        }
-                    }
+        function appCard(a) {
+            const cls = tier(a.coveragePercent);
+            const icon = a.criticalVulnerabilities ? '🚨' : '⚠️';
+            const crit = a.criticalVulnerabilities ? `, ${a.criticalVulnerabilities} critical` : '';
+            const vulnAlert = a.vulnerabilities
+                ? `<div class="vuln-alert ${a.criticalVulnerabilities ? 'critical' : 'warning'}"><span class="vuln-icon">${icon}</span><span class="vuln-text">${a.vulnerabilities} vulnerabilit${a.vulnerabilities === 1 ? 'y' : 'ies'} on routes${crit}</span></div>`
+                : '';
+            const routes = (a.routes || []).map((r) => {
+                const flag = r.vulnerabilities ? ` <strong style="color:#ff6666;">${r.vulnerabilities} vuln</strong>` : '';
+                return `<div class="route-item ${r.vulnerabilities ? 'has-vuln' : ''} ${r.status === 'DISCOVERED' ? 'unexercised' : ''}"><span class="route-verb">${esc(r.verb || '—')}</span> ${esc(r.url)}${flag}</div>`;
+            }).join('');
+            const shown = (a.routes || []).length;
+            const heading = shown === a.totalRoutes ? `All ${shown} routes` : `${shown} of ${a.totalRoutes} routes`;
+            const routeBlock = routes
+                ? `<button class="route-toggle" data-app="${esc(a.appId)}">Show routes</button><div class="route-list" id="routes-${esc(a.appId)}" style="display:none;"><div class="route-list-header">${heading}</div>${routes}</div>`
+                : '';
+            return `<div class="app-card ${cls}">
+                <div class="app-header">
+                    <div class="app-name">${esc(shortApp(a.name))}</div>
+                    <div class="coverage-badge ${cls}">${a.coveragePercent}%</div>
+                </div>
+                <div class="app-metrics">
+                    <div class="metric-item"><div class="metric-label">Total Routes</div><div class="metric-value">${a.totalRoutes}</div></div>
+                    <div class="metric-item"><div class="metric-label">Exercised</div><div class="metric-value">${a.exercised}</div></div>
+                    <div class="metric-item"><div class="metric-label">Discovered</div><div class="metric-value">${a.discovered}</div></div>
+                    <div class="metric-item"><div class="metric-label">Language</div><div class="metric-value" style="font-size: 1em; opacity: 0.7;">${esc(a.language || '—')}</div></div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar">
+                        <div class="progress-exercised" style="width: ${a.coveragePercent}%;"></div>
+                        <div class="progress-discovered" style="width: ${(100 - a.coveragePercent).toFixed(2)}%;"></div>
+                    </div>
+                    <div class="progress-label">${a.exercised} exercised / ${a.discovered} discovered</div>
+                </div>
+                ${vulnAlert}
+                ${routeBlock}
+            </div>`;
+        }
+
+        function renderApps(apps) {
+            const grid = document.getElementById('appGrid');
+            grid.innerHTML = apps.slice().sort((a, b) => b.totalRoutes - a.totalRoutes).map(appCard).join('');
+            grid.querySelectorAll('.route-toggle').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const list = document.getElementById('routes-' + btn.dataset.app);
+                    const open = list.style.display !== 'none';
+                    list.style.display = open ? 'none' : 'block';
+                    btn.textContent = open ? 'Show routes' : 'Hide routes';
+                });
+            });
+        }
+
+        function upsertChart(id, config) {
+            if (charts[id]) charts[id].destroy();
+            charts[id] = new Chart(document.getElementById(id).getContext('2d'), config);
+        }
+
+        function renderCharts(d) {
+            upsertChart('coverageChart', {
+                type: 'doughnut',
+                data: {
+                    labels: ['Exercised', 'Discovered only'],
+                    datasets: [{ data: [d.totals.exercised, d.totals.discovered], backgroundColor: ['#00c878', '#667eea'], borderWidth: 2, borderColor: '#0a0e27' }],
                 },
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 15,
-                            font: {
-                                size: 13
-                            }
-                        }
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { padding: 20, font: { size: 14 } } },
+                        tooltip: { callbacks: { label: (c) => { const t = c.dataset.data.reduce((a, b) => a + b, 0); return `${c.label}: ${c.parsed} (${t ? ((c.parsed / t) * 100).toFixed(1) : 0}%)`; } } },
                     },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        callbacks: {
-                            footer: function(tooltipItems) {
-                                let total = 0;
-                                tooltipItems.forEach(function(tooltipItem) {
-                                    total += tooltipItem.parsed.y;
-                                });
-                                return 'Total: ' + total;
-                            }
-                        }
-                    }
-                }
+                },
+            });
+            const apps = d.apps.slice().sort((a, b) => b.totalRoutes - a.totalRoutes);
+            upsertChart('routesChart', {
+                type: 'bar',
+                data: {
+                    labels: apps.map((a) => shortApp(a.name)),
+                    datasets: [
+                        { label: 'Exercised', data: apps.map((a) => a.exercised), backgroundColor: '#00c878' },
+                        { label: 'Discovered only', data: apps.map((a) => a.discovered), backgroundColor: '#667eea' },
+                    ],
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11 } } },
+                        y: { stacked: true, beginAtZero: true, grid: { color: 'rgba(102, 126, 234, 0.2)' } },
+                    },
+                    plugins: { legend: { position: 'bottom', labels: { padding: 15, font: { size: 13 } } }, tooltip: { mode: 'index', intersect: false } },
+                },
+            });
+        }
+
+        async function load() {
+            const banner = document.getElementById('errorBanner');
+            banner.style.display = 'none';
+            if (HOSTED) { hostedNotice(); return; }
+            try {
+                const res = await fetch('/api/routes', { cache: 'no-store' });
+                const ct = res.headers.get('content-type') || '';
+                if (!ct.includes('json')) throw new Error('NOT_REPORT_SERVER');
+                const d = await res.json();
+                if (!res.ok) throw new Error(d.error || res.statusText);
+                Reports.markLoaded(d);
+                renderStats(d.totals); renderCharts(d); renderApps(d.apps);
+            } catch (err) {
+                const b = document.getElementById('sourceBadge');
+                b.textContent = 'NO DATA';
+                b.className = 'source-badge mock';
+                failureBanner(err);
             }
-        });
+        }
+
+        document.getElementById('refreshBtn').addEventListener('click', load);
+        load();
     </script>
 </body>
 </html>

@@ -19,8 +19,25 @@
     return String(name == null ? '' : name).replace(/^SAML-cargocats-/, '');
   }
 
-  // Served from GitHub Pages there is no local server to call.
-  var HOSTED = ['localhost', '127.0.0.1', ''].indexOf(global.location.hostname) === -1;
+  // A frozen snapshot carries its own data, so it needs no server at all. The
+  // fetch interceptor below means pages do not have to know about this.
+  var FROZEN = global.FROZEN_DATA || null;
+
+  if (FROZEN) {
+    var realFetch = global.fetch ? global.fetch.bind(global) : null;
+    global.fetch = function (url, opts) {
+      if (String(url).indexOf('/api/') === 0) {
+        return Promise.resolve(new Response(JSON.stringify(FROZEN.payload), {
+          status: 200, headers: { 'Content-Type': 'application/json' },
+        }));
+      }
+      return realFetch ? realFetch(url, opts) : Promise.reject(new Error('offline'));
+    };
+  }
+
+  // Served from GitHub Pages there is no local server to call, unless the page
+  // is a frozen snapshot, in which case it already has everything it needs.
+  var HOSTED = !FROZEN && ['localhost', '127.0.0.1', ''].indexOf(global.location.hostname) === -1;
 
   function snapshotHref() {
     return global.location.pathname.split('/').pop().replace(/\.html$/, '_static.html');
@@ -178,10 +195,42 @@
     });
   }
 
+  function ageInDays(iso) {
+    return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  }
+
+  function frozenNotice() {
+    var when = new Date(FROZEN.capturedAt);
+    var days = ageInDays(FROZEN.capturedAt);
+    banner('<strong>Frozen snapshot.</strong> This is real data from the Contrast organization, captured '
+      + when.toLocaleDateString() + (days > 0 ? ', ' + days + (days === 1 ? ' day' : ' days') + ' ago' : ' today')
+      + '. Nothing here updates, and controls that would fetch more data will keep showing this same capture. '
+      + 'Run the project locally for the live version.', 'info');
+  }
+
   function markLoaded(d) {
+    if (FROZEN) {
+      badge('SNAPSHOT', 'mock');
+      var el0 = document.getElementById('updated');
+      if (el0) el0.textContent = 'Captured ' + new Date(FROZEN.capturedAt).toLocaleDateString();
+      frozenNotice();
+      renderMcpPanel(d.mcp, 'frozen');
+      return;
+    }
     badge(d.source === 'live' ? 'LIVE' : 'MOCK DATA', d.source === 'live' ? 'live' : 'mock');
     var el = document.getElementById('updated');
-    if (el) el.textContent = 'Last refreshed ' + new Date(d.generatedAt).toLocaleTimeString();
+    if (el) {
+      if (d.source === 'live') {
+        el.textContent = 'Last refreshed ' + new Date(d.generatedAt).toLocaleTimeString();
+      } else if (d.capturedAt) {
+        // Sample data should always admit its age rather than pass as current.
+        var days = ageInDays(d.capturedAt);
+        el.textContent = 'Sample data captured ' + new Date(d.capturedAt).toLocaleDateString()
+          + (days > 0 ? ', ' + days + (days === 1 ? ' day' : ' days') + ' ago' : ', today');
+      } else {
+        el.textContent = 'Sample data, capture date unknown';
+      }
+    }
     renderMcpPanel(d.mcp, d.source);
   }
 
@@ -208,6 +257,7 @@
     esc: esc,
     shortApp: shortApp,
     HOSTED: HOSTED,
+    FROZEN: FROZEN,
     badge: badge,
     banner: banner,
     clearBanner: clearBanner,

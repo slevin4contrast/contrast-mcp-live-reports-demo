@@ -6,6 +6,16 @@ const path = require('path');
 const contrast = require('./lib/mcp');
 
 const PORT = process.env.PORT || 3000;
+
+// When serving sample data, say how old it is. A snapshot that silently drifts
+// is exactly the failure this project was built to fix.
+function capturedAt() {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'captured.json'), 'utf8')).capturedAt;
+  } catch {
+    return null;
+  }
+}
 const MOCK = process.env.MOCK === '1' || !contrast.configured();
 
 function summarize(items) {
@@ -226,7 +236,7 @@ http.createServer(async (req, res) => {
       contrast.beginTrace();
       const payload = await routes[pathname](searchParams);
       const mcp = contrast.endTrace();
-      const body = JSON.stringify({ ...payload, mcp });
+      const body = JSON.stringify({ ...payload, mcp, capturedAt: MOCK ? capturedAt() : null });
       res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
       return res.end(body);
     } catch (err) {

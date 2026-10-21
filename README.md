@@ -126,9 +126,17 @@ so the hosted copy serves the `_static` snapshots instead and says so on every p
 rewrites its own links and relabels the badges when it detects it is not running on localhost.
 To see the reports pull live data, clone the repo and run it locally.
 
-Each live page keeps its original static version next to it, named with a `_static` suffix.
-Those open directly in a browser with no server running, which makes them a safe fallback for a
-demo with no network.
+Each live page has a frozen copy beside it, named with a `_static` suffix. These are not
+hand-written: `npm run snapshot` takes the real page, freezes a real API response into it, and
+the shared module serves that instead of fetching. They open with no server and no network, and
+label themselves with their capture date, which makes them a safe fallback and an honest one.
+
+Regenerate both kinds of captured data when the org changes:
+
+```bash
+npm run fixtures    # sample data for MOCK mode
+npm run snapshot    # frozen _static pages (server must be running live)
+```
 
 ## Static pages
 

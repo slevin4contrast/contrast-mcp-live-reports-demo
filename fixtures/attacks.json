@@ -1,26 +1,25 @@
 [
  {
-  "id": "3024263e-801d-4695-aaaa-84d58a23528e",
-  "source": "10.1.12.212",
-  "status": "PROBED",
-  "probes": 365,
+  "id": "6feac2be-06eb-48da-b6f7-cd0a2213eb8f",
+  "source": "10.1.12.234",
+  "status": "EXPLOITED",
+  "probes": 40,
   "rules": [
    "Command Injection",
-   "Expression Language Injection",
+   "JNDI Injection",
+   "Log4j2 Remote Code Execution Vulnerability (also known as Log4Shell), CVE-2021-45046",
    "Path Traversal",
    "SQL Injection",
-   "Spring Expression Language Injection Vulnerability",
-   "Struts 1 ClassLoader Property Overwrite Vulnerability",
-   "Struts 2 ParametersInterceptor OGNL RCE Vulnerability"
+   "Untrusted Deserialization"
   ],
-  "startTime": "2026-10-05T13:36:32+00:00",
-  "endTime": "2026-10-05T13:47:48+00:00",
+  "startTime": "2026-10-13T13:46:10+00:00",
+  "endTime": "2026-10-13T13:46:54+00:00",
   "targets": [
    {
     "app": "SAML-cargocats-frontgateservice",
     "language": "Java",
     "severity": "MEDIUM",
-    "status": "PROBED"
+    "status": "EXPLOITED"
    }
   ]
  },
@@ -133,26 +132,27 @@
   ]
  },
  {
-  "id": "6feac2be-06eb-48da-b6f7-cd0a2213eb8f",
-  "source": "10.1.12.234",
-  "status": "EXPLOITED",
-  "probes": 40,
+  "id": "3024263e-801d-4695-aaaa-84d58a23528e",
+  "source": "10.1.12.212",
+  "status": "PROBED",
+  "probes": 365,
   "rules": [
    "Command Injection",
-   "JNDI Injection",
-   "Log4j2 Remote Code Execution Vulnerability (also known as Log4Shell), CVE-2021-45046",
+   "Expression Language Injection",
    "Path Traversal",
    "SQL Injection",
-   "Untrusted Deserialization"
+   "Spring Expression Language Injection Vulnerability",
+   "Struts 1 ClassLoader Property Overwrite Vulnerability",
+   "Struts 2 ParametersInterceptor OGNL RCE Vulnerability"
   ],
-  "startTime": "2026-10-13T13:46:10+00:00",
-  "endTime": "2026-10-13T13:46:54+00:00",
+  "startTime": "2026-10-05T13:36:32+00:00",
+  "endTime": "2026-10-05T13:47:48+00:00",
   "targets": [
    {
     "app": "SAML-cargocats-frontgateservice",
     "language": "Java",
     "severity": "MEDIUM",
-    "status": "EXPLOITED"
+    "status": "PROBED"
    }
   ]
  }

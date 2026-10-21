@@ -70,6 +70,22 @@ async function main() {
     });
   }
 
+  // The snapshots are what GitHub Pages serves and what every error links to,
+  // so they must carry real captured data, not the invented numbers they began with.
+  for (const f of fs.readdirSync(ROOT).filter((n) => n.endsWith('_static.html'))) {
+    check(`${f} carries frozen data`, () => {
+      const src = fs.readFileSync(path.join(ROOT, f), 'utf8');
+      if (!src.includes('window.FROZEN_DATA')) return 'no frozen payload, this is a hand-written snapshot';
+      const m = src.match(/window\.FROZEN_DATA = (\{[\s\S]*?\});<\/script>/);
+      if (!m) return 'frozen payload is malformed';
+      let parsed;
+      try { parsed = JSON.parse(m[1].replace(/\\u003c/g, '<')); } catch (e) { return 'frozen payload is not valid JSON'; }
+      if (!parsed.capturedAt) return 'frozen payload has no capture date';
+      if (parsed.payload && parsed.payload.source !== 'live') return `captured from ${parsed.payload.source}, not live`;
+      return null;
+    });
+  }
+
   check('no credentials committed', () => {
     const tracked = execFileSync('git', ['ls-files'], { cwd: ROOT, encoding: 'utf8' }).split('\n').filter(Boolean);
     const banned = tracked.filter((f) => /\.env$|contrast-client\.json$|\.pem$|\.key$/.test(f));
