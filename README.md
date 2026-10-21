@@ -24,6 +24,32 @@ Authentication reuses the OAuth token Claude Code already stored in the macOS ke
 you connected the MCP server. The server reads that token per request, so a refreshed token is
 picked up automatically. The token never reaches the browser.
 
+### Making it refresh itself (recommended for demos)
+
+By default the server borrows the OAuth token Claude Code holds, and that token lasts about 15
+minutes. Renewing it means running something in Claude Code, which is fine while you are working
+but a nuisance during a long demo.
+
+Run this once and the problem goes away:
+
+```bash
+npm run setup
+```
+
+That registers this server as its own OAuth client on your Contrast tenant and saves the
+credentials to `.contrast-client.json`, which is gitignored and written chmod 600. From then on
+the server mints its own access tokens and renews them a minute before they lapse, so nothing
+expires mid-demo and Claude Code is never involved.
+
+It is deliberately safe in both directions. The server never touches Claude Code's refresh token,
+so it cannot break your MCP connection, and Claude Code cannot invalidate the server's
+credentials. To undo it, delete `.contrast-client.json` and revoke the client in Contrast; the
+server falls back to borrowing Claude Code's token.
+
+Setup reads Claude Code's current access token once to authorize the registration, so the MCP
+server needs to be connected and the token valid when you run it. If it reports a 401, run any
+Contrast command in Claude Code and try again.
+
 ### When a page says the session expired
 
 Access tokens last about 15 minutes, and this server deliberately does not refresh them (see
@@ -93,10 +119,11 @@ demo with no network.
 ## Layout
 
 ```
-server.js          Local server and API routes, no dependencies
-lib/mcp.js         Contrast MCP client, the only file that talks to the server
-fixtures/          Sample data used when no token is available
-*_static.html      Frozen snapshots of pages that are now live
+server.js                 Local server and API routes, no dependencies
+lib/mcp.js                Contrast MCP client, the only file that talks to the server
+scripts/register-client.js  One-time setup for self-refreshing credentials
+fixtures/                 Sample data used when no token is available
+*_static.html             Frozen snapshots of pages that are now live
 ```
 
 ## Adding another live page
