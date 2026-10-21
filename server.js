@@ -190,10 +190,15 @@ http.createServer(async (req, res) => {
   const { pathname, searchParams } = new URL(req.url, 'http://localhost');
   if (routes[pathname]) {
     try {
-      const body = JSON.stringify(await routes[pathname](searchParams));
+      // Record the MCP tool calls this request makes, so the page can show its work.
+      contrast.beginTrace();
+      const payload = await routes[pathname](searchParams);
+      const mcp = contrast.endTrace();
+      const body = JSON.stringify({ ...payload, mcp });
       res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
       return res.end(body);
     } catch (err) {
+      contrast.endTrace();
       console.error(err.message);
       res.writeHead(502, { 'Content-Type': 'application/json' });
       return res.end(JSON.stringify({ error: err.message }));

@@ -191,10 +191,7 @@
                 if (!ct.includes('json')) throw new Error('NOT_REPORT_SERVER');
                 const d = await res.json();
                 if (!res.ok) throw new Error(d.error || res.statusText);
-                const badge = document.getElementById('sourceBadge');
-                badge.textContent = d.source === 'live' ? 'LIVE' : 'MOCK DATA';
-                badge.className = 'source-badge ' + (d.source === 'live' ? 'live' : 'mock');
-                document.getElementById('updated').textContent = 'Last refreshed ' + new Date(d.generatedAt).toLocaleTimeString();
+                Reports.markLoaded(d);
                 renderStats(d.totals); renderCharts(d); renderAttacks(d.items);
             } catch (err) {
                 const b = document.getElementById('sourceBadge');

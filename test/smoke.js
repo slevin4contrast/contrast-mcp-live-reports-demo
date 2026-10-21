@@ -137,14 +137,26 @@ async function main() {
       return res.ok && (await res.text()).includes('<html') ? null : `HTTP ${res.status}`;
     });
 
+    await checkAsync('responses carry an MCP trace', async () => {
+      const res = await fetch(`${BASE}/api/routes`);
+      const d = await res.json();
+      if (!Array.isArray(d.mcp)) return 'no mcp array on the response';
+      return null; // mock mode makes no calls, so an empty trace is correct here
+    });
+
     // ---- pages actually render ----
     if (!SKIP_UI && fs.existsSync(chrome)) {
       for (const page of LIVE_PAGES) {
+        await checkAsync(`${page} shows the MCP panel`, async () => {
+          const { dom } = renderBadge(page);
+          return dom.includes('id="mcpPanel"') ? null : 'no MCP call panel rendered';
+        });
         await checkAsync(`${page} reaches a terminal state`, async () => {
           const { badge } = renderBadge(page);
           if (!badge) return 'no source badge found';
           if (badge === 'Loading') return 'stuck on Loading, the script probably threw';
-          return ['MOCK DATA', 'LIVE', 'SNAPSHOT'].includes(badge) ? null : `unexpected badge "${badge}"`;
+          if (!['MOCK DATA', 'LIVE', 'SNAPSHOT'].includes(badge)) return `unexpected badge "${badge}"`;
+          return null;
         });
       }
     }

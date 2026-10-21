@@ -466,10 +466,7 @@
                 const d = await res.json();
                 if (!res.ok) throw new Error(d.error || res.statusText);
                 DATA = d;
-                const badge = document.getElementById('sourceBadge');
-                badge.textContent = d.source === 'live' ? 'LIVE' : 'MOCK DATA';
-                badge.className = 'source-badge ' + (d.source === 'live' ? 'live' : 'mock');
-                document.getElementById('updated').textContent = 'Last refreshed ' + new Date(d.generatedAt).toLocaleTimeString();
+                Reports.markLoaded(d);
                 const chosen = d.detail ? d.detail.cveId : null;
                 renderPicker(d.list, chosen);
                 renderList(d.list, chosen);
