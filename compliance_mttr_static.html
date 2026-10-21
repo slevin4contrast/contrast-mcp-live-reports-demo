@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compliance & MTTR Executive Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #e4e7eb;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-header .subtitle {
+            color: #9ca3af;
+            font-size: 1.1rem;
+        }
+
+        .dashboard-header .timestamp {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        }
+
+        .kpi-label {
+            font-size: 0.9rem;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .kpi-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .kpi-trend {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+
+        .trend-up {
+            color: #10b981;
+        }
+
+        .trend-down {
+            color: #ef4444;
+        }
+
+        .trend-neutral {
+            color: #f59e0b;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+            color: #e4e7eb;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+            padding-bottom: 15px;
+        }
+
+        .compliance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 20px;
+        }
+
+        .compliance-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid rgba(102, 126, 234, 0.15);
+        }
+
+        .compliance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .compliance-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #e4e7eb;
+        }
+
+        .compliance-score {
+            font-size: 2rem;
+            font-weight: 700;
+            padding: 5px 15px;
+            border-radius: 8px;
+        }
+
+        .score-excellent {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .score-good {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .score-poor {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .control-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            border-left: 3px solid;
+        }
+
+        .control-pass {
+            border-left-color: #10b981;
+        }
+
+        .control-fail {
+            border-left-color: #ef4444;
+        }
+
+        .control-partial {
+            border-left-color: #f59e0b;
+        }
+
+        .control-name {
+            font-weight: 500;
+            color: #e4e7eb;
+        }
+
+        .control-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .badge-pass {
+            background: #10b981;
+            color: #10b981;
+        }
+
+        .badge-fail {
+            background: #ef4444;
+            color: #ef4444;
+        }
+
+        .badge-partial {
+            background: #f59e0b;
+            color: #f59e0b;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin: 20px 0;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid rgba(102, 126, 234, 0.15);
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #e4e7eb;
+        }
+
+        .app-portfolio {
+            display: grid;
+            gap: 15px;
+        }
+
+        .app-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(102, 126, 234, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .app-card:hover {
+            transform: translateX(5px);
+            border-color: rgba(102, 126, 234, 0.4);
+        }
+
+        .app-info {
+            flex: 1;
+        }
+
+        .app-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #e4e7eb;
+            margin-bottom: 8px;
+        }
+
+        .app-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+            color: #9ca3af;
+        }
+
+        .risk-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .risk-critical {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+        }
+
+        .risk-high {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+            border: 1px solid #f59e0b;
+        }
+
+        .risk-medium {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border: 1px solid #3b82f6;
+        }
+
+        .risk-low {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid #10b981;
+        }
+
+        .benchmark-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .benchmark-item {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(102, 126, 234, 0.15);
+        }
+
+        .benchmark-label {
+            font-size: 0.9rem;
+            color: #9ca3af;
+            margin-bottom: 10px;
+        }
+
+        .benchmark-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .benchmark-comparison-text {
+            font-size: 0.85rem;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+        }
+
+        .sla-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .sla-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border: 1px solid rgba(102, 126, 234, 0.15);
+        }
+
+        .sla-severity {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sla-percentage {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .sla-met {
+            color: #10b981;
+        }
+
+        .sla-missed {
+            color: #ef4444;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #9ca3af;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .compliance-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-header h1 {
+                font-size: 1.8rem;
+            }
+        }
+
+        .alert-banner {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .alert-icon {
+            font-size: 2rem;
+        }
+
+        .alert-content h3 {
+            color: #ef4444;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .alert-content p {
+            color: #fca5a5;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Compliance & MTTR Executive Dashboard</h1>
+            <div class="subtitle">Security Posture & Remediation Performance</div>
+            <div class="timestamp">Last Updated: <span id="currentDate"></span></div>
+        </div>
+
+        <!-- Alert Banner -->
+        <div class="alert-banner">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-content">
+                <h3>Critical Attention Required</h3>
+                <p>1 Critical vulnerability and 4 High severity issues require immediate remediation to meet compliance standards.</p>
+            </div>
+        </div>
+
+        <!-- Executive Summary KPIs -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Total Vulnerabilities</div>
+                <div class="kpi-value">33</div>
+                <div class="kpi-trend trend-down">
+                    <span>↓ 12%</span>
+                    <span style="color: #9ca3af;">vs last month</span>
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-label">MTTR Critical/High</div>
+                <div class="kpi-value">3.2d</div>
+                <div class="kpi-trend trend-up">
+                    <span>↑ 8%</span>
+                    <span style="color: #9ca3af;">faster than target</span>
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-label">MTTR Medium/Low</div>
+                <div class="kpi-value">14.8d</div>
+                <div class="kpi-trend trend-up">
+                    <span>↑ 15%</span>
+                    <span style="color: #9ca3af;">improved from 17.4d</span>
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-label">Remediated This Month</div>
+                <div class="kpi-value">27</div>
+                <div class="kpi-trend trend-up">
+                    <span>↑ 23%</span>
+                    <span style="color: #9ca3af;">above target</span>
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-label">Security Posture Score</div>
+                <div class="kpi-value">78%</div>
+                <div class="kpi-trend trend-up">
+                    <span>↑ 5pts</span>
+                    <span style="color: #9ca3af;">improving</span>
+                </div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-label">SLA Compliance</div>
+                <div class="kpi-value">92%</div>
+                <div class="kpi-trend trend-up">
+                    <span>↑ 4%</span>
+                    <span style="color: #9ca3af;">meeting targets</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compliance Framework Status -->
+        <div class="section">
+            <h2 class="section-title">Compliance Framework Status</h2>
+
+            <div class="compliance-grid">
+                <!-- NIST 800-53 -->
+                <div class="compliance-card">
+                    <div class="compliance-header">
+                        <div class="compliance-name">NIST 800-53</div>
+                        <div class="compliance-score score-good">76%</div>
+                    </div>
+                    <div class="control-list">
+                        <div class="control-item control-pass">
+                            <div class="control-name">AC-3 Access Enforcement</div>
+                            <div class="control-status">
+                                <span class="status-badge badge-pass"></span>
+                                <span style="color: #10b981;">PASS</span>
+                            </div>
+                        </div>
+                        <div class="control-item control-fail">
+                            <div class="control-name">SI-2 Flaw Remediation</div>
+                            <div class="control-status">
+                                <span class="status-badge badge-fail"></span>
+                                <span style="color: #ef4444;">FAIL</span>
+                            </div>
+                        </div>
+                        <div class="control-item control-partial">
+                            <div class="control-name">SC-7 Boundary Protection</div>
+                            <div class="control-status">
+                                <span class="status-badge badge-partial"></span>
+                                <span style="color: #f59e0b;">PARTIAL</span>
+                            </div>
+                        </div>
+                        <div class="control-item control-pass">
+                            <div class="control-name">AU-12 Audit Generation</div>
+                            <div class="control-status">
+                                <span class="status-badge badge-pass"></span>
+                                <span style="color: #10b981;">PASS</span>
+                            </div>
+                        </div>
+                        <div class="control-item control-fail">
+                            <div class="control-name">SI-10 Input Validation</div>
+                            <div class="control-status">
+                                <span class="status-badge badge-fail"></span>
+                                <span style="color: #ef4444;">FAIL</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 76%;"></div>
+                    </div>
+                </div>
+
+                <!-- PCI-DSS -->
+                <div class="compliance-card">
+                    <div class="compliance-header">
+                        <div class="compliance-name">PCI-DSS v4.0</div>
+                        <div class="compliance-score score-poor">68%</div>
+                    </div>
+                    <div class="control-list">
+                        <div class="control-item control-fail">
+                            <div class="control-name">Req 6.2 Secure Coding</div>
+                            <div class="control-status">
+                                <span class="status-badge badge-fail"></span>
+                                <span style="color: #ef4444;">FAIL</span>
+                            </div>
+                        </div>
+                        <div class="control-item control-partial">
+                            <div class="control-name">Req 6.5 Vulnerability Management</div>
+                            <div class="control-status">
+                                <span class="status-badge badge-partial"></span>
+                                <span style="color: #f59e0b;">PARTIAL</span>
+                            </div>
+                        </div>
+                        <div class="control-item control-pass">
+                            <div class="control-name">Req 8.2 Authentication</div>
+                            <div class="control-status">
+                                <span class="status-badge badge-pass"></span>
+                                <span style="color: #10b981;">PASS</span>
+                            </div>
+                        </div>
+                        <div class="control-item control-fail">
+                            <div class="control-name">Req 4.1 Encryption in Transit</div>
+                            <div class="control-status">
+                                <span class="status-badge badge-fail"></span>
+                                <span style="color: #ef4444;">FAIL</span>
+                            </div>
+                        </div>
+                        <div class="control-item control-pass">
+                            <div class="control-name">Req 10.2 Audit Trails</div>
+                            <div class="control-status">
+                                <span class="status-badge badge-pass"></span>
+                                <span style="color: #10b981;">PASS</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 68%;"></div>
+                    </div>
+                </div>
+
+                <!-- OWASP Top 10 -->
+                <div class="compliance-card">
+                    <div class="compliance-header">
+                        <div class="compliance-name">OWASP Top 10</div>
+                        <div class="compliance-score score-good">72%</div>
+                    </div>
+                    <div class="control-list">
+                        <div class="control-item control-fail">
+                            <div class="control-name">A03:2021 Injection</div>
+                            <div class="control-status">
+                                <span class="status-badge badge-fail"></span>
+                                <span style="color: #ef4444;">FAIL</span>
+                            </div>
+                        </div>
+                        <div class="control-item control-partial">
+                            <div class="control-name">A01:2021 Broken Access Control</div>
+                            <div class="control-status">
+                                <span class="status-badge badge-partial"></span>
+                                <span style="color: #f59e0b;">PARTIAL</span>
+                            </div>
+                        </div>
+                        <div class="control-item control-pass">
+                            <div class="control-name">A02:2021 Cryptographic Failures</div>
+                            <div class="control-status">
+                                <span class="status-badge badge-pass"></span>
+                                <span style="color: #10b981;">PASS</span>
+                            </div>
+                        </div>
+                        <div class="control-item control-fail">
+                            <div class="control-name">A05:2021 Security Misconfiguration</div>
+                            <div class="control-status">
+                                <span class="status-badge badge-fail"></span>
+                                <span style="color: #ef4444;">FAIL</span>
+                            </div>
+                        </div>
+                        <div class="control-item control-pass">
+                            <div class="control-name">A09:2021 Security Logging</div>
+                            <div class="control-status">
+                                <span class="status-badge badge-pass"></span>
+                                <span style="color: #10b981;">PASS</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 72%;"></div>
+                    </div>
+                </div>
+
+                <!-- SOC 2 -->
+                <div class="compliance-card">
+                    <div class="compliance-header">
+                        <div class="compliance-name">SOC 2 Type II</div>
+                        <div class="compliance-score score-good">81%</div>
+                    </div>
+                    <div class="control-list">
+                        <div class="control-item control-pass">
+                            <div class="control-name">CC6.1 Logical Access</div>
+                            <div class="control-status">
+                                <span class="status-badge badge-pass"></span>
+                                <span style="color: #10b981;">PASS</span>
+                            </div>
+                        </div>
+                        <div class="control-item control-pass">
+                            <div class="control-name">CC7.2 Detection Monitoring</div>
+                            <div class="control-status">
+                                <span class="status-badge badge-pass"></span>
+                                <span style="color: #10b981;">PASS</span>
+                            </div>
+                        </div>
+                        <div class="control-item control-partial">
+                            <div class="control-name">CC8.1 Change Management</div>
+                            <div class="control-status">
+                                <span class="status-badge badge-partial"></span>
+                                <span style="color: #f59e0b;">PARTIAL</span>
+                            </div>
+                        </div>
+                        <div class="control-item control-pass">
+                            <div class="control-name">CC6.6 Encryption</div>
+                            <div class="control-status">
+                                <span class="status-badge badge-pass"></span>
+                                <span style="color: #10b981;">PASS</span>
+                            </div>
+                        </div>
+                        <div class="control-item control-pass">
+                            <div class="control-name">CC7.1 Threat Detection</div>
+                            <div class="control-status">
+                                <span class="status-badge badge-pass"></span>
+                                <span style="color: #10b981;">PASS</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 81%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MTTR Metrics & Trends -->
+        <div class="section">
+            <h2 class="section-title">MTTR Metrics & Trends</h2>
+
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <div class="chart-title">MTTR by Severity Level</div>
+                    <div class="chart-container">
+                        <canvas id="mttrBySeverityChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">MTTR Trend (6 Months)</div>
+                    <div class="chart-container">
+                        <canvas id="mttrTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Benchmark Comparison -->
+            <div class="benchmark-comparison">
+                <div class="benchmark-item">
+                    <div class="benchmark-label">Your MTTR (Critical)</div>
+                    <div class="benchmark-value">3.2d</div>
+                    <div class="benchmark-comparison-text trend-up">
+                        <span>↑ 35% better</span>
+                    </div>
+                </div>
+                <div class="benchmark-item">
+                    <div class="benchmark-label">Industry Average</div>
+                    <div class="benchmark-value">4.9d</div>
+                    <div class="benchmark-comparison-text" style="color: #9ca3af;">
+                        <span>benchmark</span>
+                    </div>
+                </div>
+                <div class="benchmark-item">
+                    <div class="benchmark-label">Your MTTR (Medium)</div>
+                    <div class="benchmark-value">14.8d</div>
+                    <div class="benchmark-comparison-text trend-up">
+                        <span>↑ 18% better</span>
+                    </div>
+                </div>
+                <div class="benchmark-item">
+                    <div class="benchmark-label">Industry Average</div>
+                    <div class="benchmark-value">18.1d</div>
+                    <div class="benchmark-comparison-text" style="color: #9ca3af;">
+                        <span>benchmark</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLA Compliance -->
+            <h3 class="chart-title" style="margin-top: 30px;">SLA Compliance by Severity</h3>
+            <div class="sla-grid">
+                <div class="sla-item">
+                    <div class="sla-severity">Critical</div>
+                    <div class="sla-percentage sla-met">100%</div>
+                    <div style="color: #9ca3af; font-size: 0.8rem;">5/5 met</div>
+                </div>
+                <div class="sla-item">
+                    <div class="sla-severity">High</div>
+                    <div class="sla-percentage sla-met">95%</div>
+                    <div style="color: #9ca3af; font-size: 0.8rem;">19/20 met</div>
+                </div>
+                <div class="sla-item">
+                    <div class="sla-severity">Medium</div>
+                    <div class="sla-percentage sla-met">88%</div>
+                    <div style="color: #9ca3af; font-size: 0.8rem;">15/17 met</div>
+                </div>
+                <div class="sla-item">
+                    <div class="sla-severity">Low</div>
+                    <div class="sla-percentage sla-met">91%</div>
+                    <div style="color: #9ca3af; font-size: 0.8rem;">10/11 met</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Application Portfolio Risk -->
+        <div class="section">
+            <h2 class="section-title">Application Portfolio Risk Assessment</h2>
+
+            <div class="app-portfolio">
+                <div class="app-card">
+                    <div class="app-info">
+                        <div class="app-name">cargo-cats-frontgateservice</div>
+                        <div class="app-stats">
+                            <span>1 Critical</span>
+                            <span>•</span>
+                            <span>2 High</span>
+                            <span>•</span>
+                            <span>4 Medium</span>
+                            <span>•</span>
+                            <span>Risk Score: 87</span>
+                        </div>
+                    </div>
+                    <div class="risk-badge risk-critical">CRITICAL RISK</div>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-info">
+                        <div class="app-name">cargo-cats-dataservice</div>
+                        <div class="app-stats">
+                            <span>1 High</span>
+                            <span>•</span>
+                            <span>6 Medium</span>
+                            <span>•</span>
+                            <span>2 Low</span>
+                            <span>•</span>
+                            <span>Risk Score: 64</span>
+                        </div>
+                    </div>
+                    <div class="risk-badge risk-high">HIGH RISK</div>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-info">
+                        <div class="app-name">cargo-cats-webhookservice</div>
+                        <div class="app-stats">
+                            <span>1 High</span>
+                            <span>•</span>
+                            <span>3 Medium</span>
+                            <span>•</span>
+                            <span>3 Note</span>
+                            <span>•</span>
+                            <span>Risk Score: 58</span>
+                        </div>
+                    </div>
+                    <div class="risk-badge risk-high">HIGH RISK</div>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-info">
+                        <div class="app-name">cargo-cats-imageservice</div>
+                        <div class="app-stats">
+                            <span>2 Medium</span>
+                            <span>•</span>
+                            <span>1 Low</span>
+                            <span>•</span>
+                            <span>2 Note</span>
+                            <span>•</span>
+                            <span>Risk Score: 42</span>
+                        </div>
+                    </div>
+                    <div class="risk-badge risk-medium">MEDIUM RISK</div>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-info">
+                        <div class="app-name">cargo-cats-labelservice</div>
+                        <div class="app-stats">
+                            <span>1 Medium</span>
+                            <span>•</span>
+                            <span>2 Note</span>
+                            <span>•</span>
+                            <span>Risk Score: 28</span>
+                        </div>
+                    </div>
+                    <div class="risk-badge risk-low">LOW RISK</div>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-info">
+                        <div class="app-name">cargo-cats-docservice</div>
+                        <div class="app-stats">
+                            <span>1 Medium</span>
+                            <span>•</span>
+                            <span>1 Note</span>
+                            <span>•</span>
+                            <span>Risk Score: 25</span>
+                        </div>
+                    </div>
+                    <div class="risk-badge risk-low">LOW RISK</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Remediation Velocity -->
+        <div class="section">
+            <h2 class="section-title">Remediation Velocity & Backlog</h2>
+
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <div class="chart-title">Vulnerabilities Opened vs Closed</div>
+                    <div class="chart-container">
+                        <canvas id="velocityChart"></canvas>
+                    </div>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #667eea;"></div>
+                            <span>Opened</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #10b981;"></div>
+                            <span>Closed</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">Backlog Trend</div>
+                    <div class="chart-container">
+                        <canvas id="backlogChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Capacity Metrics -->
+            <div class="benchmark-comparison" style="margin-top: 30px;">
+                <div class="benchmark-item">
+                    <div class="benchmark-label">Avg Remediation Rate</div>
+                    <div class="benchmark-value">27</div>
+                    <div class="benchmark-comparison-text" style="color: #9ca3af;">
+                        <span>per month</span>
+                    </div>
+                </div>
+                <div class="benchmark-item">
+                    <div class="benchmark-label">Current Backlog</div>
+                    <div class="benchmark-value">33</div>
+                    <div class="benchmark-comparison-text trend-down">
+                        <span>↓ 12% reduction</span>
+                    </div>
+                </div>
+                <div class="benchmark-item">
+                    <div class="benchmark-label">Est. Time to Clear</div>
+                    <div class="benchmark-value">1.2</div>
+                    <div class="benchmark-comparison-text" style="color: #9ca3af;">
+                        <span>months</span>
+                    </div>
+                </div>
+                <div class="benchmark-item">
+                    <div class="benchmark-label">Team Velocity</div>
+                    <div class="benchmark-value">123%</div>
+                    <div class="benchmark-comparison-text trend-up">
+                        <span>↑ of target capacity</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set current date
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        // Chart.js default configuration
+        Chart.defaults.color = '#9ca3af';
+        Chart.defaults.borderColor = 'rgba(102, 126, 234, 0.1)';
+        Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif';
+
+        // MTTR by Severity Chart
+        const mttrBySeverityCtx = document.getElementById('mttrBySeverityChart').getContext('2d');
+        new Chart(mttrBySeverityCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Critical', 'High', 'Medium', 'Low', 'Note'],
+                datasets: [{
+                    label: 'MTTR (days)',
+                    data: [2.8, 3.5, 14.8, 18.2, 25.5],
+                    backgroundColor: [
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(16, 185, 129, 0.8)',
+                        'rgba(107, 114, 128, 0.8)'
+                    ],
+                    borderColor: [
+                        '#ef4444',
+                        '#f59e0b',
+                        '#3b82f6',
+                        '#10b981',
+                        '#6b7280'
+                    ],
+                    borderWidth: 1
+                }, {
+                    label: 'Industry Benchmark',
+                    data: [4.9, 5.2, 18.1, 22.5, 30.0],
+                    type: 'line',
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderWidth: 2,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#667eea'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#667eea',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Days'
+                        },
+                        grid: {
+                            color: 'rgba(102, 126, 234, 0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // MTTR Trend Chart
+        const mttrTrendCtx = document.getElementById('mttrTrendChart').getContext('2d');
+        new Chart(mttrTrendCtx, {
+            type: 'line',
+            data: {
+                labels: ['Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan'],
+                datasets: [{
+                    label: 'Critical/High',
+                    data: [5.2, 4.8, 4.2, 3.9, 3.5, 3.2],
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#ef4444'
+                }, {
+                    label: 'Medium/Low',
+                    data: [19.5, 18.8, 17.9, 16.5, 15.8, 14.8],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#3b82f6'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#667eea',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'MTTR (days)'
+                        },
+                        grid: {
+                            color: 'rgba(102, 126, 234, 0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // Velocity Chart
+        const velocityCtx = document.getElementById('velocityChart').getContext('2d');
+        new Chart(velocityCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan'],
+                datasets: [{
+                    label: 'Opened',
+                    data: [28, 32, 25, 29, 31, 22],
+                    backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                    borderColor: '#667eea',
+                    borderWidth: 1
+                }, {
+                    label: 'Closed',
+                    data: [22, 25, 28, 26, 30, 27],
+                    backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                    borderColor: '#10b981',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#667eea',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Count'
+                        },
+                        grid: {
+                            color: 'rgba(102, 126, 234, 0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // Backlog Chart
+        const backlogCtx = document.getElementById('backlogChart').getContext('2d');
+        new Chart(backlogCtx, {
+            type: 'line',
+            data: {
+                labels: ['Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan'],
+                datasets: [{
+                    label: 'Open Vulnerabilities',
+                    data: [48, 55, 52, 55, 56, 51],
+                    borderColor: '#764ba2',
+                    backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 6,
+                    pointBackgroundColor: '#764ba2',
+                    borderWidth: 3
+                }, {
+                    label: 'Target',
+                    data: [45, 45, 45, 45, 45, 45],
+                    borderColor: '#10b981',
+                    backgroundColor: 'transparent',
+                    borderDash: [5, 5],
+                    borderWidth: 2,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: '#667eea',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Vulnerability Count'
+                        },
+                        grid: {
+                            color: 'rgba(102, 126, 234, 0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+[
+ {
+  "id": "3024263e-801d-4695-aaaa-84d58a23528e",
+  "source": "10.1.12.212",
+  "status": "PROBED",
+  "probes": 365,
+  "rules": [
+   "Command Injection",
+   "Expression Language Injection",
+   "Path Traversal",
+   "SQL Injection",
+   "Spring Expression Language Injection Vulnerability",
+   "Struts 1 ClassLoader Property Overwrite Vulnerability",
+   "Struts 2 ParametersInterceptor OGNL RCE Vulnerability"
+  ],
+  "startTime": "2026-10-05T13:36:32+00:00",
+  "endTime": "2026-10-05T13:47:48+00:00",
+  "targets": [
+   {
+    "app": "SAML-cargocats-frontgateservice",
+    "language": "Java",
+    "severity": "MEDIUM",
+    "status": "PROBED"
+   }
+  ]
+ },
+ {
+  "id": "d1025f4a-1508-46db-a186-813451e35b84",
+  "source": "10.1.12.244",
+  "status": "EXPLOITED",
+  "probes": 362,
+  "rules": [
+   "Command Injection",
+   "Expression Language Injection",
+   "Path Traversal",
+   "SQL Injection",
+   "Server-Side JavaScript Injection",
+   "Spring Expression Language Injection Vulnerability",
+   "XML External Entity Injection (XXE)"
+  ],
+  "startTime": "2026-10-13T13:09:39+00:00",
+  "endTime": "2026-10-13T13:46:54+00:00",
+  "targets": [
+   {
+    "app": "SAML-cargocats-dataservice",
+    "language": "Java",
+    "severity": "MEDIUM",
+    "status": "EXPLOITED"
+   },
+   {
+    "app": "SAML-cargocats-reportservice",
+    "language": "Java",
+    "severity": "MEDIUM",
+    "status": "PROBED"
+   },
+   {
+    "app": "SAML-cargocats-webhookservice",
+    "language": "Python",
+    "severity": "MEDIUM",
+    "status": "EXPLOITED"
+   },
+   {
+    "app": "SAML-cargocats-labelservice",
+    "language": "Node",
+    "severity": "MEDIUM",
+    "status": "EXPLOITED"
+   },
+   {
+    "app": "SAML-cargocats-docservice",
+    "language": "Python",
+    "severity": "MEDIUM",
+    "status": "EXPLOITED"
+   },
+   {
+    "app": "SAML-cargocats-imageservice",
+    "language": ".NET Core",
+    "severity": "MEDIUM",
+    "status": "EXPLOITED"
+   }
+  ]
+ },
+ {
+  "id": "232ba1fd-baa7-43d3-a517-71ac7780a289",
+  "source": "10.1.12.231",
+  "status": "PROBED",
+  "probes": 338,
+  "rules": [
+   "Command Injection",
+   "Expression Language Injection",
+   "Path Traversal",
+   "SQL Injection",
+   "Spring Expression Language Injection Vulnerability",
+   "Struts 1 ClassLoader Property Overwrite Vulnerability",
+   "Struts 2 ParametersInterceptor OGNL RCE Vulnerability"
+  ],
+  "startTime": "2026-10-13T13:09:39+00:00",
+  "endTime": "2026-10-13T13:15:18+00:00",
+  "targets": [
+   {
+    "app": "SAML-cargocats-frontgateservice",
+    "language": "Java",
+    "severity": "MEDIUM",
+    "status": "PROBED"
+   }
+  ]
+ },
+ {
+  "id": "e884f6fd-7e6c-4abc-b0a6-14313444c0ff",
+  "source": "10.1.12.218",
+  "status": "EXPLOITED",
+  "probes": 217,
+  "rules": [
+   "Command Injection",
+   "Expression Language Injection",
+   "Path Traversal",
+   "SQL Injection"
+  ],
+  "startTime": "2026-10-05T13:36:32+00:00",
+  "endTime": "2026-10-05T13:47:46+00:00",
+  "targets": [
+   {
+    "app": "SAML-cargocats-webhookservice",
+    "language": "Python",
+    "severity": "MEDIUM",
+    "status": "EXPLOITED"
+   },
+   {
+    "app": "SAML-cargocats-dataservice",
+    "language": "Java",
+    "severity": "MEDIUM",
+    "status": "PROBED"
+   }
+  ]
+ },
+ {
+  "id": "6feac2be-06eb-48da-b6f7-cd0a2213eb8f",
+  "source": "10.1.12.234",
+  "status": "EXPLOITED",
+  "probes": 40,
+  "rules": [
+   "Command Injection",
+   "JNDI Injection",
+   "Log4j2 Remote Code Execution Vulnerability (also known as Log4Shell), CVE-2021-45046",
+   "Path Traversal",
+   "SQL Injection",
+   "Untrusted Deserialization"
+  ],
+  "startTime": "2026-10-13T13:46:10+00:00",
+  "endTime": "2026-10-13T13:46:54+00:00",
+  "targets": [
+   {
+    "app": "SAML-cargocats-frontgateservice",
+    "language": "Java",
+    "severity": "MEDIUM",
+    "status": "EXPLOITED"
+   }
+  ]
+ }
+]

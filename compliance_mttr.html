@@ -504,6 +504,20 @@
             color: #fca5a5;
             font-size: 0.95rem;
         }
+        .source-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; font-size: 0.95rem; }
+        .source-badge { padding: 3px 12px; border-radius: 12px; font-weight: bold; font-size: 0.85rem; }
+        .source-badge.live { background: #00c878; color: #0a0e27; }
+        .source-badge.mock { background: #ffaa00; color: #0a0e27; }
+        .refresh-btn { background: #4f46e5; color: #fff; border: 0; border-radius: 8px; padding: 8px 18px; cursor: pointer; font-size: 0.95rem; }
+        .error-banner { display: none; background: rgba(239, 68, 68, 0.15); border: 2px solid #ef4444; border-radius: 10px; padding: 16px 20px; margin-bottom: 20px; }
+        .illustrative-banner { background: rgba(245, 158, 11, 0.12); border-left: 5px solid #f59e0b; border-radius: 10px; padding: 18px 24px; margin: 40px 0 24px; line-height: 1.6; }
+        .illustrative-banner h3 { color: #f59e0b; margin-bottom: 8px; font-size: 1.15rem; }
+        .live-tag { display: inline-block; background: #00c878; color: #0a0e27; font-size: 0.7rem; font-weight: bold; padding: 2px 8px; border-radius: 10px; vertical-align: middle; margin-left: 8px; }
+        .sla-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        .sla-table th, .sla-table td { padding: 10px 14px; text-align: left; border-bottom: 1px solid rgba(148,163,184,0.2); }
+        .sla-table th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.8; }
+        .breach { color: #ef4444; font-weight: bold; }
+        .ok { color: #10b981; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -514,70 +528,42 @@
             <div class="timestamp">Last Updated: <span id="currentDate"></span></div>
         </div>
 
-        <!-- Alert Banner -->
-        <div class="alert-banner">
-            <div class="alert-icon">⚠️</div>
-            <div class="alert-content">
-                <h3>Critical Attention Required</h3>
-                <p>1 Critical vulnerability and 4 High severity issues require immediate remediation to meet compliance standards.</p>
-            </div>
+        <div class="source-bar">
+            <div><span id="sourceBadge" class="source-badge mock">Loading</span> <span id="updated"></span></div>
+            <button class="refresh-btn" id="refreshBtn">↻ Refresh</button>
+        </div>
+        <div class="error-banner" id="errorBanner"></div>
+
+        <div id="liveAlert"></div>
+
+        <h2 class="section-title">Executive Summary <span class="live-tag">LIVE</span></h2>
+        <div class="kpi-grid" id="liveKpis"></div>
+
+        <div class="section">
+            <h2 class="section-title">Open Findings by Severity and SLA <span class="live-tag">LIVE</span></h2>
+            <p style="opacity:.8; margin-bottom:6px;" id="slaPolicy"></p>
+            <table class="sla-table" id="slaTable"></table>
         </div>
 
-        <!-- Executive Summary KPIs -->
-        <div class="kpi-grid">
-            <div class="kpi-card">
-                <div class="kpi-label">Total Vulnerabilities</div>
-                <div class="kpi-value">33</div>
-                <div class="kpi-trend trend-down">
-                    <span>↓ 12%</span>
-                    <span style="color: #9ca3af;">vs last month</span>
-                </div>
-            </div>
+        <div class="section">
+            <h2 class="section-title">Age of Open Findings <span class="live-tag">LIVE</span></h2>
+            <div class="chart-container" style="height: 320px;"><canvas id="ageChart"></canvas></div>
+        </div>
 
-            <div class="kpi-card">
-                <div class="kpi-label">MTTR Critical/High</div>
-                <div class="kpi-value">3.2d</div>
-                <div class="kpi-trend trend-up">
-                    <span>↑ 8%</span>
-                    <span style="color: #9ca3af;">faster than target</span>
-                </div>
-            </div>
+        <div class="section">
+            <h2 class="section-title">Oldest Open Findings <span class="live-tag">LIVE</span></h2>
+            <table class="sla-table" id="oldestTable"></table>
+        </div>
 
-            <div class="kpi-card">
-                <div class="kpi-label">MTTR Medium/Low</div>
-                <div class="kpi-value">14.8d</div>
-                <div class="kpi-trend trend-up">
-                    <span>↑ 15%</span>
-                    <span style="color: #9ca3af;">improved from 17.4d</span>
-                </div>
-            </div>
-
-            <div class="kpi-card">
-                <div class="kpi-label">Remediated This Month</div>
-                <div class="kpi-value">27</div>
-                <div class="kpi-trend trend-up">
-                    <span>↑ 23%</span>
-                    <span style="color: #9ca3af;">above target</span>
-                </div>
-            </div>
-
-            <div class="kpi-card">
-                <div class="kpi-label">Security Posture Score</div>
-                <div class="kpi-value">78%</div>
-                <div class="kpi-trend trend-up">
-                    <span>↑ 5pts</span>
-                    <span style="color: #9ca3af;">improving</span>
-                </div>
-            </div>
-
-            <div class="kpi-card">
-                <div class="kpi-label">SLA Compliance</div>
-                <div class="kpi-value">92%</div>
-                <div class="kpi-trend trend-up">
-                    <span>↑ 4%</span>
-                    <span style="color: #9ca3af;">meeting targets</span>
-                </div>
-            </div>
+        <div class="illustrative-banner">
+            <h3>⚠️ Everything below this line is sample content</h3>
+            <p>
+                The compliance framework sections, MTTR trends, benchmark comparisons and team metrics that
+                follow are illustrative examples of how such a dashboard could look. They are <strong>not</strong>
+                drawn from your Contrast organization. Contrast does not store NIST 800-53, PCI-DSS or SOC 2
+                control mappings, and this organization has no remediation history to compute MTTR from, so
+                those numbers are placeholders. Do not present them as live results.
+            </p>
         </div>
 
         <!-- Compliance Framework Status -->
@@ -1289,6 +1275,89 @@
                 }
             }
         });
+    </script>
+    <script>
+        const esc = (v) => String(v == null ? '' : v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const shortApp = (n) => String(n).replace(/^SAML-cargocats-/, '');
+        const ORDER = ['Critical', 'High', 'Medium', 'Low', 'Note'];
+        let ageChart = null;
+
+        function kpi(label, value, note) {
+            return `<div class="kpi-card"><div class="kpi-label">${label}</div><div class="kpi-value">${value}</div>` +
+                   (note ? `<div class="kpi-trend"><span style="color:#9ca3af;">${note}</span></div>` : '') + '</div>';
+        }
+
+        function renderLive(d) {
+            const t = d.totals;
+
+            const worst = ORDER.filter((s) => d.bySeverity[s] && d.bySeverity[s].breached > 0);
+            document.getElementById('liveAlert').innerHTML = worst.length
+                ? `<div class="alert-banner"><div class="alert-icon">⚠️</div><div class="alert-content">
+                     <h3>SLA Breaches</h3>
+                     <p>${t.breached} open finding${t.breached === 1 ? '' : 's'} past the assumed remediation SLA, including ${worst.map((s) => `${d.bySeverity[s].breached} ${s}`).join(' and ')}.</p>
+                   </div></div>`
+                : `<div class="alert-banner"><div class="alert-icon">✅</div><div class="alert-content">
+                     <h3>No SLA breaches</h3><p>All ${t.open} open findings are within the assumed remediation SLA.</p></div></div>`;
+
+            document.getElementById('liveKpis').innerHTML = [
+                kpi('Total Findings', t.total, 'all statuses'),
+                kpi('Open', t.open, 'still actionable'),
+                kpi('Remediated', t.closed, t.closed ? 'closed to date' : 'none recorded'),
+                kpi('Mean Time To Remediate', t.mttrDays != null ? t.mttrDays + 'd' : 'n/a', t.mttrDays != null ? 'across closed findings' : 'no remediation history'),
+                kpi('SLA Compliance', t.slaCompliance + '%', `${t.breached} breached`),
+                kpi('Median Age', t.medianAge != null ? t.medianAge + 'd' : '—', t.oldestAge != null ? `oldest ${t.oldestAge}d` : ''),
+            ].join('');
+
+            document.getElementById('slaPolicy').textContent =
+                'Assumed remediation SLA, not a value Contrast stores: ' +
+                ORDER.map((s) => `${s} ${d.sla[s]}d`).join(', ') + '.';
+
+            document.getElementById('slaTable').innerHTML =
+                '<thead><tr><th>Severity</th><th>Open</th><th>SLA</th><th>Median age</th><th>Oldest</th><th>Breached</th></tr></thead><tbody>' +
+                ORDER.map((s) => {
+                    const r = d.bySeverity[s] || { open: 0, breached: 0, slaDays: '—', medianAge: null, oldestAge: null };
+                    return `<tr><td><strong>${s}</strong></td><td>${r.open}</td><td>${r.slaDays}d</td>` +
+                           `<td>${r.medianAge != null ? r.medianAge + 'd' : '—'}</td><td>${r.oldestAge != null ? r.oldestAge + 'd' : '—'}</td>` +
+                           `<td class="${r.breached ? 'breach' : 'ok'}">${r.breached}</td></tr>`;
+                }).join('') + '</tbody>';
+
+            document.getElementById('oldestTable').innerHTML =
+                '<thead><tr><th>Finding</th><th>Application</th><th>Severity</th><th>Status</th><th>Age</th><th>SLA</th></tr></thead><tbody>' +
+                d.oldest.map((v) => `<tr><td>${esc(v.title).slice(0, 80)}</td><td>${esc(shortApp(v.app))}</td>` +
+                    `<td>${esc(v.severity)}</td><td>${esc(v.status)}</td><td>${v.ageDays != null ? v.ageDays + 'd' : '—'}</td>` +
+                    `<td class="${v.breached ? 'breach' : 'ok'}">${v.breached ? 'breached' : 'within'}</td></tr>`).join('') + '</tbody>';
+
+            const labels = Object.keys(d.buckets);
+            if (ageChart) ageChart.destroy();
+            ageChart = new Chart(document.getElementById('ageChart').getContext('2d'), {
+                type: 'bar',
+                data: { labels, datasets: [{ label: 'Open findings', data: labels.map((k) => d.buckets[k]), backgroundColor: ['#10b981', '#f59e0b', '#f97316', '#ef4444'] }] },
+                options: { responsive: true, maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } },
+                    plugins: { legend: { display: false } } },
+            });
+        }
+
+        async function loadLive() {
+            const banner = document.getElementById('errorBanner');
+            banner.style.display = 'none';
+            try {
+                const res = await fetch('/api/compliance', { cache: 'no-store' });
+                const d = await res.json();
+                if (!res.ok) throw new Error(d.error || res.statusText);
+                const badge = document.getElementById('sourceBadge');
+                badge.textContent = d.source === 'live' ? 'LIVE' : 'MOCK DATA';
+                badge.className = 'source-badge ' + (d.source === 'live' ? 'live' : 'mock');
+                document.getElementById('updated').textContent = 'Last refreshed ' + new Date(d.generatedAt).toLocaleTimeString();
+                renderLive(d);
+            } catch (err) {
+                banner.style.display = 'block';
+                banner.innerHTML = `<strong>Could not load live data.</strong> ${esc(err.message)}. Start the server with <code>npm start</code> and open this page at http://localhost:3000, or view the <a href="compliance_mttr_static.html">static snapshot</a>.`;
+            }
+        }
+
+        document.getElementById('refreshBtn').addEventListener('click', loadLive);
+        loadLive();
     </script>
 </body>
 </html>

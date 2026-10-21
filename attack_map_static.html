@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contrast Security - Attack Map Visualization</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            color: #fff;
+        }
+        #header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        #header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+        #header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+        }
+        #map {
+            height: 80vh;
+            width: 100%;
+        }
+        #legend {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(10, 14, 39, 0.95);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 1000;
+            border: 2px solid #667eea;
+            min-width: 250px;
+        }
+        #legend h3 {
+            margin: 0 0 15px 0;
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .legend-color {
+            width: 30px;
+            height: 4px;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+        .exploited { background: #ff4444; }
+        .probed { background: #ffaa00; }
+        .server { background: #00ff88; }
+        .attack-tooltip {
+            background: rgba(10, 14, 39, 0.95);
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 14px;
+        }
+        .attack-tooltip strong {
+            color: #667eea;
+        }
+        .leaflet-popup-content-wrapper {
+            background: rgba(10, 14, 39, 0.95);
+            color: #fff;
+            border: 2px solid #667eea;
+        }
+        .leaflet-popup-tip {
+            background: rgba(10, 14, 39, 0.95);
+        }
+        .status-exploited {
+            color: #ff4444;
+            font-weight: bold;
+        }
+        .status-probed {
+            color: #ffaa00;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <h1>🛡️ Contrast Security - Attack Visualization</h1>
+        <p>Real-time attack patterns targeting Cargo Cats infrastructure in Northeast Indiana</p>
+    </div>
+    <div id="map"></div>
+    <div id="legend">
+        <h3>Legend</h3>
+        <div class="legend-item">
+            <div class="legend-color exploited"></div>
+            <span>Exploited Attack</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color probed"></div>
+            <span>Probed Attack</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color server"></div>
+            <span>Server Location</span>
+        </div>
+        <div style="margin-top: 20px; font-size: 12px; opacity: 0.8;">
+            <strong>Note:</strong> IPs shown are private addresses. Locations are representative for visualization.
+        </div>
+    </div>
+
+    <script>
+        // Server location: Northeast Indiana (Fort Wayne area)
+        const serverLocation = [41.0793, -85.1394];
+
+        // Attack data with mock geographic locations for private IPs
+        const attacks = [
+            {
+                ip: '10.1.3.116',
+                location: [34.0522, -118.2437], // Los Angeles area
+                city: 'Los Angeles, CA',
+                count: 2,
+                status: 'EXPLOITED',
+                rules: ['Command Injection', 'Path Traversal', 'SQL Injection'],
+                probes: 138,
+                targets: ['webhookservice', 'dataservice']
+            },
+            {
+                ip: '10.1.3.98',
+                location: [47.6062, -122.3321], // Seattle area
+                city: 'Seattle, WA',
+                count: 1,
+                status: 'PROBED',
+                rules: ['Command Injection', 'Path Traversal', 'SQL Injection'],
+                probes: 116,
+                targets: ['frontgateservice']
+            },
+            {
+                ip: '192.168.151.139',
+                location: [39.7392, -104.9903], // Denver area
+                city: 'Denver, CO',
+                count: 1,
+                status: 'PROBED',
+                rules: ['Path Traversal'],
+                probes: 2,
+                targets: ['frontgateservice']
+            },
+            {
+                ip: '192.168.159.43',
+                location: [29.7604, -95.3698], // Houston area
+                city: 'Houston, TX',
+                count: 1,
+                status: 'PROBED',
+                rules: ['Path Traversal'],
+                probes: 1,
+                targets: ['frontgateservice']
+            },
+            {
+                ip: '192.168.195.195',
+                location: [25.7617, -80.1918], // Miami area
+                city: 'Miami, FL',
+                count: 2,
+                status: 'PROBED',
+                rules: ['Path Traversal'],
+                probes: 2,
+                targets: ['frontgateservice']
+            },
+            {
+                ip: '192.168.199.221',
+                location: [42.3601, -71.0589], // Boston area
+                city: 'Boston, MA',
+                count: 1,
+                status: 'PROBED',
+                rules: ['Path Traversal'],
+                probes: 2,
+                targets: ['frontgateservice']
+            }
+        ];
+
+        // Initialize map centered on US
+        const map = L.map('map').setView([39.8283, -98.5795], 5);
+
+        // Add tile layer
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+            subdomains: 'abcd',
+            maxZoom: 19
+        }).addTo(map);
+
+        // Add server marker
+        const serverIcon = L.divIcon({
+            className: 'custom-div-icon',
+            html: `<div style="background-color: #00ff88; width: 20px; height: 20px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 20px #00ff88;"></div>`,
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+        });
+
+        L.marker(serverLocation, { icon: serverIcon })
+            .addTo(map)
+            .bindPopup(`
+                <div class="attack-tooltip">
+                    <strong>🖥️ Server Location</strong><br>
+                    Fort Wayne, IN<br>
+                    Northeast Indiana<br>
+                    <strong>Target:</strong> Cargo Cats Infrastructure
+                </div>
+            `);
+
+        // Add attack source markers and lines
+        attacks.forEach(attack => {
+            // Determine color based on status
+            const color = attack.status === 'EXPLOITED' ? '#ff4444' : '#ffaa00';
+            const statusClass = attack.status === 'EXPLOITED' ? 'status-exploited' : 'status-probed';
+
+            // Create custom icon for attack source
+            const attackIcon = L.divIcon({
+                className: 'custom-div-icon',
+                html: `<div style="background-color: ${color}; width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 15px ${color};"></div>`,
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            });
+
+            // Add marker for attack source
+            L.marker(attack.location, { icon: attackIcon })
+                .addTo(map)
+                .bindPopup(`
+                    <div class="attack-tooltip">
+                        <strong>🚨 Attack Source</strong><br>
+                        <strong>IP:</strong> ${attack.ip}<br>
+                        <strong>Location:</strong> ${attack.city}<br>
+                        <strong>Status:</strong> <span class="${statusClass}">${attack.status}</span><br>
+                        <strong>Attack Count:</strong> ${attack.count}<br>
+                        <strong>Total Probes:</strong> ${attack.probes}<br>
+                        <strong>Rules:</strong> ${attack.rules.join(', ')}<br>
+                        <strong>Targets:</strong> ${attack.targets.join(', ')}
+                    </div>
+                `);
+
+            // Draw animated line from attack source to server
+            const line = L.polyline([attack.location, serverLocation], {
+                color: color,
+                weight: 3,
+                opacity: 0.7,
+                dashArray: '10, 10',
+                className: 'attack-line'
+            }).addTo(map);
+
+            // Add tooltip to line
+            line.bindTooltip(`
+                <div class="attack-tooltip">
+                    <strong>${attack.ip} → Server</strong><br>
+                    <strong>Status:</strong> <span class="${statusClass}">${attack.status}</span><br>
+                    <strong>Rules:</strong> ${attack.rules.join(', ')}<br>
+                    <strong>Probes:</strong> ${attack.probes}
+                </div>
+            `, {
+                sticky: true
+            });
+
+            // Add pulsing animation
+            let opacity = 0.7;
+            let increasing = false;
+            setInterval(() => {
+                if (increasing) {
+                    opacity += 0.05;
+                    if (opacity >= 1) increasing = false;
+                } else {
+                    opacity -= 0.05;
+                    if (opacity <= 0.3) increasing = true;
+                }
+                line.setStyle({ opacity: opacity });
+            }, 100);
+        });
+
+        // Add some styling for the attack lines animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes dash {
+                to {
+                    stroke-dashoffset: -100;
+                }
+            }
+            .attack-line {
+                animation: dash 2s linear infinite;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

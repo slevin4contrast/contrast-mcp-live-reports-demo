@@ -499,6 +499,50 @@ based on the index.html page that was created, create the library security repor
             </div>
         </div>
 
+        <!-- CVE Impact Report -->
+        <div class="report-section">
+            <div class="report-header">
+                <h2>🧨 CVE Impact Report</h2>
+                <p>Generated: October 21, 2026 | File: cve_impact.html</p>
+            </div>
+
+            <div class="prompt-card" style="border-radius: 0 0 10px 10px;">
+                <div class="prompt-header">
+                    <h3>
+                        <span class="prompt-number">1</span>
+                        Single Comprehensive Prompt
+                    </h3>
+                </div>
+                <div class="prompt-content">
+                    <div class="prompt-meta">
+                        <span class="meta-badge">🔍 MCP Tools: search_cves, get_cve_impact, list_applications_by_cve, list_cve_issues</span>
+                        <span class="meta-badge">📊 Data Source: contrast-hosted-mcp</span>
+                        <span class="meta-badge">📈 Features: Shield Posture, Blast Radius</span>
+                    </div>
+
+                    <div class="prompt-description">
+                        <strong>Purpose:</strong> Show how a single high-profile CVE affects the environment, including exposure, protection mode and what to do next.
+                    </div>
+
+                    <div class="prompt-box">
+                        <span class="prompt-label">USER PROMPT</span>
+use the contrast mcp server to find the highest-risk CVE in my environment and build a CVE impact report in the same style as the other reports, with affected apps and servers, shield posture, and a response plan
+                    </div>
+
+                    <div class="output-info">
+                        <h4>📤 Output Generated:</h4>
+                        <ul>
+                            <li>Log4Shell (CVE-2021-44228) selected as the CVE that is both exploited and on the CISA KEV list</li>
+                            <li>Blast radius meters for applications and servers (1 of 8 each)</li>
+                            <li>Per-environment shield table showing MONITOR mode with exploitation seen in QA</li>
+                            <li>Five-step response plan from containment to verification</li>
+                            <li>Comparison table of the other top critical CVEs</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Route Coverage Analysis Report -->
         <div class="report-section">
             <div class="report-header">
@@ -830,6 +874,54 @@ Create a developer security training module based on the top 3 vulnerability typ
                             <li>Hands-on exercises with checklists</li>
                             <li>Gamification: 3 unlockable badges, progress bar, time tracking</li>
                             <li>Resources section with OWASP links and security documentation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Data Conversion -->
+        <div class="report-section">
+            <div class="report-header">
+                <h2>⚡ Live Data Conversion</h2>
+                <p>Generated: October 21, 2026 | Files: server.js, lib/mcp.js</p>
+            </div>
+
+            <div class="prompt-card" style="border-radius: 0 0 10px 10px;">
+                <div class="prompt-header">
+                    <h3>
+                        <span class="prompt-number">1</span>
+                        Turning Static Reports Into Live Dashboards
+                    </h3>
+                </div>
+                <div class="prompt-content">
+                    <div class="prompt-meta">
+                        <span class="meta-badge">🔍 MCP Tools: search_vulnerabilities, search_applications, get_route_coverage</span>
+                        <span class="meta-badge">🔌 Runtime: Node.js proxy calling the MCP server</span>
+                        <span class="meta-badge">🔐 Auth: existing MCP OAuth token, server-side only</span>
+                    </div>
+
+                    <div class="prompt-description">
+                        <strong>Purpose:</strong> Replace hardcoded numbers with data fetched at page load, so a demo always reflects the current state of the org rather than a snapshot.
+                    </div>
+
+                    <div class="prompt-box">
+                        <span class="prompt-label">USER PROMPT</span>
+can we make them live dynamic pages with api calls to my eval org?
+                    </div>
+
+                    <div class="output-info">
+                        <h4>📤 Output Generated:</h4>
+                        <ul>
+                            <li>Dependency-free Node server bound to localhost, calling the same MCP tools Claude Code calls</li>
+                            <li>No second API client and no new credentials, since the server reuses the MCP OAuth token already in the keychain</li>
+                            <li>Mock mode with fixtures, so the demo still runs with no token and labels itself MOCK DATA</li>
+                            <li>LIVE or MOCK badge, last-refreshed timestamp, and a Refresh button on every converted page</li>
+                            <li>Error banner that falls back to the static snapshot when the API is unreachable</li>
+                            <li>Original pages preserved as *_static.html for offline demos</li>
+                            <li>Six pages converted: vulnerability dashboard, route coverage, library security, a CVE explorer with a picker, attack activity, and the compliance dashboard</li>
+                            <li>Two pages had to drop invented content: the attack map plotted private 10.x addresses on US cities, and the compliance dashboard reported an MTTR for an org with zero remediated findings</li>
+                            <li>Live data revealed drift from the snapshots at every turn: 27 findings rather than 24, route coverage at 46% rather than 60.77%, and 420 libraries rather than 127</li>
                         </ul>
                     </div>
                 </div>

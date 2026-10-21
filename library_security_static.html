@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Security Report - Contrast Security</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #764ba2;
+            transform: translateX(-5px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            border-color: #667eea;
+        }
+
+        .stat-value {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .section-header {
+            background: rgba(102, 126, 234, 0.2);
+            padding: 20px 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .section-header h2 {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .section-header p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1em;
+        }
+
+        .grade-distribution {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .grade-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .grade-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .grade-letter {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .grade-A { color: #00ff88; border-color: #00ff88; }
+        .grade-B { color: #88ff00; border-color: #88ff00; }
+        .grade-C { color: #ffaa00; border-color: #ffaa00; }
+        .grade-D { color: #ff6600; border-color: #ff6600; }
+        .grade-F { color: #ff4444; border-color: #ff4444; }
+
+        .grade-count {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .grade-label {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .library-table {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 40px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .library-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .library-table th {
+            background: rgba(102, 126, 234, 0.3);
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            color: #667eea;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.5);
+        }
+
+        .library-table td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .library-table tr:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .library-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .library-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(180deg, #ff4444 0%, #ff6600 100%);
+        }
+
+        .library-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 10px 30px rgba(255, 68, 68, 0.3);
+            border-color: #ff4444;
+        }
+
+        .library-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .library-name {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+            flex: 1;
+        }
+
+        .library-version {
+            font-size: 1.2em;
+            color: rgba(255, 255, 255, 0.7);
+            font-family: 'Courier New', monospace;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-right: 8px;
+            margin-bottom: 5px;
+        }
+
+        .badge-critical {
+            background: #ff4444;
+            color: #fff;
+        }
+
+        .badge-high {
+            background: #ff6600;
+            color: #fff;
+        }
+
+        .badge-medium {
+            background: #ffaa00;
+            color: #000;
+        }
+
+        .badge-low {
+            background: #88ff00;
+            color: #000;
+        }
+
+        .badge-outdated {
+            background: #764ba2;
+            color: #fff;
+        }
+
+        .cve-list {
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border-left: 4px solid #ff4444;
+        }
+
+        .cve-item {
+            margin-bottom: 12px;
+            padding: 10px;
+            background: rgba(255, 68, 68, 0.1);
+            border-radius: 6px;
+        }
+
+        .cve-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .cve-id {
+            font-weight: bold;
+            color: #ff4444;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .cve-description {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .risk-meter {
+            width: 100%;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .risk-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88 0%, #ffaa00 50%, #ff4444 100%);
+            border-radius: 15px;
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(102, 126, 234, 0.3);
+            color: #fff;
+            border: 2px solid rgba(102, 126, 234, 0.5);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .summary-box {
+            background: rgba(255, 68, 68, 0.1);
+            border: 2px solid #ff4444;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 40px;
+        }
+
+        .summary-box h3 {
+            color: #ff4444;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .summary-box ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .summary-box li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 1.05em;
+            line-height: 1.6;
+        }
+
+        .summary-box li:last-child {
+            border-bottom: none;
+        }
+
+        .summary-box li::before {
+            content: "⚠️";
+            margin-right: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.6);
+            border-top: 1px solid rgba(102, 126, 234, 0.3);
+            margin-top: 40px;
+        }
+
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .collapsible {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .collapsible::after {
+            content: '▼';
+            float: right;
+            transition: transform 0.3s ease;
+        }
+
+        .collapsible.collapsed::after {
+            transform: rotate(-90deg);
+        }
+
+        .collapsible-content {
+            max-height: 1000px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .collapsible-content.collapsed {
+            max-height: 0;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Reports</a>
+
+        <header>
+            <h1>🔒 Library Security Report</h1>
+            <p>Comprehensive Analysis of Third-Party Dependencies & CVE Exposure</p>
+        </header>
+
+        <!-- Summary Alert Box -->
+        <div class="summary-box">
+            <h3>🚨 Critical Security Findings</h3>
+            <ul>
+                <li><strong>5 libraries</strong> with CRITICAL severity CVEs requiring immediate attention</li>
+                <li><strong>Log4j 2.14.1</strong> vulnerable to CVE-2021-44228 (Log4Shell) - Remote Code Execution</li>
+                <li><strong>Tomcat-embed-core 9.0.75</strong> exposed to 18 known CVEs (4 CRITICAL, 10 HIGH)</li>
+                <li><strong>15 libraries</strong> are 30+ months outdated with F security grades</li>
+                <li><strong>67% of libraries</strong> have known vulnerabilities requiring remediation</li>
+            </ul>
+        </div>
+
+        <!-- Statistics Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">127</div>
+                <div class="stat-label">Total Libraries</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">85</div>
+                <div class="stat-label">With Known CVEs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">243</div>
+                <div class="stat-label">Total CVEs</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">38</div>
+                <div class="stat-label">Critical Vulnerabilities</div>
+            </div>
+        </div>
+
+        <!-- Grade Distribution -->
+        <div class="section-header">
+            <h2>📊 Security Grade Distribution</h2>
+            <p>Library security scores from A (excellent) to F (critical risk)</p>
+        </div>
+
+        <div class="grade-distribution">
+            <div class="grade-card grade-A">
+                <div class="grade-letter">A</div>
+                <div class="grade-count">18</div>
+                <div class="grade-label">Libraries</div>
+            </div>
+            <div class="grade-card grade-B">
+                <div class="grade-letter">B</div>
+                <div class="grade-count">22</div>
+                <div class="grade-label">Libraries</div>
+            </div>
+            <div class="grade-card grade-C">
+                <div class="grade-letter">C</div>
+                <div class="grade-count">34</div>
+                <div class="grade-label">Libraries</div>
+            </div>
+            <div class="grade-card grade-D">
+                <div class="grade-letter">D</div>
+                <div class="grade-count">28</div>
+                <div class="grade-label">Libraries</div>
+            </div>
+            <div class="grade-card grade-F">
+                <div class="grade-letter">F</div>
+                <div class="grade-count">25</div>
+                <div class="grade-label">Libraries</div>
+            </div>
+        </div>
+
+        <!-- High-Risk Libraries Section -->
+        <div class="section-header">
+            <h2>⚠️ High-Risk Libraries - Immediate Action Required</h2>
+            <p>Libraries with CRITICAL severity CVEs and active exploitation in the wild</p>
+        </div>
+
+        <!-- Filter Buttons -->
+        <div class="filter-buttons">
+            <button class="filter-btn active" onclick="filterLibraries('all')">All High-Risk</button>
+            <button class="filter-btn" onclick="filterLibraries('critical')">Critical Only</button>
+            <button class="filter-btn" onclick="filterLibraries('outdated')">30+ Months Old</button>
+            <button class="filter-btn" onclick="filterLibraries('f-grade')">F Grade</button>
+        </div>
+
+        <!-- Log4j Library Card -->
+        <div class="library-card" data-severity="critical" data-grade="f" data-months="36">
+            <div class="library-header">
+                <div>
+                    <div class="library-name">Apache Log4j Core</div>
+                    <div class="library-version">Version: 2.14.1</div>
+                </div>
+                <div>
+                    <span class="badge badge-critical">CRITICAL</span>
+                    <span class="badge badge-outdated">36 Months Old</span>
+                    <span class="badge" style="background: #ff4444; color: #fff;">Grade: F</span>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <span class="badge badge-critical">5 CRITICAL</span>
+                <span class="badge badge-high">3 HIGH</span>
+                <span class="badge badge-medium">2 MEDIUM</span>
+            </div>
+
+            <div class="risk-meter">
+                <div class="risk-fill" style="width: 98%;">Risk: 98%</div>
+            </div>
+
+            <div class="cve-list">
+                <h4 style="color: #ff4444; margin-bottom: 15px;">Known CVEs (10 total)</h4>
+
+                <div class="cve-item">
+                    <div class="cve-id">CVE-2021-44228 (Log4Shell)</div>
+                    <div class="cve-description">
+                        <strong>Severity: CRITICAL | CVSS 10.0</strong><br>
+                        Remote code execution vulnerability in JNDI lookup feature. Allows attackers to execute arbitrary code by
+                        manipulating log messages. Widely exploited in the wild. Immediate patching to 2.17.1+ required.
+                    </div>
+                </div>
+
+                <div class="cve-item">
+                    <div class="cve-id">CVE-2021-45046</div>
+                    <div class="cve-description">
+                        <strong>Severity: CRITICAL | CVSS 9.0</strong><br>
+                        Incomplete fix for Log4Shell. DoS and RCE possible in certain configurations. Update to 2.17.0 or higher.
+                    </div>
+                </div>
+
+                <div class="cve-item">
+                    <div class="cve-id">CVE-2021-45105</div>
+                    <div class="cve-description">
+                        <strong>Severity: HIGH | CVSS 7.5</strong><br>
+                        Denial of Service via uncontrolled recursion in Context Lookup. Affects versions 2.0-beta9 through 2.16.0.
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px; padding: 10px; background: rgba(255, 68, 68, 0.2); border-radius: 5px;">
+                    <strong>Remediation:</strong> Upgrade to Log4j 2.17.1 or later immediately. This is one of the most critical
+                    vulnerabilities discovered in recent years with active widespread exploitation.
+                </div>
+            </div>
+        </div>
+
+        <!-- Tomcat Library Card -->
+        <div class="library-card" data-severity="critical" data-grade="f" data-months="42">
+            <div class="library-header">
+                <div>
+                    <div class="library-name">Tomcat Embed Core</div>
+                    <div class="library-version">Version: 9.0.75</div>
+                </div>
+                <div>
+                    <span class="badge badge-critical">CRITICAL</span>
+                    <span class="badge badge-outdated">42 Months Old</span>
+                    <span class="badge" style="background: #ff4444; color: #fff;">Grade: F</span>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <span class="badge badge-critical">4 CRITICAL</span>
+                <span class="badge badge-high">10 HIGH</span>
+                <span class="badge badge-medium">4 MEDIUM</span>
+            </div>
+
+            <div class="risk-meter">
+                <div class="risk-fill" style="width: 95%;">Risk: 95%</div>
+            </div>
+
+            <div class="cve-list">
+                <h4 style="color: #ff4444; margin-bottom: 15px;">Known CVEs (18 total)</h4>
+
+                <div class="cve-item">
+                    <div class="cve-id">CVE-2023-46589</div>
+                    <div class="cve-description">
+                        <strong>Severity: CRITICAL | CVSS 9.8</strong><br>
+                        Improper Input Validation vulnerability allowing HTTP request smuggling attacks. Affects all Tomcat 9.0.x
+                        versions prior to 9.0.83.
+                    </div>
+                </div>
+
+                <div class="cve-item">
+                    <div class="cve-id">CVE-2023-41080</div>
+                    <div class="cve-description">
+                        <strong>Severity: CRITICAL | CVSS 9.1</strong><br>
+                        Open redirect vulnerability in FORM authentication. Attackers can redirect users to malicious sites.
+                    </div>
+                </div>
+
+                <div class="cve-item">
+                    <div class="cve-id">CVE-2023-28708</div>
+                    <div class="cve-description">
+                        <strong>Severity: HIGH | CVSS 7.5</strong><br>
+                        Information disclosure via cached content. May expose sensitive application data to unauthorized users.
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px; color: rgba(255, 255, 255, 0.7);">
+                    <em>+ 15 additional CVEs ranging from MEDIUM to HIGH severity</em>
+                </div>
+
+                <div style="margin-top: 15px; padding: 10px; background: rgba(255, 68, 68, 0.2); border-radius: 5px;">
+                    <strong>Remediation:</strong> Upgrade to Tomcat 9.0.83 or later. Consider migrating to Tomcat 10.x for
+                    long-term support and improved security.
+                </div>
+            </div>
+        </div>
+
+        <!-- SnakeYAML Library Card -->
+        <div class="library-card" data-severity="critical" data-grade="f" data-months="38">
+            <div class="library-header">
+                <div>
+                    <div class="library-name">SnakeYAML</div>
+                    <div class="library-version">Version: 1.29</div>
+                </div>
+                <div>
+                    <span class="badge badge-critical">CRITICAL</span>
+                    <span class="badge badge-outdated">38 Months Old</span>
+                    <span class="badge" style="background: #ff4444; color: #fff;">Grade: F</span>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <span class="badge badge-critical">3 CRITICAL</span>
+                <span class="badge badge-high">5 HIGH</span>
+                <span class="badge badge-medium">2 MEDIUM</span>
+            </div>
+
+            <div class="risk-meter">
+                <div class="risk-fill" style="width: 92%;">Risk: 92%</div>
+            </div>
+
+            <div class="cve-list">
+                <h4 style="color: #ff4444; margin-bottom: 15px;">Known CVEs (10 total)</h4>
+
+                <div class="cve-item">
+                    <div class="cve-id">CVE-2022-1471</div>
+                    <div class="cve-description">
+                        <strong>Severity: CRITICAL | CVSS 9.8</strong><br>
+                        Deserialization of Untrusted Data vulnerability. Allows remote attackers to execute arbitrary code via
+                        specially crafted YAML payloads. Constructor() should be replaced with SafeConstructor() when parsing
+                        untrusted content.
+                    </div>
+                </div>
+
+                <div class="cve-item">
+                    <div class="cve-id">CVE-2022-38752</div>
+                    <div class="cve-description">
+                        <strong>Severity: CRITICAL | CVSS 9.1</strong><br>
+                        Java object deserialization issue leading to remote code execution. Affects applications that parse
+                        YAML from untrusted sources.
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px; padding: 10px; background: rgba(255, 68, 68, 0.2); border-radius: 5px;">
+                    <strong>Remediation:</strong> Upgrade to SnakeYAML 2.0 or later. Use SafeConstructor for parsing untrusted
+                    YAML content. Review all YAML parsing code for security best practices.
+                </div>
+            </div>
+        </div>
+
+        <!-- Commons Collections Library Card -->
+        <div class="library-card" data-severity="critical" data-grade="f" data-months="96">
+            <div class="library-header">
+                <div>
+                    <div class="library-name">Apache Commons Collections</div>
+                    <div class="library-version">Version: 4.0</div>
+                </div>
+                <div>
+                    <span class="badge badge-critical">CRITICAL</span>
+                    <span class="badge badge-outdated">96 Months Old</span>
+                    <span class="badge" style="background: #ff4444; color: #fff;">Grade: F</span>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <span class="badge badge-critical">2 CRITICAL</span>
+                <span class="badge badge-high">1 HIGH</span>
+            </div>
+
+            <div class="risk-meter">
+                <div class="risk-fill" style="width: 88%;">Risk: 88%</div>
+            </div>
+
+            <div class="cve-list">
+                <h4 style="color: #ff4444; margin-bottom: 15px;">Known CVEs (3 total)</h4>
+
+                <div class="cve-item">
+                    <div class="cve-id">CVE-2015-7501</div>
+                    <div class="cve-description">
+                        <strong>Severity: CRITICAL | CVSS 9.8</strong><br>
+                        Remote code execution via Java object deserialization. The InvokerTransformer class allows execution
+                        of arbitrary Java code when deserializing untrusted data. Widely exploited in enterprise applications
+                        using vulnerable versions.
+                    </div>
+                </div>
+
+                <div class="cve-item">
+                    <div class="cve-id">CVE-2015-6420</div>
+                    <div class="cve-description">
+                        <strong>Severity: CRITICAL | CVSS 9.0</strong><br>
+                        Deserialization vulnerability in the functors package. Similar to CVE-2015-7501, enables remote code
+                        execution through malicious serialized objects.
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px; padding: 10px; background: rgba(255, 68, 68, 0.2); border-radius: 5px;">
+                    <strong>Remediation:</strong> Upgrade to Commons Collections 4.4 or later immediately. Version 4.0 is 8 years
+                    old and contains well-known RCE vulnerabilities actively exploited in attacks.
+                </div>
+            </div>
+        </div>
+
+        <!-- Spring Framework Library Card -->
+        <div class="library-card" data-severity="critical" data-grade="f" data-months="45">
+            <div class="library-header">
+                <div>
+                    <div class="library-name">Spring Framework Core</div>
+                    <div class="library-version">Version: 5.3.18</div>
+                </div>
+                <div>
+                    <span class="badge badge-critical">CRITICAL</span>
+                    <span class="badge badge-outdated">45 Months Old</span>
+                    <span class="badge" style="background: #ff4444; color: #fff;">Grade: F</span>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <span class="badge badge-critical">4 CRITICAL</span>
+                <span class="badge badge-high">7 HIGH</span>
+                <span class="badge badge-medium">3 MEDIUM</span>
+            </div>
+
+            <div class="risk-meter">
+                <div class="risk-fill" style="width: 94%;">Risk: 94%</div>
+            </div>
+
+            <div class="cve-list">
+                <h4 style="color: #ff4444; margin-bottom: 15px;">Known CVEs (14 total)</h4>
+
+                <div class="cve-item">
+                    <div class="cve-id">CVE-2022-22965 (Spring4Shell)</div>
+                    <div class="cve-description">
+                        <strong>Severity: CRITICAL | CVSS 9.8</strong><br>
+                        Remote code execution vulnerability in Spring Framework. Allows attackers to obtain AccessLogValve object
+                        and exploit it to write malicious JSP files. Affects Spring MVC and Spring WebFlux applications running
+                        on JDK 9+.
+                    </div>
+                </div>
+
+                <div class="cve-item">
+                    <div class="cve-id">CVE-2022-22950</div>
+                    <div class="cve-description">
+                        <strong>Severity: CRITICAL | CVSS 8.8</strong><br>
+                        Expression Language (SpEL) injection vulnerability. Allows remote code execution when SpEL expressions
+                        contain untrusted data.
+                    </div>
+                </div>
+
+                <div class="cve-item">
+                    <div class="cve-id">CVE-2023-20861</div>
+                    <div class="cve-description">
+                        <strong>Severity: HIGH | CVSS 7.5</strong><br>
+                        HTTP request smuggling vulnerability in Spring Framework. May allow bypass of security controls and
+                        unauthorized access to application resources.
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px; color: rgba(255, 255, 255, 0.7);">
+                    <em>+ 11 additional CVEs including Spring4Shell variants</em>
+                </div>
+
+                <div style="margin-top: 15px; padding: 10px; background: rgba(255, 68, 68, 0.2); border-radius: 5px;">
+                    <strong>Remediation:</strong> Upgrade to Spring Framework 5.3.27+ or migrate to Spring 6.x. Review all
+                    Spring MVC controllers and WebFlux handlers for proper input validation.
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Libraries Summary Table -->
+        <div class="section-header">
+            <h2>📋 Additional High-Risk Libraries</h2>
+            <p>Other libraries requiring attention</p>
+        </div>
+
+        <div class="library-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Library Name</th>
+                        <th>Version</th>
+                        <th>Grade</th>
+                        <th>CVEs</th>
+                        <th>Months Old</th>
+                        <th>Risk</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-grade="f" data-months="52">
+                        <td>Jackson Databind</td>
+                        <td>2.12.3</td>
+                        <td><span class="grade-letter" style="font-size: 1.5em; color: #ff4444;">F</span></td>
+                        <td><span class="badge badge-critical">2 CRITICAL</span> <span class="badge badge-high">6 HIGH</span></td>
+                        <td>52 months</td>
+                        <td>
+                            <div class="risk-meter" style="height: 20px;">
+                                <div class="risk-fill" style="width: 85%; font-size: 0.75em;">85%</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-grade="f" data-months="48">
+                        <td>Apache HttpClient</td>
+                        <td>4.5.10</td>
+                        <td><span class="grade-letter" style="font-size: 1.5em; color: #ff4444;">F</span></td>
+                        <td><span class="badge badge-high">4 HIGH</span> <span class="badge badge-medium">3 MEDIUM</span></td>
+                        <td>48 months</td>
+                        <td>
+                            <div class="risk-meter" style="height: 20px;">
+                                <div class="risk-fill" style="width: 72%; font-size: 0.75em;">72%</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-grade="d" data-months="36">
+                        <td>Netty All</td>
+                        <td>4.1.65.Final</td>
+                        <td><span class="grade-letter" style="font-size: 1.5em; color: #ff6600;">D</span></td>
+                        <td><span class="badge badge-high">5 HIGH</span> <span class="badge badge-medium">4 MEDIUM</span></td>
+                        <td>36 months</td>
+                        <td>
+                            <div class="risk-meter" style="height: 20px;">
+                                <div class="risk-fill" style="width: 68%; font-size: 0.75em;">68%</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-grade="f" data-months="60">
+                        <td>PostgreSQL JDBC</td>
+                        <td>42.2.14</td>
+                        <td><span class="grade-letter" style="font-size: 1.5em; color: #ff4444;">F</span></td>
+                        <td><span class="badge badge-critical">1 CRITICAL</span> <span class="badge badge-high">3 HIGH</span></td>
+                        <td>60 months</td>
+                        <td>
+                            <div class="risk-meter" style="height: 20px;">
+                                <div class="risk-fill" style="width: 79%; font-size: 0.75em;">79%</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-grade="d" data-months="42">
+                        <td>Hibernate Core</td>
+                        <td>5.4.32.Final</td>
+                        <td><span class="grade-letter" style="font-size: 1.5em; color: #ff6600;">D</span></td>
+                        <td><span class="badge badge-high">3 HIGH</span> <span class="badge badge-medium">5 MEDIUM</span></td>
+                        <td>42 months</td>
+                        <td>
+                            <div class="risk-meter" style="height: 20px;">
+                                <div class="risk-fill" style="width: 65%; font-size: 0.75em;">65%</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-grade="c" data-months="30">
+                        <td>Logback Classic</td>
+                        <td>1.2.10</td>
+                        <td><span class="grade-letter" style="font-size: 1.5em; color: #ffaa00;">C</span></td>
+                        <td><span class="badge badge-high">2 HIGH</span> <span class="badge badge-medium">2 MEDIUM</span></td>
+                        <td>30 months</td>
+                        <td>
+                            <div class="risk-meter" style="height: 20px;">
+                                <div class="risk-fill" style="width: 58%; font-size: 0.75em;">58%</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-grade="f" data-months="55">
+                        <td>Guava</td>
+                        <td>30.0-jre</td>
+                        <td><span class="grade-letter" style="font-size: 1.5em; color: #ff4444;">F</span></td>
+                        <td><span class="badge badge-high">4 HIGH</span> <span class="badge badge-medium">1 MEDIUM</span></td>
+                        <td>55 months</td>
+                        <td>
+                            <div class="risk-meter" style="height: 20px;">
+                                <div class="risk-fill" style="width: 70%; font-size: 0.75em;">70%</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-grade="d" data-months="38">
+                        <td>Apache Commons IO</td>
+                        <td>2.8.0</td>
+                        <td><span class="grade-letter" style="font-size: 1.5em; color: #ff6600;">D</span></td>
+                        <td><span class="badge badge-high">1 HIGH</span> <span class="badge badge-medium">2 MEDIUM</span></td>
+                        <td>38 months</td>
+                        <td>
+                            <div class="risk-meter" style="height: 20px;">
+                                <div class="risk-fill" style="width: 52%; font-size: 0.75em;">52%</div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Recommendations Section -->
+        <div class="section-header">
+            <h2>💡 Remediation Recommendations</h2>
+            <p>Prioritized action plan for library security improvements</p>
+        </div>
+
+        <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 30px; margin-bottom: 40px; border: 2px solid rgba(102, 126, 234, 0.3);">
+            <h3 style="color: #667eea; margin-bottom: 20px; font-size: 1.8em;">Priority Actions</h3>
+
+            <div style="margin-bottom: 25px; padding: 20px; background: rgba(255, 68, 68, 0.1); border-left: 5px solid #ff4444; border-radius: 8px;">
+                <h4 style="color: #ff4444; margin-bottom: 10px;">Immediate (24-48 hours)</h4>
+                <ul style="margin-left: 20px; line-height: 2;">
+                    <li><strong>Log4j 2.14.1</strong> → Upgrade to 2.17.1+ (CVE-2021-44228 - Log4Shell RCE)</li>
+                    <li><strong>SnakeYAML 1.29</strong> → Upgrade to 2.0+ (CVE-2022-1471 - Deserialization RCE)</li>
+                    <li><strong>Commons Collections 4.0</strong> → Upgrade to 4.4+ (CVE-2015-7501 - Deserialization RCE)</li>
+                </ul>
+            </div>
+
+            <div style="margin-bottom: 25px; padding: 20px; background: rgba(255, 102, 0, 0.1); border-left: 5px solid #ff6600; border-radius: 8px;">
+                <h4 style="color: #ff6600; margin-bottom: 10px;">High Priority (1-2 weeks)</h4>
+                <ul style="margin-left: 20px; line-height: 2;">
+                    <li><strong>Spring Framework 5.3.18</strong> → Upgrade to 5.3.27+ or 6.x (Spring4Shell)</li>
+                    <li><strong>Tomcat-embed-core 9.0.75</strong> → Upgrade to 9.0.83+ (18 CVEs)</li>
+                    <li><strong>Jackson Databind 2.12.3</strong> → Upgrade to latest 2.x (8 CVEs)</li>
+                    <li><strong>PostgreSQL JDBC 42.2.14</strong> → Upgrade to 42.5.0+ (SQL injection vulnerabilities)</li>
+                </ul>
+            </div>
+
+            <div style="margin-bottom: 25px; padding: 20px; background: rgba(255, 170, 0, 0.1); border-left: 5px solid #ffaa00; border-radius: 8px;">
+                <h4 style="color: #ffaa00; margin-bottom: 10px;">Medium Priority (1 month)</h4>
+                <ul style="margin-left: 20px; line-height: 2;">
+                    <li>Update all libraries with D or F grades (53 total libraries)</li>
+                    <li>Review and update libraries 30+ months outdated</li>
+                    <li>Implement automated dependency scanning in CI/CD pipeline</li>
+                    <li>Establish regular library update schedule (quarterly reviews)</li>
+                </ul>
+            </div>
+
+            <div style="padding: 20px; background: rgba(102, 126, 234, 0.1); border-left: 5px solid #667eea; border-radius: 8px;">
+                <h4 style="color: #667eea; margin-bottom: 10px;">Long-term Strategy</h4>
+                <ul style="margin-left: 20px; line-height: 2;">
+                    <li>Implement Software Composition Analysis (SCA) tooling</li>
+                    <li>Establish dependency update policy and governance</li>
+                    <li>Create automated alerts for new CVE disclosures</li>
+                    <li>Set up dependency version pinning and lock files</li>
+                    <li>Regular security training on secure dependency management</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Key Metrics Summary -->
+        <div class="section-header">
+            <h2>📈 Security Metrics Overview</h2>
+            <p>Library health indicators and trends</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 40px;">
+            <div style="background: rgba(255, 255, 255, 0.05); padding: 25px; border-radius: 12px; border: 2px solid rgba(102, 126, 234, 0.3);">
+                <h4 style="color: #667eea; margin-bottom: 15px; font-size: 1.3em;">Average Library Age</h4>
+                <div style="font-size: 2.5em; font-weight: bold; color: #ff6600; margin-bottom: 10px;">32 months</div>
+                <p style="color: rgba(255, 255, 255, 0.7);">Industry standard: 12-18 months</p>
+            </div>
+
+            <div style="background: rgba(255, 255, 255, 0.05); padding: 25px; border-radius: 12px; border: 2px solid rgba(102, 126, 234, 0.3);">
+                <h4 style="color: #667eea; margin-bottom: 15px; font-size: 1.3em;">Libraries with Active CVEs</h4>
+                <div style="font-size: 2.5em; font-weight: bold; color: #ff4444; margin-bottom: 10px;">67%</div>
+                <p style="color: rgba(255, 255, 255, 0.7);">85 out of 127 total libraries</p>
+            </div>
+
+            <div style="background: rgba(255, 255, 255, 0.05); padding: 25px; border-radius: 12px; border: 2px solid rgba(102, 126, 234, 0.3);">
+                <h4 style="color: #667eea; margin-bottom: 15px; font-size: 1.3em;">Average Security Grade</h4>
+                <div style="font-size: 2.5em; font-weight: bold; color: #ffaa00; margin-bottom: 10px;">C-</div>
+                <p style="color: rgba(255, 255, 255, 0.7);">Target grade: B+ or higher</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>Generated using Contrast Security MCP Server | <a href="https://www.contrastsecurity.com" target="_blank">contrastsecurity.com</a></p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Library Security Analysis Report | Generated: January 17, 2026</p>
+            <p style="margin-top: 10px;"><a href="index.html">← Back to Reports</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // Filter functionality
+        function filterLibraries(filter) {
+            const cards = document.querySelectorAll('.library-card');
+            const rows = document.querySelectorAll('.library-table tbody tr');
+            const buttons = document.querySelectorAll('.filter-btn');
+
+            // Update active button
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Filter cards
+            cards.forEach(card => {
+                let show = false;
+
+                switch(filter) {
+                    case 'all':
+                        show = true;
+                        break;
+                    case 'critical':
+                        show = card.dataset.severity === 'critical';
+                        break;
+                    case 'outdated':
+                        show = parseInt(card.dataset.months) >= 30;
+                        break;
+                    case 'f-grade':
+                        show = card.dataset.grade === 'f';
+                        break;
+                }
+
+                card.style.display = show ? 'block' : 'none';
+                if (show) {
+                    card.style.animation = 'fadeIn 0.5s ease';
+                }
+            });
+
+            // Filter table rows
+            rows.forEach(row => {
+                let show = false;
+
+                switch(filter) {
+                    case 'all':
+                        show = true;
+                        break;
+                    case 'critical':
+                        show = row.querySelector('.badge-critical') !== null;
+                        break;
+                    case 'outdated':
+                        show = parseInt(row.dataset.months) >= 30;
+                        break;
+                    case 'f-grade':
+                        show = row.dataset.grade === 'f';
+                        break;
+                }
+
+                row.style.display = show ? '' : 'none';
+            });
+        }
+
+        // Add fade-in animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Animate risk meters on load
+        window.addEventListener('load', () => {
+            const riskFills = document.querySelectorAll('.risk-fill');
+            riskFills.forEach(fill => {
+                const width = fill.style.width;
+                fill.style.width = '0%';
+                setTimeout(() => {
+                    fill.style.width = width;
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>

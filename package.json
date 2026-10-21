@@ -1,0 +1,13 @@
+{
+  "name": "contrast-generated-reports",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Security reports generated from the Contrast MCP server, served live by a local proxy",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "mock": "MOCK=1 node server.js"
+  },
+  "engines": { "node": ">=18" }
+}

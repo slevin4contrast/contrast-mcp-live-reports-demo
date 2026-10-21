@@ -1,0 +1,668 @@
+{
+ "list": [
+  {
+   "cveId": "CVE-2015-6420",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2015-6420",
+   "severity": "CRITICAL",
+   "maxScore": 10,
+   "cveShieldExists": true,
+   "epssScore": 0.18763,
+   "epssPercentile": 97.26,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 0,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 1
+   },
+   "highestShieldStatus": "EXPLOITED",
+   "numApplications": 1,
+   "numEnvironments": 1,
+   "numLibraryVersions": 1
+  },
+  {
+   "cveId": "CVE-2021-44228",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2021-44228",
+   "severity": "CRITICAL",
+   "maxScore": 10,
+   "cveShieldExists": true,
+   "epssScore": 0.99999,
+   "epssPercentile": 100,
+   "knownExploited": true,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 0,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 1
+   },
+   "highestShieldStatus": "EXPLOITED",
+   "numApplications": 1,
+   "numEnvironments": 1,
+   "numLibraryVersions": 1
+  },
+  {
+   "cveId": "CVE-2025-24813",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2025-24813",
+   "severity": "CRITICAL",
+   "maxScore": 10,
+   "cveShieldExists": true,
+   "epssScore": 0.99927,
+   "epssPercentile": 99.97,
+   "knownExploited": true,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 1,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "NOT_SEEN",
+   "numApplications": 1,
+   "numEnvironments": 1,
+   "numLibraryVersions": 1
+  },
+  {
+   "cveId": "CVE-2021-45046",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2021-45046",
+   "severity": "CRITICAL",
+   "maxScore": 9.5,
+   "cveShieldExists": true,
+   "epssScore": 0.99977,
+   "epssPercentile": 99.98,
+   "knownExploited": true,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 0,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 1
+   },
+   "highestShieldStatus": "EXPLOITED",
+   "numApplications": 1,
+   "numEnvironments": 1,
+   "numLibraryVersions": 1
+  },
+  {
+   "cveId": "CVE-2023-44487",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2023-44487",
+   "severity": "CRITICAL",
+   "maxScore": 9.3,
+   "cveShieldExists": true,
+   "epssScore": 0.99999,
+   "epssPercentile": 100,
+   "knownExploited": true,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 1,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "NOT_SEEN",
+   "numApplications": 1,
+   "numEnvironments": 1,
+   "numLibraryVersions": 1
+  },
+  {
+   "cveId": "CVE-2025-64087",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2025-64087",
+   "severity": "CRITICAL",
+   "maxScore": 9.3,
+   "cveShieldExists": true,
+   "epssScore": 0.00586,
+   "epssPercentile": 47.03,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 0,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 1
+   },
+   "highestShieldStatus": "EXPLOITED",
+   "numApplications": 1,
+   "numEnvironments": 1,
+   "numLibraryVersions": 1
+  },
+  {
+   "cveId": "CVE-2015-7501",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2015-7501",
+   "severity": "CRITICAL",
+   "maxScore": 9.1,
+   "cveShieldExists": true,
+   "epssScore": 0.85562,
+   "epssPercentile": 99.72,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 1,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "NOT_SEEN",
+   "numApplications": 1,
+   "numEnvironments": 1,
+   "numLibraryVersions": 1
+  },
+  {
+   "cveId": "CVE-2016-1000027",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2016-1000027",
+   "severity": "CRITICAL",
+   "maxScore": 9.1,
+   "cveShieldExists": true,
+   "epssScore": 0.33179,
+   "epssPercentile": 98.36,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 1,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "NOT_SEEN",
+   "numApplications": 1,
+   "numEnvironments": 1,
+   "numLibraryVersions": 1
+  },
+  {
+   "cveId": "CVE-2022-1471",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2022-1471",
+   "severity": "CRITICAL",
+   "maxScore": 9.1,
+   "cveShieldExists": true,
+   "epssScore": 0.99569,
+   "epssPercentile": 99.95,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 1,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "NOT_SEEN",
+   "numApplications": 1,
+   "numEnvironments": 1,
+   "numLibraryVersions": 1
+  },
+  {
+   "cveId": "CVE-2023-34034",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2023-34034",
+   "severity": "CRITICAL",
+   "maxScore": 9.1,
+   "cveShieldExists": true,
+   "epssScore": 0.04107,
+   "epssPercentile": 90.67,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 1,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "NOT_SEEN",
+   "numApplications": 1,
+   "numEnvironments": 1,
+   "numLibraryVersions": 1
+  },
+  {
+   "cveId": "CVE-2024-50379",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2024-50379",
+   "severity": "CRITICAL",
+   "maxScore": 9.1,
+   "cveShieldExists": true,
+   "epssScore": 0.31824,
+   "epssPercentile": 98.29,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 1,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "NOT_SEEN",
+   "numApplications": 1,
+   "numEnvironments": 1,
+   "numLibraryVersions": 1
+  },
+  {
+   "cveId": "CVE-2024-56337",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2024-56337",
+   "severity": "CRITICAL",
+   "maxScore": 9.1,
+   "cveShieldExists": true,
+   "epssScore": 0.08969,
+   "epssPercentile": 95.22,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 1,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "NOT_SEEN",
+   "numApplications": 1,
+   "numEnvironments": 1,
+   "numLibraryVersions": 1
+  },
+  {
+   "cveId": "CVE-2026-41293",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-41293",
+   "severity": "CRITICAL",
+   "maxScore": 9.1,
+   "cveShieldExists": false,
+   "epssScore": 0.0168,
+   "epssPercentile": 76.62,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 3,
+    "shieldOff": 0,
+    "notSeen": 0,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "NO_SHIELD",
+   "numApplications": 3,
+   "numEnvironments": 1,
+   "numLibraryVersions": 2
+  },
+  {
+   "cveId": "CVE-2026-43512",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-43512",
+   "severity": "CRITICAL",
+   "maxScore": 9.1,
+   "cveShieldExists": true,
+   "epssScore": 0.01326,
+   "epssPercentile": 70.58,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 3,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "NOT_SEEN",
+   "numApplications": 3,
+   "numEnvironments": 1,
+   "numLibraryVersions": 2
+  },
+  {
+   "cveId": "CVE-2026-47884",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-47884",
+   "severity": "CRITICAL",
+   "maxScore": 9.1,
+   "cveShieldExists": true,
+   "epssScore": 0.00605,
+   "epssPercentile": 47.99,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 3,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "NOT_SEEN",
+   "numApplications": 3,
+   "numEnvironments": 1,
+   "numLibraryVersions": 2
+  },
+  {
+   "cveId": "CVE-2026-65905",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-65905",
+   "severity": "CRITICAL",
+   "maxScore": 9.1,
+   "cveShieldExists": true,
+   "epssScore": 0.00562,
+   "epssPercentile": 45.69,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 3,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "NOT_SEEN",
+   "numApplications": 3,
+   "numEnvironments": 1,
+   "numLibraryVersions": 2
+  },
+  {
+   "cveId": "CVE-2024-38821",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2024-38821",
+   "severity": "CRITICAL",
+   "maxScore": 9,
+   "cveShieldExists": true,
+   "epssScore": 0.01741,
+   "epssPercentile": 77.43,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 1,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "NOT_SEEN",
+   "numApplications": 1,
+   "numEnvironments": 1,
+   "numLibraryVersions": 1
+  },
+  {
+   "cveId": "CVE-2025-66614",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2025-66614",
+   "severity": "CRITICAL",
+   "maxScore": 9,
+   "cveShieldExists": true,
+   "epssScore": 0.00274,
+   "epssPercentile": 18.63,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 3,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "NOT_SEEN",
+   "numApplications": 3,
+   "numEnvironments": 1,
+   "numLibraryVersions": 2
+  },
+  {
+   "cveId": "CVE-2026-22732",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-22732",
+   "severity": "CRITICAL",
+   "maxScore": 9,
+   "cveShieldExists": true,
+   "epssScore": 0.00489,
+   "epssPercentile": 40.83,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 0,
+    "protecting": 0,
+    "exposed": 1,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "EXPOSED",
+   "numApplications": 1,
+   "numEnvironments": 1,
+   "numLibraryVersions": 1
+  },
+  {
+   "cveId": "CVE-2026-43515",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-43515",
+   "severity": "CRITICAL",
+   "maxScore": 9,
+   "cveShieldExists": true,
+   "epssScore": 0.01221,
+   "epssPercentile": 68.3,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 3,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "NOT_SEEN",
+   "numApplications": 3,
+   "numEnvironments": 1,
+   "numLibraryVersions": 2
+  },
+  {
+   "cveId": "CVE-2026-65182",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-65182",
+   "severity": "CRITICAL",
+   "maxScore": 9,
+   "cveShieldExists": true,
+   "epssScore": 0.00538,
+   "epssPercentile": 44.22,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 3,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "NOT_SEEN",
+   "numApplications": 3,
+   "numEnvironments": 1,
+   "numLibraryVersions": 2
+  },
+  {
+   "cveId": "CVE-2026-68525",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-68525",
+   "severity": "CRITICAL",
+   "maxScore": 9,
+   "cveShieldExists": true,
+   "epssScore": 0.00477,
+   "epssPercentile": 39.87,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 3,
+    "protecting": 0,
+    "exposed": 0,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "NOT_SEEN",
+   "numApplications": 3,
+   "numEnvironments": 1,
+   "numLibraryVersions": 2
+  },
+  {
+   "cveId": "CVE-2026-40477",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-40477",
+   "severity": "HIGH",
+   "maxScore": 8.4,
+   "cveShieldExists": true,
+   "epssScore": 0.00944,
+   "epssPercentile": 60.45,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 1,
+    "protecting": 0,
+    "exposed": 1,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "EXPOSED",
+   "numApplications": 1,
+   "numEnvironments": 1,
+   "numLibraryVersions": 2
+  },
+  {
+   "cveId": "CVE-2026-40478",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-40478",
+   "severity": "HIGH",
+   "maxScore": 8.4,
+   "cveShieldExists": true,
+   "epssScore": 0.01204,
+   "epssPercentile": 67.85,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 1,
+    "protecting": 0,
+    "exposed": 1,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "EXPOSED",
+   "numApplications": 1,
+   "numEnvironments": 1,
+   "numLibraryVersions": 2
+  },
+  {
+   "cveId": "CVE-2026-41901",
+   "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2026-41901",
+   "severity": "HIGH",
+   "maxScore": 8.4,
+   "cveShieldExists": true,
+   "epssScore": 0.00544,
+   "epssPercentile": 44.59,
+   "knownExploited": false,
+   "shieldStatusCounts": {
+    "noShield": 0,
+    "shieldOff": 0,
+    "notSeen": 1,
+    "protecting": 0,
+    "exposed": 1,
+    "blocked": 0,
+    "exploited": 0
+   },
+   "highestShieldStatus": "EXPOSED",
+   "numApplications": 1,
+   "numEnvironments": 1,
+   "numLibraryVersions": 2
+  }
+ ],
+ "detail": {
+  "cveId": "CVE-2015-6420",
+  "cveUrl": "https://nvd.nist.gov/vuln/detail/CVE-2015-6420",
+  "risk": {
+   "title": "Insecure Deserialization in Apache Commons Collection",
+   "description": "Serialized-object interfaces in certain Cisco Collaboration and Social Media; Endpoint Clients and Client Software; Network Application, Service, and Acceleration; Network and Content Security Devices; Network Management and Provisioning; Routing and Switching - Enterprise and Service Provider; Unified Computing; Voice and Unified Communications Devices; Video, Streaming, TelePresence, and Transcoding Devices; Wireless; and Cisco Hosted Services products allow remote attackers to execute arbitrary commands via a crafted serialized Java object, related to the Apache Commons Collections (ACC) library.",
+   "severity": "CRITICAL",
+   "maxScore": 10,
+   "epssScore": 0.18763,
+   "epssPercentile": 97.26,
+   "knownExploited": false
+  },
+  "exposure": {
+   "present": true,
+   "environments": [
+    "QA"
+   ],
+   "libraries": [
+    {
+     "name": "commons-collections4",
+     "version": "4.0"
+    }
+   ],
+   "issueCount": 1
+  },
+  "protection": {
+   "shieldAvailable": true,
+   "maximumProtectionMode": "BLOCK",
+   "environmentProtectionModes": [
+    {
+     "environment": "DEVELOPMENT",
+     "protectionMode": "MONITOR"
+    },
+    {
+     "environment": "QA",
+     "protectionMode": "MONITOR"
+    },
+    {
+     "environment": "PRODUCTION",
+     "protectionMode": "MONITOR"
+    }
+   ],
+   "hasOverride": false
+  },
+  "signals": {
+   "shieldAvailableButNotBlockingInProduction": true
+  },
+  "impactStats": {
+   "impactedAppCount": 1,
+   "totalAppCount": 8,
+   "impactedServerCount": 1,
+   "totalServerCount": 8,
+   "appPercentage": 12.5,
+   "serverPercentage": 12.5
+  },
+  "cvssVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H",
+  "cwe": "CWE-502",
+  "apps": [
+   {
+    "name": "SAML-cargocats-frontgateservice",
+    "importance": "MEDIUM",
+    "classCount": 431,
+    "classUsage": 5
+   }
+  ],
+  "servers": [
+   {
+    "name": "SAML-cargocats-frontgateservice-agent",
+    "environment": "QA",
+    "status": "ONLINE",
+    "path": "/app/"
+   }
+  ],
+  "issues": [
+   {
+    "issueId": "ISS-2026-1474",
+    "app": "SAML-cargocats-frontgateservice",
+    "library": "commons-collections4 4.0",
+    "score": 10,
+    "severity": "CRITICAL",
+    "status": "OPEN",
+    "shield": {
+     "development": null,
+     "qa": "EXPLOITED",
+     "production": null
+    }
+   }
+  ]
+ }
+}

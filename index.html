@@ -218,85 +218,111 @@
             </p>
             <p>
                 Each report provides interactive insights into application security, vulnerability management, attack detection,
-                and more. These examples illustrate how the Contrast MCP Server can be leveraged to create custom security
+                and more. These examples illustrate how the Contrast MCP Server can be used to create custom security
                 dashboards and reporting solutions.
+            </p>
+            <p style="margin-top: 15px; padding: 15px 20px; background: rgba(0, 200, 120, 0.12); border-left: 4px solid #00c878; border-radius: 8px;">
+                <strong><span class="badge" style="background: #00c878; color: #0a0e27;">LIVE</span> pages pull data on demand.</strong>
+                Run <code style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 5px;">node server.js</code>
+                and open these reports at <code style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 5px;">http://localhost:3000</code>.
+                They call the same MCP tools Claude Code calls, reusing the token it already holds, so there is nothing to configure.
+                Every other report is a static snapshot. See the README for details.
             </p>
         </section>
 
         <section class="reports-grid">
             <div class="report-card">
                 <div class="report-icon">🗺️</div>
-                <h3>Attack Map Visualization <span class="badge exploited">EXPLOITED</span></h3>
+                <h3>Attack Activity <span class="badge" style="background: #00c878; color: #0a0e27;">LIVE</span></h3>
                 <p>
-                    Interactive geographic visualization of attack patterns targeting the Cargo Cats infrastructure.
-                    Shows real-time ADR (Attack Detection and Response) data with animated attack vectors connecting
-                    source IPs to server locations.
+                    ADR attack detection across the Cargo Cats infrastructure. Shows each attack source,
+                    the techniques it attempted, how many probes it sent, and which applications were
+                    exploited rather than merely probed.
                 </p>
                 <div class="report-meta">
-                    <span class="meta-item">📊 8 Total Attacks</span>
-                    <span class="meta-item">🚨 1 Exploited</span>
-                    <span class="meta-item">🔍 7 Probed</span>
-                    <span class="meta-item">📍 6 Unique IPs</span>
+                    <span class="meta-item">📊 5 Attacks</span>
+                    <span class="meta-item">🚨 3 Exploited</span>
+                    <span class="meta-item">🔍 1,322 Probes</span>
+                    <span class="meta-item">🎯 7 Apps Targeted</span>
                 </div>
                 <p style="font-size: 0.9em; margin-bottom: 15px;">
-                    <strong>Attack Types:</strong> SQL Injection, Command Injection, Path Traversal
+                    <strong>Top Techniques:</strong> Command Injection, SQL Injection, Path Traversal
                 </p>
                 <a href="attack_map.html" class="report-link">View Attack Map →</a>
             </div>
 
             <div class="report-card">
                 <div class="report-icon">📊</div>
-                <h3>Vulnerability Dashboard <span class="badge" style="background: #ff4444;">CRITICAL</span></h3>
+                <h3>Vulnerability Dashboard <span class="badge" style="background: #00c878; color: #0a0e27;">LIVE</span></h3>
                 <p>
                     Comprehensive vulnerability analysis across all applications, showing severity distributions,
                     trending issues, and remediation status. Track critical security issues requiring immediate attention.
                 </p>
                 <div class="report-meta">
-                    <span class="meta-item">🚨 24 Total Vulnerabilities</span>
-                    <span class="meta-item">💀 1 Critical</span>
-                    <span class="meta-item">🔴 3 High</span>
-                    <span class="meta-item">🟡 17 Medium</span>
+                    <span class="meta-item">🚨 27 Total Vulnerabilities</span>
+                    <span class="meta-item">💀 2 Critical</span>
+                    <span class="meta-item">🔴 4 High</span>
+                    <span class="meta-item">🟡 11 Medium</span>
                 </div>
                 <p style="font-size: 0.9em; margin-bottom: 15px;">
-                    <strong>Critical Issue:</strong> SQL Injection in cargo-cats-dataservice
+                    <strong>Critical Issues:</strong> SQL Injection in dataservice, JNDI Injection in frontgateservice
                 </p>
                 <a href="vulnerability_dashboard.html" class="report-link">View Dashboard →</a>
             </div>
 
             <div class="report-card">
                 <div class="report-icon">🔒</div>
-                <h3>Library Security Report <span class="badge exploited">CRITICAL</span></h3>
+                <h3>Library Security Report <span class="badge" style="background: #00c878; color: #0a0e27;">LIVE</span></h3>
                 <p>
                     Comprehensive analysis of third-party libraries and dependencies, highlighting known CVEs,
                     security grades, and outdated packages requiring immediate attention.
                 </p>
                 <div class="report-meta">
-                    <span class="meta-item">📚 127 Libraries</span>
-                    <span class="meta-item">🚨 85 With CVEs</span>
-                    <span class="meta-item">⚠️ 38 Critical</span>
-                    <span class="meta-item">📉 25 F-Grade</span>
+                    <span class="meta-item">📚 420 Libraries</span>
+                    <span class="meta-item">🚨 58 With CVEs</span>
+                    <span class="meta-item">⚠️ 39 Critical</span>
+                    <span class="meta-item">📉 132 F-Grade</span>
                 </div>
                 <p style="font-size: 0.9em; margin-bottom: 15px;">
-                    <strong>Key Risks:</strong> Log4Shell, Spring4Shell, SnakeYAML RCE, Commons Collections
+                    <strong>Key Risks:</strong> 181 unique CVEs, worst is tomcat-embed-core with 11 critical
                 </p>
                 <a href="library_security.html" class="report-link">View Security Report →</a>
             </div>
 
             <div class="report-card">
+                <div class="report-icon">🧨</div>
+                <h3>CVE Impact Report <span class="badge" style="background: #00c878; color: #0a0e27;">LIVE</span></h3>
+                <p>
+                    Pick any CVE and see its blast radius: affected applications and servers, runtime class usage,
+                    CVE Shield posture per environment, open issues, and a response plan built from the live data.
+                </p>
+                <div class="report-meta">
+                    <span class="meta-item">🔎 Top 25 by CVSS</span>
+                    <span class="meta-item">🎯 EPSS + CISA KEV</span>
+                    <span class="meta-item">🛡️ Shield per environment</span>
+                    <span class="meta-item">🚨 Exploitation observed</span>
+                </div>
+                <p style="font-size: 0.9em; margin-bottom: 15px;">
+                    <strong>Defaults to:</strong> the highest-scoring CVE agents have actually seen exploited
+                </p>
+                <a href="cve_impact.html" class="report-link">View CVE Report →</a>
+            </div>
+
+            <div class="report-card">
                 <div class="report-icon">📈</div>
-                <h3>Route Coverage Analysis</h3>
+                <h3>Route Coverage Analysis <span class="badge" style="background: #00c878; color: #0a0e27;">LIVE</span></h3>
                 <p>
                     Detailed breakdown of API endpoint coverage showing exercised vs. discovered routes
                     across all microservices in the application stack, with vulnerability tracking.
                 </p>
                 <div class="report-meta">
-                    <span class="meta-item">🔢 181 Total Routes</span>
-                    <span class="meta-item">✅ 110 Exercised</span>
-                    <span class="meta-item">🔍 71 Discovered</span>
-                    <span class="meta-item">📊 60.77% Avg Coverage</span>
+                    <span class="meta-item">🔢 100 Total Routes</span>
+                    <span class="meta-item">✅ 46 Exercised</span>
+                    <span class="meta-item">🔍 54 Discovered</span>
+                    <span class="meta-item">📊 46% Avg Coverage</span>
                 </div>
                 <p style="font-size: 0.9em; margin-bottom: 15px;">
-                    <strong>Highlight:</strong> 2 apps at 100% coverage, 1 CRITICAL vuln in exercised routes
+                    <strong>Highlight:</strong> dataservice at 18% coverage, 1 CRITICAL vuln on an exercised route
                 </p>
                 <a href="route_coverage.html" class="report-link">View Coverage Analysis →</a>
             </div>
@@ -360,19 +386,19 @@
 
             <div class="report-card">
                 <div class="report-icon">📋</div>
-                <h3>Compliance & MTTR Dashboard</h3>
+                <h3>Compliance &amp; MTTR Dashboard <span class="badge" style="background: #00c878; color: #0a0e27;">PARTLY LIVE</span></h3>
                 <p>
-                    Executive-level security posture view with Mean Time To Remediate metrics. Shows
-                    compliance status for NIST 800-53, PCI-DSS, OWASP Top 10, and SOC 2 frameworks.
+                    Live finding aging and SLA breach tracking at the top, from your org. The compliance
+                    framework sections below are sample content and are labeled as such on the page.
                 </p>
                 <div class="report-meta">
-                    <span class="meta-item">📊 33 Vulnerabilities</span>
-                    <span class="meta-item">⏱️ 3.2 Days MTTR</span>
-                    <span class="meta-item">✅ 76% Compliance</span>
-                    <span class="meta-item">📈 Improving</span>
+                    <span class="meta-item">📊 27 Open Findings</span>
+                    <span class="meta-item">⏱️ MTTR n/a</span>
+                    <span class="meta-item">✅ 93% Within SLA</span>
+                    <span class="meta-item">🚨 2 Breached</span>
                 </div>
                 <p style="font-size: 0.9em; margin-bottom: 15px;">
-                    <strong>Frameworks:</strong> NIST 800-53, PCI-DSS v4.0, OWASP, SOC 2
+                    <strong>Note:</strong> no remediation history in this org, so MTTR cannot be computed
                 </p>
                 <a href="compliance_mttr.html" class="report-link">View Compliance Dashboard →</a>
             </div>
