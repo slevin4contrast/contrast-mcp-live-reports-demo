@@ -689,7 +689,7 @@
   "name": "SAML-cargocats-aiservice",
   "appId": "4c3cb4f9-6d46-438d-9bfe-f4182f515fdf",
   "language": "Java",
-  "status": "online",
+  "status": "offline",
   "totalRoutes": 2,
   "exercised": 0,
   "discovered": 2,
