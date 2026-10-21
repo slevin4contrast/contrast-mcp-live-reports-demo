@@ -10,13 +10,40 @@ directly and draws the answer, and each shows which tools it called to get there
 **No AI tokens are spent viewing these pages.** MCP is a protocol, not a model. The pages talk to
 Contrast over HTTPS and no model runs, so refreshing a dashboard costs nothing in Claude usage.
 
+## Before anything else: connect the MCP server
+
+This project reads from the Contrast MCP server, so that has to exist first. Setup and the
+supported clients are documented at
+[Contrast-Security-OSS/mcp-contrast](https://github.com/Contrast-Security-OSS/mcp-contrast#hosted-mcp-server-recommended).
+The short version for Contrast SaaS:
+
+```bash
+claude mcp add --transport http contrast-hosted-mcp https://app.contrastsecurity.com/mcp
+```
+
+Replace the host if you are on a dedicated instance, following `https://<your-contrast-host>/mcp`.
+There is no API key. Authentication is OAuth with PKCE, and your first tool call opens a browser
+to sign in with your existing Contrast credentials and pick an organization.
+
+Then confirm it works by asking your assistant something like *"use Contrast to list my
+applications"*. If that returns data, this project will too.
+
+Two things to know:
+
+- **The name matters.** These scripts look for an MCP connection called `contrast-hosted-mcp`,
+  which is what the command above creates. If you registered it under another name, set
+  `CONTRAST_MCP_NAME` to match.
+- **On-premises or EOP?** The hosted server is SaaS only. There is a local Docker server that
+  authenticates with API and service keys instead; see the same repo. This project has only been
+  tested against the hosted one.
+
 ## Quick start
 
 ```bash
 npm start
 ```
 
-Then open http://localhost:3000. There is no API key to configure.
+Then open http://localhost:3000. There is no API key to configure here either.
 
 With no Contrast session the server runs in mock mode and serves sample data from `fixtures/`,
 labelled on the page with the date it was captured.
@@ -54,6 +81,22 @@ calls in about two seconds, starting with `search_cves` returning 25 rows.
 org, but the NIST, PCI-DSS, OWASP and SOC 2 sections below them are sample content. Contrast does
 not store control mappings, and the demo org has no remediation history, so MTTR is reported as
 not available rather than invented. A banner marks where the live data stops.
+
+## Using this without Claude
+
+Nothing here calls a language model, so your choice of assistant does not matter at runtime. MCP
+is a vendor-neutral protocol, and these pages are an ordinary web app calling that endpoint over
+HTTPS.
+
+The one place Claude appears is the initial sign-in: `npm run login` reads the token Claude Code
+already stored, so it can register an OAuth client of its own. After that the server renews
+itself and Claude Code is never consulted again, which you can verify by disconnecting it.
+
+Contrast's hosted MCP server also works with Codex CLI, GitHub Copilot CLI, opencode and Claude
+Desktop. Those store their credentials elsewhere, so `npm run login` cannot bootstrap from them
+yet. Until it can, either run the sign-in once on a machine with Claude Code, or have a Contrast
+admin create an OAuth client and write `.contrast-client.json` by hand as
+`{ clientId, clientSecret, tokenEndpoint, serverUrl }`.
 
 ## Keeping it signed in
 
@@ -154,6 +197,19 @@ Two quirks worth knowing. `get_route_coverage` and `list_applications_by_cve` ne
 under a `data` key, while the other tools return fields at the top level. And since pages build
 HTML in template literals, a syntax error leaves the page silently stuck on "Loading"; `npm test`
 catches that.
+
+## Known limits
+
+Worth understanding before pointing this at a large organization:
+
+- **Large result sets are truncated.** `/api/vulnerabilities` stops after 20 pages, so an org with
+  more than 1,000 findings silently shows 1,000. `/api/attacks` stops at 2,000. This is being
+  fixed; until it is, treat the totals on a big org as a floor rather than a count.
+- **Per-application endpoints fan out sequentially.** Route coverage makes one call per
+  application and library security makes several, one after another. On the eight-application demo
+  org that is 4 and 6 seconds. On two hundred applications it would be minutes.
+- **macOS only for sign-in.** `npm run login` reads the macOS keychain. The server itself is
+  cross-platform once `.contrast-client.json` exists.
 
 ## Notes
 

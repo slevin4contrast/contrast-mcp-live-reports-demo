@@ -21,7 +21,10 @@ const path = require('path');
 const crypto = require('crypto');
 const { execFileSync } = require('child_process');
 
-const SERVER_NAME = 'contrast-hosted-mcp';
+// The name the official setup command uses:
+//   claude mcp add --transport http contrast-hosted-mcp https://<your-host>/mcp
+// Override with CONTRAST_MCP_NAME if you registered it under another name.
+const SERVER_NAME = process.env.CONTRAST_MCP_NAME || 'contrast-hosted-mcp';
 const OUT = path.join(__dirname, '..', '.contrast-client.json');
 const PORT = Number(process.env.LOGIN_PORT || 5200);
 const REDIRECT = `http://127.0.0.1:${PORT}/callback`;
@@ -35,7 +38,11 @@ const load = () => { try { return JSON.parse(fs.readFileSync(OUT, 'utf8')); } ca
 function keychainEntry() {
   const raw = execFileSync('security', ['find-generic-password', '-s', 'Claude Code-credentials', '-w'], { encoding: 'utf8' });
   const entry = Object.values(JSON.parse(raw).mcpOAuth || {}).find((e) => e.serverName === SERVER_NAME);
-  if (!entry) throw new Error(`No stored credentials for ${SERVER_NAME}. Connect it in Claude Code with /mcp first.`);
+  if (!entry) {
+    throw new Error(`No stored credentials for "${SERVER_NAME}". Connect the MCP server first:\n`
+      + `  claude mcp add --transport http ${SERVER_NAME} https://<your-contrast-host>/mcp\n`
+      + 'then run a Contrast command so it signs in. Set CONTRAST_MCP_NAME if you used another name.');
+  }
   return entry;
 }
 
