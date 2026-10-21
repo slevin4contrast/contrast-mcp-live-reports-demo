@@ -495,5 +495,39 @@
             <p style="margin-top: 10px; font-size: 0.9em;">Repository: contrast-generated-reports</p>
         </footer>
     </div>
+
+    <script>
+        // Served from GitHub Pages there is no local server, so the live pages cannot
+        // fetch anything. Send visitors to the static snapshots and say why.
+        (function () {
+            if (['localhost', '127.0.0.1', ''].includes(location.hostname)) return;
+
+            const SNAPSHOTS = ['attack_map', 'compliance_mttr', 'cve_impact',
+                               'library_security', 'route_coverage', 'vulnerability_dashboard'];
+
+            document.querySelectorAll('a.report-link').forEach((a) => {
+                const page = (a.getAttribute('href') || '').replace(/\.html$/, '');
+                if (SNAPSHOTS.includes(page)) a.setAttribute('href', page + '_static.html');
+            });
+
+            document.querySelectorAll('.report-card .badge').forEach((b) => {
+                if (b.textContent.trim() === 'LIVE' || b.textContent.trim() === 'PARTLY LIVE') {
+                    b.textContent = 'SNAPSHOT';
+                    b.setAttribute('style', 'background: #566080; color: #fff;');
+                }
+            });
+
+            const about = document.querySelector('section');
+            if (!about) return;
+            const note = document.createElement('p');
+            note.setAttribute('style', 'margin-top: 15px; padding: 15px 20px; background: rgba(102,126,234,0.15); border-left: 4px solid #667eea; border-radius: 8px;');
+            note.innerHTML = '<strong>You are viewing the hosted copy.</strong> GitHub Pages cannot reach a Contrast '
+                + 'organization, so these links open static snapshots. To see the same reports pull live data, clone '
+                + '<a href="https://github.com/slevin4contrast/contrast-mcp-live-reports-demo" style="color:#8fa2ff;">the repo</a>, '
+                + 'run <code style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 5px;">npm start</code>, '
+                + 'and open <code style="background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 5px;">http://localhost:3000</code>.';
+            about.appendChild(note);
+        })();
+    </script>
 </body>
 </html>

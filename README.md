@@ -59,6 +59,13 @@ org, but the NIST, PCI-DSS, OWASP and SOC 2 sections below them are sample conte
 does not store control mappings, and this org has no remediation history, so MTTR is reported
 as not available rather than invented. A banner on the page marks where the live data stops.
 
+### Viewing it on GitHub Pages
+
+The repo is also published as a static site. GitHub Pages cannot reach a Contrast organization,
+so the hosted copy serves the `_static` snapshots instead and says so on every page. The index
+rewrites its own links and relabels the badges when it detects it is not running on localhost.
+To see the reports pull live data, clone the repo and run it locally.
+
 Each live page keeps its original static version next to it, named with a `_static` suffix.
 Those open directly in a browser with no server running, which makes them a safe fallback for a
 demo with no network.

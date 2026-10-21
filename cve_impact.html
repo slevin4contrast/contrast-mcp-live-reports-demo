@@ -455,9 +455,27 @@
                 + issues + servers + shield + plan;
         }
 
+        // On GitHub Pages there is no local server, so there is nothing to fetch.
+        // Say so plainly and point at the snapshot instead of showing a broken page.
+        const HOSTED = !['localhost', '127.0.0.1', ''].includes(location.hostname);
+        function hostedNotice() {
+            const b = document.getElementById('sourceBadge');
+            b.textContent = 'SNAPSHOT';
+            b.className = 'source-badge mock';
+            const el = document.getElementById('errorBanner');
+            const snap = location.pathname.split('/').pop().replace(/\.html$/, '_static.html');
+            el.style.display = 'block';
+            el.style.background = 'rgba(102, 126, 234, 0.15)';
+            el.style.borderColor = '#667eea';
+            el.innerHTML = '<strong>Hosted copy, so no live data.</strong> This page is served from GitHub Pages, '
+                + 'which cannot reach a Contrast organization. Clone the repo and run <code>npm start</code> to see it live, '
+                + 'or open the <a href="' + snap + '" style="color:#8fa2ff; font-weight:bold;">static snapshot</a>.';
+        }
+
         async function load(cveId) {
             const banner = document.getElementById('errorBanner');
             banner.style.display = 'none';
+            if (HOSTED) { hostedNotice(); return; }
             document.getElementById('detail').classList.add('loading');
             try {
                 const res = await fetch('/api/cves' + (cveId ? '?id=' + encodeURIComponent(cveId) : ''), { cache: 'no-store' });
@@ -473,6 +491,9 @@
                 renderList(d.list, chosen);
                 renderDetail(d.detail);
             } catch (err) {
+                const b = document.getElementById('sourceBadge');
+                b.textContent = 'NO DATA';
+                b.className = 'source-badge mock';
                 banner.style.display = 'block';
                 banner.innerHTML = `<strong>Could not load live data.</strong> ${esc(err.message)}. Start the server with <code>node server.js</code> and open this page at http://localhost:3000, or view the <a href="cve_impact_static.html" style="color:#8fa2ff;">static snapshot</a>.`;
             } finally {
