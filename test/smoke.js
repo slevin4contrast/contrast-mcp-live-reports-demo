@@ -16,7 +16,7 @@ const BASE = `http://127.0.0.1:${PORT}`;
 const SKIP_UI = process.argv.includes('--no-ui');
 
 const LIVE_PAGES = ['vulnerability_dashboard', 'route_coverage', 'library_security', 'cve_impact',
-                    'attack_map', 'compliance_mttr', 'poc_generator', 'smartfix_guide'];
+                    'attack_map', 'compliance_mttr', 'poc_generator', 'smartfix_guide', 'tool_explorer'];
 
 let passed = 0;
 const failures = [];
@@ -96,6 +96,7 @@ async function main() {
       '/api/attacks': (d) => (d.totals && Array.isArray(d.items) ? null : 'missing totals/items'),
       '/api/compliance': (d) => (d.totals && d.bySeverity && d.sla ? null : 'missing totals/bySeverity/sla'),
       '/api/vulnerability': (d) => (Array.isArray(d.list) && d.detail ? null : 'missing list/detail'),
+      '/api/tools': (d) => (Array.isArray(d.tools) && d.tools.length && d.tools[0].name && d.tools[0].schema ? null : 'missing tools/name/schema'),
     };
     for (const [route, validate] of Object.entries(expect)) {
       await checkAsync(`GET ${route}`, async () => {
@@ -106,6 +107,18 @@ async function main() {
         return validate(d);
       });
     }
+
+    await checkAsync('tool sandbox refuses a non read-only tool', async () => {
+      const res = await fetch(`${BASE}/api/tool?name=delete_everything`);
+      if (res.status !== 502) return `expected 502, got ${res.status}`;
+      const d = await res.json();
+      return /Refusing to run/.test(d.error) ? null : `unexpected error: ${d.error}`;
+    });
+
+    await checkAsync('tool sandbox refuses a tool not in the catalogue', async () => {
+      const res = await fetch(`${BASE}/api/tool?name=search_nonexistent_thing`);
+      return res.status === 502 ? null : `expected 502, got ${res.status}`;
+    });
 
     await checkAsync('bad CVE id is rejected', async () => {
       const res = await fetch(`${BASE}/api/cves?id=not-a-cve`);

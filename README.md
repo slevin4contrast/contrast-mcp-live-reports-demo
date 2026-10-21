@@ -81,6 +81,16 @@ Every live page carries a badge reading either LIVE or MOCK DATA, a last-refresh
 and a Refresh button, so a demo never silently shows stale numbers. Set `MOCK=1` to force
 sample data even when a token is available.
 
+## Start here
+
+`tool_explorer.html` lists every tool the MCP server exposes, read from the server itself via
+`tools/list` rather than written by hand, and lets you run the read-only ones against your own
+organization. If you want to understand what an MCP server could do for you, open that first.
+
+Every report page also carries a collapsible panel showing the tool calls behind it: which tools
+ran, with what arguments, how long each took and how many rows came back. No model runs, so
+refreshing a page costs nothing in AI usage.
+
 ## Live pages
 
 | Page | Endpoint | MCP tools |
@@ -93,6 +103,7 @@ sample data even when a token is available.
 | `compliance_mttr.html` | `/api/compliance` | `search_vulnerabilities` (all statuses) |
 | `poc_generator.html` | `/api/vulnerability` | `search_vulnerabilities`, `get_vulnerability` |
 | `smartfix_guide.html` | `/api/vulnerability` | `search_vulnerabilities`, `get_vulnerability` |
+| `tool_explorer.html` | `/api/tools`, `/api/tool` | `tools/list`, plus any read-only tool you run |
 
 `/api/vulnerability` takes an optional `?id=` and `?appId=`, since `get_vulnerability` needs
 both. With no id it opens on the most severe finding. The PoC page turns the captured request

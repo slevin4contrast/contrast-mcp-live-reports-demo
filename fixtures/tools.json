@@ -1,0 +1,843 @@
+[
+ {
+  "name": "list_issue_observations",
+  "description": "List observation-level evidence for one issue, cursor-paginated. Use search_issues to find the issueId, and get_observation for full detail on one observation.",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "issueId": {
+     "type": "string",
+     "description": "Issue ID"
+    },
+    "cursor": {
+     "type": "string",
+     "description": "Opaque continuation token returned as nextCursor by the prior response"
+    },
+    "pageSize": {
+     "type": "integer",
+     "description": "Items per page (max 100), default: 50"
+    }
+   },
+   "required": [
+    "issueId"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "search_applications",
+  "description": "Search applications by name, tag, or custom metadata. Returns every application when no\nfilters are given. This is the discovery tool for the appId parameter used by\napplication-scoped tools.\n\nExample: name=\"petclinic\", metadataFilters='{\"team\":\"payments\"}'\n",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "page": {
+     "type": "integer",
+     "description": "Page number (1-based), default: 1"
+    },
+    "pageSize": {
+     "type": "integer",
+     "description": "Items per page (max 100), default: 50"
+    },
+    "name": {
+     "type": "string",
+     "description": "Text search filter (searches name, contextPath, tags, metadata)"
+    },
+    "tag": {
+     "type": "string",
+     "description": "Tag filter (exact match, case-insensitive)"
+    },
+    "metadataFilters": {
+     "type": "string",
+     "description": "JSON object for metadata filters. Format: {\"field\":\"value\"} or {\"field\":[\"v1\",\"v2\"]}. Multiple fields use AND logic. Multiple values within a field use OR logic. Field names and values are case-insensitive. Values must be non-empty."
+    }
+   },
+   "required": [],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "search_incidents",
+  "description": "Search incidents across the authenticated organization with optional filters.\n\nUse search_applications first to find an application ID from an application name, then pass applicationIds.\n\nUnlike search_attacks, this tool searches unified security incidents. Use search_issues with hasIncident=true to find the issues behind incidents.\n\nFor a count alone, call with no cursor and pageSize=1, then read totalItems.\n\nExamples:\n- Open critical production incidents: statuses=\"OPEN\", severities=\"CRITICAL\", deploymentTiers=\"PRODUCTION\"\n- Incidents for one application in a window: applicationIds=\"app-uuid\", startTime=\"2026-01-01T00:00:00Z\"\n- Attack-driven incidents by text: searchTerms=\"sql injection\", dataTypes=\"ATTACK\"\n",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "cursor": {
+     "type": "string",
+     "description": "Opaque continuation token returned as nextCursor by the prior response. Send the same filters and sort as the first page. Omit for the first page."
+    },
+    "pageSize": {
+     "type": "integer",
+     "description": "Items per page (max 100), default: 50"
+    },
+    "sort": {
+     "type": "string",
+     "description": "Sort as property,DIRECTION. Valid properties: assignedUserName, createdAt, incidentId, name, score, status, updatedAt. Use score to sort by risk because severity is derived from score. Valid directions: ASC, DESC. Default: createdAt,DESC"
+    },
+    "startTime": {
+     "type": "string",
+     "description": "Filter by start timestamp. Accepts ISO-8601 timestamp with timezone, e.g. 2025-01-15T10:30:00Z, or epoch milliseconds. Date-only values are rejected. Default: no start-time lower bound."
+    },
+    "endTime": {
+     "type": "string",
+     "description": "Filter by end timestamp. Accepts ISO-8601 timestamp with timezone, e.g. 2025-01-16T10:30:00Z, or epoch milliseconds. Date-only values are rejected. Default: no end-time upper bound."
+    },
+    "applicationIds": {
+     "type": "string",
+     "description": "Comma-separated application IDs. Default: all applications."
+    },
+    "statuses": {
+     "type": "string",
+     "description": "Comma-separated statuses: OPEN,CLOSED. Default: all statuses"
+    },
+    "severities": {
+     "type": "string",
+     "description": "Comma-separated severities: CRITICAL,HIGH,MEDIUM,LOW,NOTE. Default: all severities"
+    },
+    "assignedUserIds": {
+     "type": "string",
+     "description": "Comma-separated assigned user IDs. Default: all assigned users"
+    },
+    "deploymentTiers": {
+     "type": "string",
+     "description": "Comma-separated deployment tiers: DEVELOPMENT,QA,PRODUCTION. Default: all deployment tiers"
+    },
+    "searchTerms": {
+     "type": "string",
+     "description": "Search terms. Default: no text search"
+    },
+    "dataTypes": {
+     "type": "string",
+     "description": "Comma-separated data types: VULNERABILITY,ATTACK,BEHAVIOR. Default: all data types"
+    },
+    "targets": {
+     "type": "string",
+     "description": "Comma-separated targets: CODE,LIBRARY. Default: all targets"
+    },
+    "sensors": {
+     "type": "string",
+     "description": "Comma-separated sensors: CONTRAST_AGENT,CONTRAST_SMART_SCAN. Default: all sensors"
+    },
+    "techniques": {
+     "type": "string",
+     "description": "Comma-separated techniques: RUNTIME,STATIC. Default: all techniques"
+    }
+   },
+   "required": [],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "list_issues_by_library",
+  "description": "List open issues linked to one library within an application's library tree. An issue matches when the requested library is the root library or a transitive library beneath it, so issue titles may name a related library rather than the queried one; do not post-filter results by title.\n\nUse search_applications to find application IDs, then list_application_libraries to find library hashes.\n",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "appId": {
+     "type": "string",
+     "description": "Application ID"
+    },
+    "libraryHash": {
+     "type": "string",
+     "description": "Library hash"
+    },
+    "page": {
+     "type": "integer",
+     "description": "Page number (1-based), default: 1"
+    },
+    "pageSize": {
+     "type": "integer",
+     "description": "Items per page (max 100), default: 50"
+    }
+   },
+   "required": [
+    "appId",
+    "libraryHash"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "search_cves",
+  "description": "Search CVEs across the authenticated NorthStar organization for CVE Shield exposure and risk.\n\nUse list_applications_by_cve only for Classic/TeamServer CVE impact; this tool searches NorthStar CVE Shield data. Use search_applications first to find application IDs by name.\n\nShield fields reflect agent-reported activity as of each agent's last report; use get_cve_impact for configured policy.\n\nhighestShieldStatus is the largest activity ordinal in NO_SHIELD < SHIELD_OFF < NOT_SEEN < PROTECTING < EXPOSED < BLOCKED < EXPLOITED, not risk order; Insights counts CVEs by it.\n\nPage 1 carries totalItems; for counts, use pageSize=1.\n\nExamples:\n- Highest-risk CVEs: sort=\"maxCvssScore,DESC\"\n- Shielded CVEs with exposure somewhere: cveShieldExists=true, shieldStatuses=\"EXPOSED,EXPLOITED\"\n- CVEs observed in production for selected applications: appIds=\"app-uuid\", environments=\"PRODUCTION\"\n",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "keyword": {
+     "type": "string",
+     "description": "CVE ID prefix match. Suffix fragments like '44228' never match. Year-anchored fragments like '2021' or '2021-44228' get 'CVE-' prepended. Matches CVE IDs only, not library names. Default: no text search."
+    },
+    "severities": {
+     "type": "string",
+     "description": "Comma-separated severities: CRITICAL,HIGH,MEDIUM,LOW,NOTE. Severity derives from Contrast-adjusted CVSS (application criticality and shield protection lower it), so CRITICAL can exclude shielded CVEs. Default: all severities."
+    },
+    "shieldStatuses": {
+     "type": "string",
+     "description": "Comma-separated shield statuses: NO_SHIELD,SHIELD_OFF,NOT_SEEN,PROTECTING,EXPOSED,BLOCKED,EXPLOITED. NO_SHIELD: no shield applies (none configured, non-Java stack, or agent below the minimum version). SHIELD_OFF: shield configured with mode OFF. NOT_SEEN: shield in MONITOR or BLOCK mode with no traffic yet. The rest are observed traffic results. Matches when any observed environment has a selected status; null environments never match. Combined with environments, EXPOSED plus PRODUCTION means observed in production and exposed somewhere, not exposed in production."
+    },
+    "cveShieldExists": {
+     "type": "boolean",
+     "description": "Filter by whether agents have reported CVE Shield activity for the CVE. Default: either state."
+    },
+    "appIds": {
+     "type": "string",
+     "description": "Comma-separated application IDs. Results cover only applications visible to the caller. Inaccessible IDs in a mixed list are silently dropped; if every ID is inaccessible the request returns a permissions error. Default: all visible applications."
+    },
+    "environments": {
+     "type": "string",
+     "description": "Comma-separated observed deployment tiers: DEVELOPMENT,QA,PRODUCTION. Independent of shieldStatuses. Default: all tiers."
+    },
+    "sort": {
+     "type": "string",
+     "description": "Sort as property,DIRECTION. Valid properties: cveId,cveShieldExists,maxCvssScore,noShieldCount,shieldOffCount,notSeenCount,protectingCount,exposedCount,blockedCount,exploitedCount,numApplications,numEnvironments,numLibraryVersions. EPSS is not sortable. Valid directions: ASC,DESC. Default: maxCvssScore,DESC. A cveId tie-breaker is appended."
+    },
+    "cursor": {
+     "type": "string",
+     "description": "Opaque continuation token returned as nextCursor by the prior response."
+    },
+    "pageSize": {
+     "type": "integer",
+     "description": "Items per page. Max: 100. Default: 50."
+    }
+   },
+   "required": [],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "search_vulnerabilities",
+  "description": "Search vulnerabilities detected by Contrast Assess across all applications in the\norganization.\n\nUse search_app_vulnerabilities instead when scoping to one application or filtering by\nsession metadata or latest session.\n\nA result's environments field reflects only its latest instance and may omit environments\nfrom earlier instances.\nResult statuses use the same canonical vulnerability status values as the statuses filter.\nExamples:\n- High-priority open: severities=\"CRITICAL,HIGH\", statuses=\"Reported,Confirmed\"\n- Production critical with recent activity: environments=\"PRODUCTION\",\n  severities=\"CRITICAL\", lastSeenAfter=\"2025-01-01\"\n- Remediation workflow tags: vulnTags=\"SmartFix Remediated\", statuses=\"Remediated\"\n",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "page": {
+     "type": "integer",
+     "description": "Page number (1-based), default: 1"
+    },
+    "pageSize": {
+     "type": "integer",
+     "description": "Items per page (max 100), default: 50"
+    },
+    "severities": {
+     "type": "string",
+     "description": "Comma-separated severities: CRITICAL,HIGH,MEDIUM,LOW,NOTE. Default: all severities"
+    },
+    "statuses": {
+     "type": "string",
+     "description": "Comma-separated vulnerability statuses: Reported,Suspicious,Confirmed,NotAProblem,Remediated,Fixed,AutoRemediated. Default: Reported,Suspicious,Confirmed (actionable only). AutoRemediated means the Agent verified a fix at runtime; Contrast did not fix it."
+    },
+    "vulnTypes": {
+     "type": "string",
+     "description": "Comma-separated vulnerability types (e.g., sql-injection,reflected-xss). Use list_vulnerability_types tool for complete list. Default: all types"
+    },
+    "environments": {
+     "type": "string",
+     "description": "Comma-separated environments: DEVELOPMENT,QA,PRODUCTION. Matches any historical vulnerability instance. Default: all environments"
+    },
+    "lastSeenAfter": {
+     "type": "string",
+     "description": "Only include vulnerabilities with LAST ACTIVITY after this date (ISO format: YYYY-MM-DD or epoch timestamp). Filters on lastTimeSeen, not discovery date"
+    },
+    "lastSeenBefore": {
+     "type": "string",
+     "description": "Only include vulnerabilities with LAST ACTIVITY before this date (ISO format: YYYY-MM-DD or epoch timestamp). Filters on lastTimeSeen, not discovery date"
+    },
+    "vulnTags": {
+     "type": "string",
+     "description": "Comma-separated VULNERABILITY-LEVEL tags (e.g., 'SmartFix Remediated,reviewed'). Note: These are vulnerability tags, not application tags. Use to find vulnerabilities tagged during remediation workflows"
+    }
+   },
+   "required": [],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "get_incident",
+  "description": "Get full detail for one incident, including runbooks. Use search_incidents to find the incidentId. For linked issues or observation evidence, use list_incident_issues or list_incident_observations.",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "incidentId": {
+     "type": "string",
+     "description": "Incident ID"
+    },
+    "includeSummary": {
+     "type": "boolean",
+     "description": "Also fetch the narrative summary and recommended actions. Adds one downstream call. Summaries can be absent for visible incidents."
+    },
+    "includeObservationCount": {
+     "type": "boolean",
+     "description": "Also fetch the total number of linked observations without paging the observation list. Adds one downstream call."
+    }
+   },
+   "required": [
+    "incidentId"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "search_issues",
+  "description": "Search issues across the authenticated organization with optional filters.\n\nUse search_applications first to find an application ID from an application name, then pass applicationIds.\n\nUnlike search_vulnerabilities and search_app_vulnerabilities, this tool searches unified security issues (the NorthStar data model), not Classic vulnerabilities.\n\nFor a count alone, call with no cursor and pageSize=1, then read totalItems.\n\nExamples:\n- Open critical issues for one app: applicationIds=\"app-uuid\", statuses=\"OPEN\", severities=\"CRITICAL\"\n- Production issues with incidents: deploymentTiers=\"PRODUCTION\", hasIncident=true\n- Recent library issues: startTime=\"2026-01-01T00:00:00Z\", targets=\"LIBRARY\"\n",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "cursor": {
+     "type": "string",
+     "description": "Opaque continuation token returned as nextCursor by the prior response. Send the same filters and sort as the first page. Omit for the first page."
+    },
+    "pageSize": {
+     "type": "integer",
+     "description": "Items per page. Max: 100. Default: 50"
+    },
+    "sort": {
+     "type": "string",
+     "description": "Sort as property,DIRECTION. Valid properties: createdAt, issueId, lastObservedTime, observationCount, score, serviceName, status, title. Use score to sort by risk because severity is derived from score. Valid directions: ASC, DESC. Default: createdAt,DESC"
+    },
+    "startTime": {
+     "type": "string",
+     "description": "Filter by start timestamp. Accepts ISO-8601 timestamp with timezone, e.g. 2025-01-15T10:30:00Z, or epoch milliseconds. Date-only values are rejected. Default: no start-time lower bound."
+    },
+    "endTime": {
+     "type": "string",
+     "description": "Filter by end timestamp. Accepts ISO-8601 timestamp with timezone, e.g. 2025-01-16T10:30:00Z, or epoch milliseconds. Date-only values are rejected. Default: no end-time upper bound."
+    },
+    "applicationIds": {
+     "type": "string",
+     "description": "Comma-separated application IDs. Default: all applications."
+    },
+    "repositoryNames": {
+     "type": "string",
+     "description": "Comma-separated repository names. Default: all repositories"
+    },
+    "statuses": {
+     "type": "string",
+     "description": "Comma-separated statuses: OPEN,CLOSED. Default: all statuses"
+    },
+    "severities": {
+     "type": "string",
+     "description": "Comma-separated severities: CRITICAL,HIGH,MEDIUM,LOW,NOTE. Default: all severities. Note: issues without a CVSS score have no severity; downstream filtering omits them whenever this filter is set. An absent severity means unscored, not low risk."
+    },
+    "deploymentTiers": {
+     "type": "string",
+     "description": "Comma-separated deployment tiers: DEVELOPMENT,QA,PRODUCTION. Default: all deployment tiers"
+    },
+    "classifications": {
+     "type": "string",
+     "description": "Comma-separated observation triage classifications: UNKNOWN,TRUE_POSITIVE,FALSE_POSITIVE. Filters by triage outcome, not vulnerability type or rule category. Default: all classifications. For vulnerability-type filtering, use searchTerms."
+    },
+    "libraries": {
+     "type": "string",
+     "description": "Comma-separated library names. Default: all libraries"
+    },
+    "hasIncident": {
+     "type": "boolean",
+     "description": "Filter by whether an issue has an incident. Default: include issues with and without incidents"
+    },
+    "searchTerms": {
+     "type": "string",
+     "description": "Search terms. Default: no text search"
+    },
+    "dataTypes": {
+     "type": "string",
+     "description": "Comma-separated data types: VULNERABILITY,ATTACK,BEHAVIOR. Default: all data types"
+    },
+    "targets": {
+     "type": "string",
+     "description": "Comma-separated targets: CODE,LIBRARY. Default: all targets"
+    },
+    "sensors": {
+     "type": "string",
+     "description": "Comma-separated sensors: CONTRAST_AGENT,CONTRAST_SMART_SCAN. Default: all sensors"
+    },
+    "techniques": {
+     "type": "string",
+     "description": "Comma-separated techniques: RUNTIME,STATIC. Default: all techniques"
+    }
+   },
+   "required": [],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "search_app_vulnerabilities",
+  "description": "Application-scoped vulnerability search with session-based filtering.\n\nRequires appId. Use search_applications to find application IDs by name.\n\nUse this instead of search_vulnerabilities when you need to filter by session metadata or latest session.\n\nSession filtering options are mutually exclusive: use either sessionMetadataFilters or useLatestSession=true, not both.\n\nA result's environments field reflects only its latest instance and may omit environments from earlier instances.\nResult statuses use the same canonical vulnerability status values as the statuses filter.\nExamples:\n- Latest session vulns: appId=\"abc123\", useLatestSession=true\n- Metadata filter: appId=\"abc123\", sessionMetadataFilters='{\"branch\":\"main\"}'\n- Production critical: appId=\"abc123\", severities=\"CRITICAL\", environments=\"PRODUCTION\"\n",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "appId": {
+     "type": "string",
+     "description": "Application ID"
+    },
+    "page": {
+     "type": "integer",
+     "description": "Page number (1-based), default: 1"
+    },
+    "pageSize": {
+     "type": "integer",
+     "description": "Items per page (max 100), default: 50"
+    },
+    "severities": {
+     "type": "string",
+     "description": "Comma-separated severities: CRITICAL,HIGH,MEDIUM,LOW,NOTE"
+    },
+    "statuses": {
+     "type": "string",
+     "description": "Comma-separated vulnerability statuses: Reported,Suspicious,Confirmed,NotAProblem,Remediated,Fixed,AutoRemediated. Default: Reported,Suspicious,Confirmed (actionable only). AutoRemediated means the Agent verified a fix at runtime; Contrast did not fix it."
+    },
+    "vulnTypes": {
+     "type": "string",
+     "description": "Comma-separated vulnerability types. Use list_vulnerability_types for complete list"
+    },
+    "environments": {
+     "type": "string",
+     "description": "Comma-separated environments: DEVELOPMENT,QA,PRODUCTION. Matches any historical vulnerability instance"
+    },
+    "lastSeenAfter": {
+     "type": "string",
+     "description": "Only include vulnerabilities with LAST ACTIVITY after this date (ISO: YYYY-MM-DD or epoch)"
+    },
+    "lastSeenBefore": {
+     "type": "string",
+     "description": "Only include vulnerabilities with LAST ACTIVITY before this date (ISO: YYYY-MM-DD or epoch)"
+    },
+    "vulnTags": {
+     "type": "string",
+     "description": "Comma-separated vulnerability tags"
+    },
+    "sessionMetadataFilters": {
+     "type": "string",
+     "description": "JSON object for session metadata filters. Format: {\"fieldName\":\"value\"} or {\"fieldName\":[\"val1\",\"val2\"]}. Multiple fields use AND logic. Multiple values within a field use OR logic. Field names are case-insensitive. Values are case-sensitive and must be non-empty."
+    },
+    "useLatestSession": {
+     "type": "boolean",
+     "description": "Filter to latest session only"
+    }
+   },
+   "required": [
+    "appId"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "get_scan_project",
+  "description": "Get a Contrast Scan (SAST) project by name, including language, scan counts, last scan ID\nand time, and vulnerability counts by severity.\n",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "projectName": {
+     "type": "string",
+     "description": "Scan project name (matched case-insensitively)"
+    }
+   },
+   "required": [
+    "projectName"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "list_incident_observations",
+  "description": "List observation-level evidence for one incident, cursor-paginated. Use search_incidents to find the incidentId. For the total count without paging, use get_incident with includeObservationCount=true; for full detail on one observation, use get_observation.",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "incidentId": {
+     "type": "string",
+     "description": "Incident ID"
+    },
+    "cursor": {
+     "type": "string",
+     "description": "Opaque continuation token returned as nextCursor by the prior response"
+    },
+    "pageSize": {
+     "type": "integer",
+     "description": "Items per page (max 100), default: 50"
+    }
+   },
+   "required": [
+    "incidentId"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "get_observation",
+  "description": "Get full detail for one observation. Use list_issue_observations or list_incident_observations to find observation IDs.",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "observationId": {
+     "type": "string",
+     "description": "Observation ID"
+    }
+   },
+   "required": [
+    "observationId"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "list_application_libraries",
+  "description": "List the third-party libraries in one application, with known CVEs, severity counts,\nsecurity grade, and class usage. classesUsed 0 means no classes from that library were\nseen loaded, so it is likely unused and unlikely to be exploitable. Use\nsearch_applications to find application IDs. Use list_applications_by_cve for the reverse\ndirection, from a CVE to affected applications.\n",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "page": {
+     "type": "integer",
+     "description": "Page number (1-based), default: 1"
+    },
+    "pageSize": {
+     "type": "integer",
+     "description": "Items per page (max 50), default: 50"
+    },
+    "appId": {
+     "type": "string",
+     "description": "Application ID"
+    }
+   },
+   "required": [
+    "appId"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "get_user_info",
+  "description": "Get identity details for the authenticated user and organization.",
+  "schema": {
+   "type": "object",
+   "properties": {},
+   "required": [],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "get_route_coverage",
+  "description": "Get route coverage for an application: which routes have been exercised by HTTP requests\nand which were only discovered. Use search_applications to find application IDs. Route\ncoverage requires the application to hold an Assess license; unlicensed applications\nreturn an error.\n",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "appId": {
+     "type": "string",
+     "description": "Application ID"
+    },
+    "sessionMetadataName": {
+     "type": "string",
+     "description": "Session metadata field name to filter by (e.g., 'branch'). Must be provided with sessionMetadataValue. Use get_session_metadata to discover field names."
+    },
+    "sessionMetadataValue": {
+     "type": "string",
+     "description": "Session metadata field value to filter by (e.g., 'main'). Must be provided with sessionMetadataName."
+    },
+    "useLatestSession": {
+     "type": "boolean",
+     "description": "If true, only return routes from the latest session. Mutually exclusive with session metadata filter."
+    }
+   },
+   "required": [
+    "appId"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "get_protect_rules",
+  "description": "Get Protect (ADR) rules for an application. Per-environment mode is one of\nBLOCKING (blocked in-app), BLOCKING_PERIMETER (blocked at the perimeter),\nMONITORING, MONITOR_PERIMETER, or OFF. Use search_applications to find\napplication IDs.\n",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "appId": {
+     "type": "string",
+     "description": "Application ID"
+    }
+   },
+   "required": [
+    "appId"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "list_incident_issues",
+  "description": "List issue summaries linked to one incident. Use search_incidents to find the incidentId, and get_issue for full issue detail.",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "incidentId": {
+     "type": "string",
+     "description": "Incident ID"
+    },
+    "page": {
+     "type": "integer",
+     "description": "Page number (1-based), default: 1"
+    },
+    "pageSize": {
+     "type": "integer",
+     "description": "Items per page (max 100), default: 50"
+    }
+   },
+   "required": [
+    "incidentId"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "get_vulnerability",
+  "description": "Get full vulnerability details by ID, including remediation guidance, stack traces, and vulnerable libraries. Use search_vulnerabilities or search_app_vulnerabilities to discover vulnerability IDs. httpRequest has sensitive headers removed. environments reflects the latest instance only and may omit earlier instances.\n",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "vulnId": {
+     "type": "string",
+     "description": "Vulnerability ID"
+    },
+    "appId": {
+     "type": "string",
+     "description": "Application ID"
+    }
+   },
+   "required": [
+    "vulnId",
+    "appId"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "search_attacks",
+  "description": "Search attacks detected by Contrast ADR (Attack Detection and Response) across the\norganization, with filtering by categorization, outcome status, keyword, and rule.\n\nExamples:\n- Effective exploits: quickFilter=\"EFFECTIVE\", statusFilter=\"EXPLOITED\"\n- Manual SQL injection: quickFilter=\"MANUAL\", rules=\"sql-injection\"\n- Blocked attacks from one source: statusFilter=\"BLOCKED\", keyword=\"192.0.2.10\"\n",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "page": {
+     "type": "integer",
+     "description": "Page number (1-based), default: 1"
+    },
+    "pageSize": {
+     "type": "integer",
+     "description": "Items per page (max 100), default: 50"
+    },
+    "quickFilter": {
+     "type": "string",
+     "description": "Quick filter for attack categorization. Valid: ALL (no filter), ACTIVE (ongoing attacks), MANUAL (human-initiated), AUTOMATED (bot attacks), PRODUCTION (prod environment), EFFECTIVE (excludes probed attacks)"
+    },
+    "statusFilter": {
+     "type": "string",
+     "description": "Status filter for attack outcome. Valid: EXPLOITED (successfully exploited), PROBED (detected but not exploited), BLOCKED (blocked by Protect), BLOCKED_PERIMETER (blocked at perimeter), PROBED_PERIMETER (probed at perimeter), SUSPICIOUS (suspicious attack)"
+    },
+    "keyword": {
+     "type": "string",
+     "description": "Keyword to match against source IP, server name/hostname, application name, rule name, attack UUID, forwarded IP/path, or attack tags (substring match, OR logic across all fields)"
+    },
+    "includeSuppressed": {
+     "type": "boolean",
+     "description": "Include suppressed attacks when true"
+    },
+    "includeBotBlockers": {
+     "type": "boolean",
+     "description": "Include attacks flagged as bot blockers"
+    },
+    "includeIpBlacklist": {
+     "type": "boolean",
+     "description": "Include attacks from blacklisted IPs"
+    },
+    "sort": {
+     "type": "string",
+     "description": "Sort as property,DIRECTION. Valid properties: sourceIP, status, startTime, endTime, type. Valid directions: ASC, DESC. Default: startTime,DESC"
+    },
+    "rules": {
+     "type": "string",
+     "description": "Comma-separated list of rule IDs to filter by (e.g., 'sql-injection,reflected-xss'). Use get_protect_rules to discover available rule IDs for an application. This filters by exact rule match, unlike keyword which does substring search."
+    }
+   },
+   "required": [],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "list_applications_by_cve",
+  "description": "List applications affected by one CVE, with the vulnerable library versions and\nper-application class usage. classUsage 0 or absent means no classes from the vulnerable\nlibrary were seen loaded, so exploitation is unlikely; prioritize applications with\nclassUsage above 0. Use list_application_libraries for the reverse direction, all\nlibraries of one application. Use search_applications for application lastSeenAt and\nsearch_servers for current server state.\n",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "cveId": {
+     "type": "string",
+     "description": "CVE identifier (e.g., CVE-2021-44228)"
+    }
+   },
+   "required": [
+    "cveId"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "list_vulnerability_types",
+  "description": "List every vulnerability type (Assess rule name) available in the organization, such as\nsql-injection or reflected-xss. Returned values are the valid inputs for the vulnTypes\nparameter of search_vulnerabilities and search_app_vulnerabilities.\n",
+  "schema": {
+   "type": "object",
+   "properties": {},
+   "required": [],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "list_issue_incidents",
+  "description": "List the incidents linked to one issue. Use search_issues to find the issueId, and get_incident for full detail on one incident.",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "issueId": {
+     "type": "string",
+     "description": "Issue ID"
+    }
+   },
+   "required": [
+    "issueId"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "get_session_metadata",
+  "description": "Get the session metadata fields and values recorded for an application, such as branch or\nbuild. Field names feed sessionMetadataFilters in search_app_vulnerabilities and session\nfilters in get_route_coverage. Use search_applications to find application IDs.\n",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "appId": {
+     "type": "string",
+     "description": "Application ID"
+    }
+   },
+   "required": [
+    "appId"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "get_cve_impact",
+  "description": "Get CVE risk, exposure, and shield protection posture across the authenticated NorthStar organization. Use search_cves to find the cveId.",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "cveId": {
+     "type": "string",
+     "description": "CVE identifier in CVE-YYYY-NNNN format (4-19 sequence digits)."
+    }
+   },
+   "required": [
+    "cveId"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "search_servers",
+  "description": "Search servers visible to the current credentials (EAC-scoped) for inventory, agent\nhealth, and Protect coverage.\n\nNon-null Assess/Protect state may reflect the first visible application's effective\nconfiguration. Protect pending-restart state is not available from this endpoint; do not\ninfer it (assessPending is accurate).\n\nExamples: quickFilter=\"ONLINE\" to inspect Protect state; quickFilter=\"UNPROTECTED\",\nenvironments=\"PRODUCTION\"; environments=\"QA\", includeApplications=true.\n",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "page": {
+     "type": "integer",
+     "description": "Page number (1-based), default: 1"
+    },
+    "pageSize": {
+     "type": "integer",
+     "description": "Items per page (max 100), default: 50"
+    },
+    "keyword": {
+     "type": "string",
+     "description": "Substring match over server name, hostname, path, or tag"
+    },
+    "environments": {
+     "type": "string",
+     "description": "Comma-separated environments. Valid: DEVELOPMENT, QA, PRODUCTION"
+    },
+    "quickFilter": {
+     "type": "string",
+     "description": "Single condition. Valid: ALL, ONLINE, OFFLINE, PROTECTED, UNPROTECTED, OUT_OF_DATE. ONLINE/OFFLINE use TeamServer's activity threshold (typically about 50 minutes). OUT_OF_DATE means older than the newest agent TeamServer can serve for that language. To combine two dimensions, filter by one and inspect item fields for the other. Default: ALL"
+    },
+    "logLevels": {
+     "type": "string",
+     "description": "Comma-separated log levels. Valid: ERROR, WARN, INFO, DEBUG, TRACE"
+    },
+    "tags": {
+     "type": "string",
+     "description": "Comma-separated exact server tags"
+    },
+    "applicationIds": {
+     "type": "string",
+     "description": "Comma-separated application IDs"
+    },
+    "agentVersions": {
+     "type": "string",
+     "description": "Comma-separated exact agent versions"
+    },
+    "includeApplications": {
+     "type": "boolean",
+     "description": "Include visible application identities; default false returns applicationCount only and applications is null, not an empty list."
+    },
+    "sort": {
+     "type": "string",
+     "description": "Sort as property,DIRECTION. Properties: name, environment, lastActivity, agentVersion. Directions: ASC, DESC. agentVersion uses backend lexical string ordering, not semantic version ordering. Default: lastActivity,DESC"
+    }
+   },
+   "required": [],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "list_cve_issues",
+  "description": "List one issue row per affected NorthStar application and library for a CVE.\n\nUse search_cves to find the cveId. This endpoint has no server-side filters; page through every result and read the per-environment shield status, which reflects agent-reported activity. A null environment means that deployment tier was never observed for this application, not that the shield failed. Use issueId with get_issue for full issue detail or list_issue_observations for evidence.",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "cveId": {
+     "type": "string",
+     "description": "CVE identifier in CVE-YYYY-NNNN format (4-19 sequence digits)."
+    },
+    "sort": {
+     "type": "string",
+     "description": "Sort as property,DIRECTION. Valid properties: name,version,issueId,cvssScore,severity,shieldResultProd,shieldResultQa,shieldResultDev,status,applicationName. Valid directions: ASC,DESC. Shield status properties use raw activity ordinals: NO_SHIELD -10, SHIELD_OFF -5, NOT_SEEN 0, PROTECTING 5, EXPOSED 10, BLOCKED 15, EXPLOITED 20; this is not risk ordering, and DESC puts BLOCKED above EXPOSED. Default: cvssScore,DESC for this reason. An issueId tie-breaker is appended."
+    },
+    "cursor": {
+     "type": "string",
+     "description": "Opaque continuation token returned as nextCursor by the prior response."
+    },
+    "pageSize": {
+     "type": "integer",
+     "description": "Items per page. Max: 100. Default: 50."
+    }
+   },
+   "required": [
+    "cveId"
+   ],
+   "additionalProperties": false
+  }
+ },
+ {
+  "name": "get_issue",
+  "description": "Get full detail for one issue, including rule, repository, environments, and incident linkage. Use search_issues to find the issueId.",
+  "schema": {
+   "type": "object",
+   "properties": {
+    "issueId": {
+     "type": "string",
+     "description": "Issue ID"
+    },
+    "includeSummary": {
+     "type": "boolean",
+     "description": "Also fetch the issue summary. Adds one downstream call. Only issues backed by IAST vulnerability or attack events have summaries."
+    }
+   },
+   "required": [
+    "issueId"
+   ],
+   "additionalProperties": false
+  }
+ }
+]

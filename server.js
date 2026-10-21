@@ -93,6 +93,38 @@ const routes = {
       oldest: open.slice().sort((a, b) => (b.ageDays || 0) - (a.ageDays || 0)).slice(0, 15),
     };
   },
+  // The tool catalogue, and a sandbox for running one. Read-only tools only:
+  // the demo should never be a way to mutate an organization's data.
+  '/api/tools': async () => {
+    const tools = MOCK ? contrast.loadFixture('tools') : await contrast.listTools();
+    return { source: MOCK ? 'mock' : 'live', generatedAt: new Date().toISOString(), tools };
+  },
+
+  '/api/tool': async (params) => {
+    const name = params && params.get('name');
+    if (!name) throw new Error('Which tool? Pass ?name=');
+    if (!/^(search|list|get)_[a-z0-9_]+$/.test(name)) {
+      throw new Error(`Refusing to run "${name}". Only search_, list_ and get_ tools are allowed here.`);
+    }
+    if (MOCK) throw new Error('Running tools needs a live Contrast session. Start the server without MOCK=1.');
+
+    const tools = await contrast.listTools();
+    if (!tools.some((t) => t.name === name)) throw new Error(`No such tool: ${name}`);
+
+    let args = {};
+    const raw = params.get('args');
+    if (raw) {
+      try { args = JSON.parse(raw); } catch { throw new Error('args must be JSON'); }
+      if (typeof args !== 'object' || Array.isArray(args)) throw new Error('args must be a JSON object');
+    }
+    const startedAt = Date.now();
+    const result = await contrast.callTool(name, args);
+    return {
+      source: 'live', generatedAt: new Date().toISOString(),
+      tool: name, args, ms: Date.now() - startedAt, result,
+    };
+  },
+
   '/api/vulnerability': async (params) => {
     const id = params && params.get('id');
     const appId = params && params.get('appId');

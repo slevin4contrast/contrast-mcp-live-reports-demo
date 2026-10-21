@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What the Contrast MCP Server Can Do</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%); color: #fff; min-height: 100vh; padding: 20px; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    header { text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(102,126,234,.3); }
+    header h1 { font-size: 2.6em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,.3); }
+    header p { font-size: 1.15em; opacity: .95; }
+    .back-link { display: inline-block; margin-bottom: 20px; color: #667eea; text-decoration: none; font-weight: bold; font-size: 1.1em; }
+    .source-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; font-size: .95em; color: rgba(255,255,255,.8); }
+    .source-badge { padding: 3px 12px; border-radius: 12px; font-weight: bold; font-size: .85em; }
+    .source-badge.live { background: #00c878; color: #0a0e27; }
+    .source-badge.mock { background: #ffaa00; color: #0a0e27; }
+    .refresh-btn { background: linear-gradient(135deg,#667eea,#764ba2); color: #fff; border: 0; border-radius: 8px; padding: 8px 18px; cursor: pointer; font-size: .95em; }
+    .error-banner { display: none; background: rgba(255,68,68,.15); border: 2px solid #ff4444; border-radius: 10px; padding: 16px 20px; margin-bottom: 20px; }
+    .intro { background: rgba(102,126,234,.1); border-left: 4px solid #667eea; border-radius: 10px; padding: 20px 24px; margin-bottom: 28px; line-height: 1.65; }
+    .intro h2 { color: #8fa2ff; font-size: 1.2em; margin-bottom: 8px; }
+    .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 22px; align-items: center; }
+    .filters input { flex: 1 1 280px; background: #1a1f3a; color: #fff; border: 2px solid rgba(102,126,234,.5); border-radius: 8px; padding: 10px 14px; font-size: 1em; }
+    .pill { background: rgba(102,126,234,.2); border: 1px solid rgba(102,126,234,.5); color: #cfd8ff; border-radius: 20px; padding: 6px 14px; cursor: pointer; font-size: .85em; }
+    .pill.active { background: #667eea; color: #fff; }
+    .group { margin-bottom: 34px; }
+    .group h2 { color: #667eea; font-size: 1.45em; margin-bottom: 4px; }
+    .group p.sub { opacity: .75; font-size: .95em; margin-bottom: 14px; }
+    .tool { background: rgba(255,255,255,.05); border: 1px solid rgba(102,126,234,.3); border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+    .tool-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .tool-name { font-family: ui-monospace, Menlo, monospace; font-weight: bold; color: #fff; font-size: 1.05em; }
+    .tool-desc { opacity: .82; margin-top: 8px; line-height: 1.55; font-size: .93em; }
+    .params { margin-top: 10px; font-size: .85em; }
+    .param { display: inline-block; background: rgba(0,0,0,.3); border-radius: 5px; padding: 2px 9px; margin: 3px 4px 0 0; font-family: ui-monospace, Menlo, monospace; }
+    .param.req { border: 1px solid #ffaa00; color: #ffd27f; }
+    .run-btn { background: rgba(0,200,120,.2); border: 1px solid rgba(0,200,120,.6); color: #7df0bd; border-radius: 6px; padding: 5px 14px; cursor: pointer; font-size: .85em; margin-left: auto; }
+    .run-btn:disabled { opacity: .45; cursor: not-allowed; }
+    .result { margin-top: 12px; background: rgba(0,0,0,.4); border-radius: 8px; padding: 12px 14px; font-family: ui-monospace, Menlo, monospace; font-size: .8em; max-height: 340px; overflow: auto; white-space: pre-wrap; word-break: break-word; display: none; }
+    .result.show { display: block; }
+    .result .ok { color: #7df0bd; }
+    .result .bad { color: #ff8a8a; }
+    footer { text-align: center; padding: 26px; color: rgba(255,255,255,.65); border-top: 1px solid rgba(102,126,234,.3); margin-top: 40px; }
+    footer a { color: #8fa2ff; }
+</style>
+</head>
+<body>
+<div class="container">
+    <a href="index.html" class="back-link">← Back to Reports</a>
+
+    <header>
+        <h1>What the Contrast MCP Server Can Do</h1>
+        <p>Every tool it exposes, read live from the server itself</p>
+    </header>
+
+    <div class="source-bar">
+        <div><span id="sourceBadge" class="source-badge mock">Loading</span> <span id="updated"></span></div>
+        <button class="refresh-btn" id="refreshBtn">↻ Refresh</button>
+    </div>
+    <div class="error-banner" id="errorBanner"></div>
+
+    <div class="intro">
+        <h2>Why this page exists</h2>
+        <p>
+            An MCP server is a set of tools an AI assistant can call on your behalf. This list is not
+            documentation anyone wrote by hand. It is the catalogue this server advertises, fetched
+            through <code>tools/list</code>, which is exactly what Claude sees the moment it connects.
+            The read-only ones can be run here against your own organization, so you can see the shape
+            of the answer before asking an assistant to reason about it.
+        </p>
+    </div>
+
+    <div class="filters">
+        <input id="search" type="search" placeholder="Filter tools, for example cve, library, attack">
+        <button class="pill active" data-kind="all">All</button>
+        <button class="pill" data-kind="runnable">Runnable here</button>
+    </div>
+
+    <div id="groups"></div>
+
+    <footer>
+        <p>Read from the Contrast MCP server via <code>tools/list</code> | <a href="https://www.contrastsecurity.com" target="_blank">contrastsecurity.com</a></p>
+    </footer>
+</div>
+
+<script src="assets/reports.js"></script>
+<script>
+    const { esc } = Reports;
+    let TOOLS = [];
+    let FILTER = 'all';
+    let QUERY = '';
+
+    // Grouped by the question someone is actually trying to answer.
+    const GROUPS = [
+        { key: 'vuln',     title: 'Find vulnerabilities',   sub: 'What is wrong in my applications, and where',         match: (n) => /vulnerab|issue|observation/.test(n) },
+        { key: 'lib',      title: 'Third-party risk',        sub: 'Which dependencies carry known CVEs, and are they used', match: (n) => /librar|cve/.test(n) },
+        { key: 'attack',   title: 'Attacks and incidents',   sub: 'What is being attempted against me right now',        match: (n) => /attack|incident|protect/.test(n) },
+        { key: 'inventory',title: 'Inventory and coverage',  sub: 'What do I have, and how much of it is actually tested', match: (n) => /application|server|route|session|user/.test(n) },
+    ];
+
+    const isRunnable = (t) => /^(search|list|get)_/.test(t.name) && !(t.schema.required || []).length;
+
+    function groupOf(tool) {
+        const g = GROUPS.find((x) => x.match(tool.name));
+        return g ? g.key : 'inventory';
+    }
+
+    function paramHtml(t) {
+        const props = t.schema.properties || {};
+        const req = t.schema.required || [];
+        const names = Object.keys(props);
+        if (!names.length) return '<div class="params"><span style="opacity:.6">No parameters</span></div>';
+        const shown = names.slice(0, 10).map((n) =>
+            `<span class="param ${req.includes(n) ? 'req' : ''}">${esc(n)}${req.includes(n) ? '*' : ''}</span>`).join('');
+        const more = names.length > 10 ? `<span class="param">+${names.length - 10} more</span>` : '';
+        return `<div class="params">${shown}${more}${req.length ? '<div style="opacity:.6;margin-top:6px">* required</div>' : ''}</div>`;
+    }
+
+    function toolHtml(t, i) {
+        const runnable = isRunnable(t);
+        const desc = t.description.split('\n').filter((l) => l.trim())[0] || '';
+        return `<div class="tool">
+            <div class="tool-head">
+                <span class="tool-name">${esc(t.name)}</span>
+                ${runnable ? `<button class="run-btn" data-tool="${esc(t.name)}" data-i="${i}">Run it</button>` : ''}
+            </div>
+            <div class="tool-desc">${esc(desc).slice(0, 320)}</div>
+            ${paramHtml(t)}
+            <div class="result" id="res-${i}"></div>
+        </div>`;
+    }
+
+    function render() {
+        const q = QUERY.toLowerCase();
+        const visible = TOOLS.filter((t) =>
+            (FILTER === 'all' || isRunnable(t))
+            && (!q || t.name.toLowerCase().includes(q) || t.description.toLowerCase().includes(q)));
+
+        const host = document.getElementById('groups');
+        if (!visible.length) { host.innerHTML = '<div class="intro">No tools match that filter.</div>'; return; }
+
+        host.innerHTML = GROUPS.map((g) => {
+            const mine = visible.filter((t) => groupOf(t) === g.key);
+            if (!mine.length) return '';
+            return `<div class="group"><h2>${g.title}</h2><p class="sub">${g.sub} &middot; ${mine.length} tool${mine.length === 1 ? '' : 's'}</p>`
+                + mine.map((t) => toolHtml(t, TOOLS.indexOf(t))).join('') + '</div>';
+        }).join('');
+
+        host.querySelectorAll('.run-btn').forEach((btn) => btn.addEventListener('click', () => runTool(btn)));
+    }
+
+    async function runTool(btn) {
+        const name = btn.dataset.tool;
+        const box = document.getElementById('res-' + btn.dataset.i);
+        btn.disabled = true;
+        const label = btn.textContent;
+        btn.textContent = 'Running...';
+        box.className = 'result show';
+        box.textContent = `Calling ${name}...`;
+        try {
+            const d = await Reports.fetchData(`/api/tool?name=${encodeURIComponent(name)}&args=${encodeURIComponent(JSON.stringify({ pageSize: 3 }))}`);
+            const pretty = JSON.stringify(d.result, null, 2);
+            box.innerHTML = `<span class="ok">${esc(name)} returned in ${d.ms} ms</span>\n\n`
+                + esc(pretty.length > 4000 ? pretty.slice(0, 4000) + '\n... truncated' : pretty);
+        } catch (err) {
+            box.innerHTML = `<span class="bad">${esc(err.message)}</span>`;
+        } finally {
+            btn.disabled = false;
+            btn.textContent = label;
+        }
+    }
+
+    const load = Reports.createLoader('/api/tools', (d) => {
+        TOOLS = d.tools;
+        document.querySelector('.intro h2').textContent = `This server exposes ${TOOLS.length} tools`;
+        render();
+    });
+
+    document.getElementById('search').addEventListener('input', (e) => { QUERY = e.target.value; render(); });
+    document.querySelectorAll('.pill').forEach((p) => p.addEventListener('click', () => {
+        document.querySelectorAll('.pill').forEach((x) => x.classList.remove('active'));
+        p.classList.add('active');
+        FILTER = p.dataset.kind;
+        render();
+    }));
+    Reports.onRefresh(load);
+    load();
+</script>
+</body>
+</html>
