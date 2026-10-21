@@ -725,6 +725,7 @@
             const banner = document.getElementById('errorBanner');
             banner.style.display = 'none';
             if (HOSTED) { hostedNotice(); return; }
+            Reports.startProgress('Fetching the finding');
             try {
                 const q = id ? `?id=${encodeURIComponent(id)}&appId=${encodeURIComponent(appId || '')}` : '';
                 const res = await fetch('/api/vulnerability' + q, { cache: 'no-store' });

@@ -78,6 +78,32 @@ async function main() {
     assert.ok(out.limit > 0, 'expected a stated limit');
   });
 
+  await test('a last page that overshoots the ceiling is not called truncated', async () => {
+    // 27 findings, ceiling of 10: one page returns everything, so nothing was
+    // lost and claiming otherwise would be a false alarm.
+    process.env.CONTRAST_MAX_ITEMS = '10';
+    try {
+      const { mcp } = loadWithStub(fakeVulns(27));
+      const out = await mcp.listVulnerabilities();
+      assert.strictEqual(out.items.length, 27);
+      assert.strictEqual(out.truncated, false, 'nothing was dropped, so this must not warn');
+    } finally {
+      delete process.env.CONTRAST_MAX_ITEMS;
+    }
+  });
+
+  await test('a ceiling that really does cut results says so', async () => {
+    process.env.CONTRAST_MAX_ITEMS = '60';
+    try {
+      const { mcp } = loadWithStub(fakeVulns(500));
+      const out = await mcp.listVulnerabilities();
+      assert.strictEqual(out.truncated, true, 'results were cut, so it must warn');
+      assert.ok(out.items.length < 500);
+    } finally {
+      delete process.env.CONTRAST_MAX_ITEMS;
+    }
+  });
+
   // ---- fan-out ----
   await test('route coverage runs applications concurrently', async () => {
     let inFlight = 0;

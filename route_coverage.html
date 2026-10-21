@@ -553,6 +553,7 @@
             const banner = document.getElementById('errorBanner');
             banner.style.display = 'none';
             if (HOSTED) { hostedNotice(); return; }
+            Reports.startProgress('Fetching route coverage for every application');
             try {
                 const res = await fetch('/api/routes', { cache: 'no-store' });
                 const ct = res.headers.get('content-type') || '';

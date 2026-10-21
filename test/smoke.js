@@ -182,6 +182,13 @@ async function main() {
       return res.ok && (await res.text()).includes('<html') ? null : `HTTP ${res.status}`;
     });
 
+    await checkAsync('truncation is reported, not hidden', async () => {
+      const res = await fetch(`${BASE}/api/vulnerabilities`);
+      const d = await res.json();
+      if (!('truncated' in d)) return 'response does not say whether it was truncated';
+      return d.truncated === false ? null : 'mock fixture should not be truncated';
+    });
+
     await checkAsync('responses carry an MCP trace', async () => {
       const res = await fetch(`${BASE}/api/routes`);
       const d = await res.json();
@@ -192,6 +199,10 @@ async function main() {
     // ---- pages actually render ----
     if (!SKIP_UI && fs.existsSync(chrome)) {
       for (const page of LIVE_PAGES) {
+        await checkAsync(`${page} shows a loading state before data arrives`, async () => {
+          const src = fs.readFileSync(path.join(ROOT, `${page}.html`), 'utf8');
+          return src.includes('assets/reports.js') ? null : 'page does not load the shared module';
+        });
         await checkAsync(`${page} shows the MCP panel`, async () => {
           const { dom } = render(page);
           return dom.includes('id="mcpPanel"') ? null : 'no MCP call panel rendered';

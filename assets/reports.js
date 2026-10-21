@@ -76,6 +76,7 @@
   // server that is not running, and telling someone to start a server that is
   // plainly already answering wastes their time.
   function failureBanner(err) {
+    stopProgress();
     var msg = String((err && err.message) || err || '');
     var link = ' Or open the <a href="' + snapshotHref() + '" style="color:#8fa2ff;">static snapshot</a>.';
     badge('NO DATA', 'mock');
@@ -217,7 +218,9 @@
       renderMcpPanel(d.mcp, 'frozen');
       return;
     }
+    stopProgress();
     badge(d.source === 'live' ? 'LIVE' : 'MOCK DATA', d.source === 'live' ? 'live' : 'mock');
+    truncationNotice(d);
     var el = document.getElementById('updated');
     if (el) {
       if (d.source === 'live') {
@@ -232,6 +235,36 @@
       }
     }
     renderMcpPanel(d.mcp, d.source);
+  }
+
+  // Some endpoints fan out across every application, so on a large organization
+  // they take tens of seconds. With no signal that is indistinguishable from a
+  // hung page, so count the seconds out loud.
+  var ticking = null;
+
+  function startProgress(label) {
+    stopProgress();
+    var started = Date.now();
+    var el = document.getElementById('updated');
+    badge('LOADING', 'mock');
+    ticking = setInterval(function () {
+      var s = Math.round((Date.now() - started) / 1000);
+      if (el) el.textContent = label + ' ' + s + 's';
+    }, 1000);
+    if (el) el.textContent = label;
+  }
+
+  function stopProgress() {
+    if (ticking) { clearInterval(ticking); ticking = null; }
+  }
+
+  // A result that quietly stopped short is the failure this project exists to
+  // expose, so say so where it cannot be missed.
+  function truncationNotice(d) {
+    if (!d || !d.truncated) return;
+    banner('<strong>Showing the first ' + esc(String(d.limit)) + ' results.</strong> Your organization '
+      + 'has more than this page fetched, so the totals below are a floor, not a count. Raise the ceiling '
+      + 'with <code>CONTRAST_MAX_ITEMS</code> if you need all of it.', 'info');
   }
 
   // The loop every page runs: skip the call when hosted, fetch, render, and turn
@@ -265,6 +298,8 @@
     failureBanner: failureBanner,
     fetchData: fetchData,
     markLoaded: markLoaded,
+    startProgress: startProgress,
+    stopProgress: stopProgress,
     renderMcpPanel: renderMcpPanel,
     createLoader: createLoader,
     onRefresh: onRefresh,
