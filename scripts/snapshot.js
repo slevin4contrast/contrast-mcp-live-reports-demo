@@ -20,6 +20,7 @@ const ROOT = path.join(__dirname, '..');
 const BASE = process.env.SNAPSHOT_BASE || 'http://127.0.0.1:3000';
 
 const PAGES = {
+  tool_explorer: '/api/tools',
   vulnerability_dashboard: '/api/vulnerabilities',
   route_coverage: '/api/routes',
   library_security: '/api/libraries',

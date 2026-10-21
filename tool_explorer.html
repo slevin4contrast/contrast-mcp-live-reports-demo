@@ -98,7 +98,11 @@
         { key: 'inventory',title: 'Inventory and coverage',  sub: 'What do I have, and how much of it is actually tested', match: (n) => /application|server|route|session|user/.test(n) },
     ];
 
-    const isRunnable = (t) => /^(search|list|get)_/.test(t.name) && !(t.schema.required || []).length;
+    // Running a tool needs the local server. A frozen copy can still show the
+    // whole catalogue, which is the point of this page, so offer the button only
+    // where pressing it would actually do something.
+    const CAN_RUN = !Reports.FROZEN && !Reports.HOSTED;
+    const isRunnable = (t) => CAN_RUN && /^(search|list|get)_/.test(t.name) && !(t.schema.required || []).length;
 
     function groupOf(tool) {
         const g = GROUPS.find((x) => x.match(tool.name));
@@ -173,6 +177,16 @@
     const load = Reports.createLoader('/api/tools', (d) => {
         TOOLS = d.tools;
         document.querySelector('.intro h2').textContent = `This server exposes ${TOOLS.length} tools`;
+        if (!CAN_RUN) {
+            const pill = document.getElementById('runnablePill');
+            if (pill) pill.remove();
+            const note = document.createElement('p');
+            note.style.marginTop = '12px';
+            note.innerHTML = '<strong>This is the catalogue, frozen.</strong> Running a tool needs the local '
+                + 'server, so there are no run buttons here. Clone the repo and run <code>npm start</code> '
+                + 'to try them against your own organization.';
+            document.querySelector('.intro').appendChild(note);
+        }
         render();
     });
 

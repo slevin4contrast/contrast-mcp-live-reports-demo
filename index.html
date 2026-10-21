@@ -534,10 +534,10 @@
         (function () {
             if (['localhost', '127.0.0.1', ''].includes(location.hostname)) return;
 
-            // Pages with a frozen copy to fall back to. tool_explorer has none, because
-            // a list of tools nobody can run is not worth freezing; it shows its own notice.
+            // Every live page has a frozen copy to fall back to.
             const SNAPSHOTS = ['attack_activity', 'compliance_mttr', 'cve_impact', 'library_security',
-                               'poc_generator', 'route_coverage', 'smartfix_guide', 'vulnerability_dashboard'];
+                               'poc_generator', 'route_coverage', 'smartfix_guide', 'tool_explorer',
+                               'vulnerability_dashboard'];
 
             document.querySelectorAll('a.report-link').forEach((a) => {
                 const page = (a.getAttribute('href') || '').replace(/\.html$/, '');
