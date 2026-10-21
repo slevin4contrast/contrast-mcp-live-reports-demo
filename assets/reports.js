@@ -65,11 +65,21 @@
   }
 
   function hostedNotice() {
+    // The data lives in the frozen copy beside this page, so send people there
+    // rather than showing them an empty one. Anyone who shares a link to the
+    // live page still lands on something populated.
+    //
+    // This cannot loop: a _static page carries FROZEN_DATA, which makes HOSTED
+    // false, so it never reaches here. The guard is belt and braces for a
+    // snapshot that somehow lost its payload.
+    if (!/_static\.html$/.test(global.location.pathname)) {
+      global.location.replace(snapshotHref());
+      return;
+    }
     badge('SNAPSHOT', 'mock');
     banner('<strong>Hosted copy, so no live data.</strong> This page is served from GitHub Pages, '
       + 'which cannot reach a Contrast organization. Clone the repo and run <code>npm start</code> '
-      + 'to see it live, or open the <a href="' + snapshotHref()
-      + '" style="color:#8fa2ff; font-weight:bold;">static snapshot</a>.', 'info');
+      + 'to see it live.', 'info');
   }
 
   // Say what actually broke. An expired session is not the same problem as a
