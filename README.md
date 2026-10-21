@@ -10,6 +10,17 @@ directly and draws the answer, and each shows which tools it called to get there
 **No AI tokens are spent viewing these pages.** MCP is a protocol, not a model. The pages talk to
 Contrast over HTTPS and no model runs, so refreshing a dashboard costs nothing in Claude usage.
 
+## Prerequisites
+
+- **Node.js 18 or newer.** Check with `node --version`. Nothing else is installed; this project
+  has no dependencies.
+- **A Contrast account** with access to at least one organization.
+- **An MCP client**, to connect the server and to sign this project in the first time. Claude
+  Code, Claude Desktop, Codex CLI, GitHub Copilot CLI and opencode all work. If you use something
+  else, see *Using this without Claude* below.
+- **A browser**, for the one-time OAuth sign-in.
+- macOS, Linux or Windows.
+
 ## Before anything else: connect the MCP server
 
 This project reads from the Contrast MCP server, so that has to exist first. Setup and the
@@ -76,6 +87,22 @@ calls in about two seconds, starting with `search_cves` returning 25 rows.
 
 `/api/cves` takes an optional `?id=CVE-YYYY-NNNN`, and `/api/vulnerability` takes `?id=` and
 `?appId=`. With no id each opens on the most significant finding.
+
+### What each page needs from Contrast
+
+Pages only show what your licences and agents actually report. If one looks empty, this is
+usually why rather than a fault:
+
+| Page | Needs |
+|---|---|
+| Vulnerability dashboard, PoC generator, SmartFix guide, Compliance | Assess, with agents reporting |
+| Route coverage | Assess, per application; applications without it are listed with zero routes |
+| Library security | Library data from the agent, which comes with Assess |
+| Attack activity | ADR, and attacks actually observed |
+| CVE impact | CVE Shield data |
+
+An organization with no data of a given kind renders an empty page rather than an error. That is
+deliberate, but it does mean an empty page is ambiguous: no data and no licence look the same.
 
 `compliance_mttr.html` is only partly live. Its KPIs, SLA table and finding ages come from the
 org, but the NIST, PCI-DSS, OWASP and SOC 2 sections below them are sample content. Contrast does
