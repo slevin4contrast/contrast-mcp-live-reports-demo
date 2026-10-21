@@ -169,7 +169,7 @@ Each page says what actually broke rather than guessing:
 ## Tests
 
 ```bash
-npm test              # unit tests, then 94 browser and API checks
+npm test              # unit tests, then 96 browser and API checks
 npm run test:unit     # just the unit tests, under a second
 npm run test:empty    # every source empty: does each page explain itself?
 npm run test:scale    # a synthetic 200-application org: does the DOM stay sane?
@@ -179,8 +179,7 @@ npm test -- --no-ui   # skip the browser checks
 No dependencies. The smoke suite runs in mock mode, so it needs no Contrast session and works
 offline. The unit tests stub the MCP client to simulate organizations no demo tenant can provide:
 60,000 findings, 40 applications, and an application whose licence does not cover route
-coverage. It covers
-every endpoint's shape, the file server's refusal to serve anything but pages, inline script
+coverage. The smoke suite covers every endpoint's shape, the file server's refusal to serve anything but pages, inline script
 syntax, that no credentials are committed, that each snapshot carries real captured data, and
 that every page renders to a terminal state in headless Chrome.
 
@@ -196,15 +195,23 @@ npm run fixtures    # sample data for mock mode
 npm run snapshot    # frozen _static pages, server must be running live
 ```
 
-A `_static` page is the real page with a real API response frozen into it. The shared module
-notices the frozen payload, serves it instead of fetching, and labels the page with its capture
-date. They open with no server and no network.
+All nine live pages have one, the tool explorer included. A `_static` page is the real page with
+a real API response frozen into it. The shared module notices the frozen payload, serves that
+instead of fetching, and labels the page with its capture date. They open with no server and no
+network.
 
 ### On GitHub Pages
 
-The repo publishes as a static site. Pages cannot reach Contrast, so the hosted copy serves the
-`_static` snapshots and says so. The index rewrites its own links and relabels the badges when it
-detects it is not on localhost.
+The repo publishes as a static site at
+<https://slevin4contrast.github.io/contrast-mcp-live-reports-demo/>. Pages cannot reach Contrast,
+so a hosted page redirects to its frozen copy and the badge reads SNAPSHOT. A link to any live
+page therefore still lands on something populated, which matters because the live URL is what
+people share.
+
+The frozen tool explorer still lists the whole catalogue, which is the point of that page, but
+drops the run buttons, because running a tool needs the local server.
+
+Running locally none of this applies: pages are live and the run buttons work.
 
 ## Still static
 
