@@ -585,6 +585,12 @@
         let shownCount = PAGE_SIZE;
 
         function renderLibraries() {
+            if (!DATA.items.length) {
+                document.getElementById('libraries').innerHTML = Reports.emptyState(
+                    'libraries', 'agents reporting library data, which comes with Assess',
+                    ['Has an application been exercised since the agent was installed?']);
+                return;
+            }
             const risky = DATA.items.filter((l) => l.total > 0);
             const list = risky.filter(matches);
             const host = document.getElementById('libraries');

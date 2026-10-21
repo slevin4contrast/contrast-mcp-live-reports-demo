@@ -1290,6 +1290,17 @@
 
         function renderLive(d) {
             const t = d.totals;
+            if (!t.total) {
+                document.getElementById('liveAlert').innerHTML = Reports.emptyState(
+                    'findings', 'Contrast Assess',
+                    ['Ageing and SLA figures are derived from findings, so there must be some.',
+                     'The framework sections below are sample content and will still render.']);
+                document.getElementById('liveKpis').innerHTML = '';
+                document.getElementById('slaTable').innerHTML = '';
+                document.getElementById('oldestTable').innerHTML = '';
+                document.getElementById('slaPolicy').textContent = '';
+                return;
+            }
 
             const worst = ORDER.filter((s) => d.bySeverity[s] && d.bySeverity[s].breached > 0);
             document.getElementById('liveAlert').innerHTML = worst.length

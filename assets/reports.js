@@ -209,6 +209,35 @@
       + 'Run the project locally for the live version.', 'info');
   }
 
+  // Nothing to show is not the same as something broken, but they look
+  // identical when a page just renders blank. An organization without ADR has
+  // no attacks; without CVE Shield, no CVE data; a new one has nothing at all.
+  // Say which it is, and what to check.
+  var EMPTY_CSS = '.empty-state{border:1px dashed rgba(102,126,234,.5);border-radius:12px;'
+    + 'padding:30px 28px;margin:16px 0 28px;background:rgba(102,126,234,.06);line-height:1.6}'
+    + '.empty-state h3{color:#8fa2ff;margin-bottom:10px;font-size:1.15em}'
+    + '.empty-state p{opacity:.85;margin-bottom:8px}'
+    + '.empty-state ul{margin:8px 0 0 20px;opacity:.85}'
+    + '.empty-state li{margin-bottom:4px}';
+
+  function emptyState(what, needs, checks) {
+    if (!document.getElementById('empty-state-css')) {
+      var st = document.createElement('style');
+      st.id = 'empty-state-css';
+      st.textContent = EMPTY_CSS;
+      document.head.appendChild(st);
+    }
+    var list = (checks || []).map(function (c) { return '<li>' + c + '</li>'; }).join('');
+    return '<div class="empty-state"><h3>No ' + esc(what) + ' to show</h3>'
+      + '<p>This is what an empty result looks like, not an error. The page loaded and the '
+      + 'Contrast MCP server answered, it just had nothing to return.</p>'
+      + '<p>Worth checking:</p><ul>'
+      + '<li>Does your organization have ' + needs + '?</li>'
+      + list
+      + '<li>Are the agents reporting? The MCP panel above shows the calls that were made.</li>'
+      + '</ul></div>';
+  }
+
   function markLoaded(d) {
     if (FROZEN) {
       badge('SNAPSHOT', 'mock');
@@ -298,6 +327,7 @@
     failureBanner: failureBanner,
     fetchData: fetchData,
     markLoaded: markLoaded,
+    emptyState: emptyState,
     startProgress: startProgress,
     stopProgress: stopProgress,
     renderMcpPanel: renderMcpPanel,

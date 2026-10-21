@@ -369,7 +369,12 @@
         }
 
         function renderDetail(d) {
-            if (!d) { document.getElementById('detail').innerHTML = ''; return; }
+            if (!d) {
+                document.getElementById('detail').innerHTML = Reports.emptyState(
+                    'findings to reproduce', 'Contrast Assess',
+                    ['A proof of concept needs a finding with a captured request behind it.']);
+                return;
+            }
             const curl = toCurl(d.httpRequest);
             const sev = SEV_CLASS[d.severity] || 'severity-note';
 

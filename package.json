@@ -14,7 +14,8 @@
     "fixtures": "node scripts/fixtures.js",
     "snapshot": "node scripts/snapshot.js",
     "test:unit": "node test/unit.js",
-    "test:scale": "node test/scale.js"
+    "test:scale": "node test/scale.js",
+    "test:empty": "node test/empty.js"
   },
   "engines": {
     "node": ">=18"

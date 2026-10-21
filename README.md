@@ -101,8 +101,9 @@ usually why rather than a fault:
 | Attack activity | ADR, and attacks actually observed |
 | CVE impact | CVE Shield data |
 
-An organization with no data of a given kind renders an empty page rather than an error. That is
-deliberate, but it does mean an empty page is ambiguous: no data and no licence look the same.
+When a page has nothing to show it says so, and lists what to check, rather than rendering
+blank. `npm run test:empty` proves that by serving every data source empty and asserting each
+page explains itself.
 
 `compliance_mttr.html` is only partly live. Its KPIs, SLA table and finding ages come from the
 org, but the NIST, PCI-DSS, OWASP and SOC 2 sections below them are sample content. Contrast does
@@ -170,6 +171,8 @@ Each page says what actually broke rather than guessing:
 ```bash
 npm test              # unit tests, then 94 browser and API checks
 npm run test:unit     # just the unit tests, under a second
+npm run test:empty    # every source empty: does each page explain itself?
+npm run test:scale    # a synthetic 200-application org: does the DOM stay sane?
 npm test -- --no-ui   # skip the browser checks
 ```
 

@@ -379,7 +379,12 @@
         }
 
         function renderDetail(d) {
-            if (!d) { document.getElementById('detail').innerHTML = ''; return; }
+            if (!d) {
+                document.getElementById('detail').innerHTML = Reports.emptyState(
+                    'CVE exposure', 'CVE Shield data',
+                    ['Are libraries being reported, so their CVEs can be matched?']);
+                return;
+            }
             const r = d.risk || {}, ex = d.exposure || {}, p = d.protection || {}, st = d.impactStats;
             const exploited = (d.issues || []).some((i) => Object.values(i.shield || {}).includes('EXPLOITED'));
 

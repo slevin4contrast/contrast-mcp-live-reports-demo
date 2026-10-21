@@ -175,6 +175,14 @@
         }
 
         function renderAttacks(items) {
+            if (!items.length) {
+                document.getElementById('attacks').innerHTML = Reports.emptyState(
+                    'attacks', 'Contrast ADR, which detects attacks at runtime',
+                    ['Has any traffic reached the applications since ADR was enabled?',
+                     'An org with ADR and no attacks is good news, not a fault.']);
+                document.getElementById('listSubhead').textContent = 'Nothing recorded';
+                return;
+            }
             document.getElementById('listSubhead').textContent =
                 `${items.length} source${items.length === 1 ? '' : 's'}, busiest first`;
             document.getElementById('attacks').innerHTML = items.length

@@ -652,7 +652,12 @@
         }
 
         function renderDetail(d) {
-            if (!d) { document.getElementById('detail').innerHTML = ''; return; }
+            if (!d) {
+                document.getElementById('detail').innerHTML = Reports.emptyState(
+                    'findings to remediate', 'Contrast Assess',
+                    ['Remediation guidance comes attached to a finding, so there must be one first.']);
+                return;
+            }
             const sev = SEV_CLASS[d.severity] || 'severity-note';
 
             const card = `<div class="vulnerability-card">

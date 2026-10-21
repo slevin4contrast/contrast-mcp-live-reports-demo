@@ -503,6 +503,12 @@
         let allApps = [];
 
         function renderApps(apps) {
+            if (!apps.length) {
+                document.getElementById('appGrid').innerHTML = Reports.emptyState(
+                    'applications', 'Contrast Assess, which route coverage requires per application',
+                    ['Are any applications onboarded and reporting?']);
+                return;
+            }
             allApps = apps.slice().sort((a, b) => b.totalRoutes - a.totalRoutes);
             const grid = document.getElementById('appGrid');
             const shown = allApps.slice(0, appsShown);
