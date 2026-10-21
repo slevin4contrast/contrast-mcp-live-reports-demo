@@ -81,11 +81,11 @@
     var link = ' Or open the <a href="' + snapshotHref() + '" style="color:#8fa2ff;">static snapshot</a>.';
     badge('NO DATA', 'mock');
 
-    if (/token expired|reauthorize|sign in/i.test(msg)) {
+    if (/session expired|token expired|reauthorize|sign in/i.test(msg)) {
       banner('<strong>Contrast session expired.</strong> The server is running fine, it just has no '
-        + 'valid token. If it signed in with <code>npm run login</code> it renews itself, so this '
-        + 'usually means that session was revoked. Otherwise run a Contrast command in Claude Code, '
-        + 'then press Refresh.' + link);
+        + 'valid token. It is borrowing one from your MCP client, so refresh it by running a Contrast '
+        + 'command there and pressing Refresh here. To stop this happening, run <code>npm run login</code> '
+        + 'once and the server keeps its own session.' + link);
     } else if (msg === 'NOT_REPORT_SERVER') {
       banner('<strong>Something else is on port 3000.</strong> This page loaded, but the API returned '
         + 'a web page instead of data, so the process answering is not the report server. Stop it, '
