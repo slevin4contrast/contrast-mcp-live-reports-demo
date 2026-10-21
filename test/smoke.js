@@ -102,6 +102,18 @@ async function main() {
     });
   }
 
+  // These pages are meant to run against a customer's own organization, so the
+  // demo org's name must not appear in anything they would read.
+  const LIVE_HTML = ['index.html', 'tool_explorer.html', 'vulnerability_dashboard.html',
+    'route_coverage.html', 'library_security.html', 'cve_impact.html', 'attack_activity.html',
+    'compliance_mttr.html', 'poc_generator.html', 'smartfix_guide.html'];
+  for (const f of LIVE_HTML) {
+    check(`${f} is free of demo-org naming`, () => {
+      const src = fs.readFileSync(path.join(ROOT, f), 'utf8');
+      return /cargo\s?cats/i.test(src) ? 'mentions the demo organization' : null;
+    });
+  }
+
   check('no credentials committed', () => {
     const tracked = execFileSync('git', ['ls-files'], { cwd: ROOT, encoding: 'utf8' }).split('\n').filter(Boolean);
     const banned = tracked.filter((f) => /\.env$|contrast-client\.json$|\.pem$|\.key$/.test(f));
