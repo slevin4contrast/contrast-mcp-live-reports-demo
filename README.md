@@ -99,7 +99,7 @@ refreshing a page costs nothing in AI usage.
 | `route_coverage.html` | `/api/routes` | `search_applications`, `get_route_coverage` |
 | `library_security.html` | `/api/libraries` | `search_applications`, `list_application_libraries` |
 | `cve_impact.html` | `/api/cves` | `search_cves`, `get_cve_impact`, `list_cve_issues`, `list_applications_by_cve` |
-| `attack_map.html` | `/api/attacks` | `search_attacks` |
+| `attack_activity.html` | `/api/attacks` | `search_attacks` |
 | `compliance_mttr.html` | `/api/compliance` | `search_vulnerabilities` (all statuses) |
 | `poc_generator.html` | `/api/vulnerability` | `search_vulnerabilities`, `get_vulnerability` |
 | `smartfix_guide.html` | `/api/vulnerability` | `search_vulnerabilities`, `get_vulnerability` |

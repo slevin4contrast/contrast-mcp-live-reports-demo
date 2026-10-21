@@ -57,8 +57,8 @@
         <a href="index.html" class="back-link">← Back to Reports</a>
 
         <header>
-            <h1>🛡️ Attack Activity</h1>
-            <p>Live ADR attack detection across Cargo Cats</p>
+            <h1>🚨 Attack Activity</h1>
+            <p>What is being attempted against these applications, as Contrast ADR sees it</p>
         </header>
 
         <div class="source-bar">
@@ -68,11 +68,11 @@
         <div class="error-banner" id="errorBanner"></div>
 
         <div class="note">
-            <strong>Why there is no map.</strong> The earlier version of this page plotted attacks on a
-            world map, but Contrast reports the source address the agent observed, and in this
-            environment those are internal addresses with no geographic location. The map read well and
-            meant nothing, so this version shows what the data actually supports: who attacked, what
-            they tried, and which applications gave way.
+            <strong>What you are looking at.</strong> Contrast ADR watches running applications and records
+            attacks as they happen. An attack here is one source address probing one or more applications,
+            grouped across every technique it tried. <strong>Probed</strong> means an attempt was detected
+            and did not succeed. <strong>Exploited</strong> means it reached something it should not have,
+            and is worth acting on first.
         </div>
 
         <div class="stats-grid" id="stats"></div>
@@ -89,14 +89,14 @@
         </div>
 
         <div class="section-header">
-            <h2>Attack sources</h2>
-            <p id="listSubhead">Sorted by probe volume</p>
+            <h2>Who is attacking</h2>
+            <p id="listSubhead">One card per source address, busiest first</p>
         </div>
         <div id="attacks"></div>
 
         <footer>
             <p>Generated using Contrast Security MCP Server | <a href="https://www.contrastsecurity.com" target="_blank">contrastsecurity.com</a></p>
-            <p style="margin-top: 10px; font-size: 0.9em;">Data from search_attacks. Static snapshot: <a href="attack_map_static.html">attack_map_static.html</a></p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Data from search_attacks. Static snapshot: <a href="attack_activity_static.html">attack_activity_static.html</a></p>
         </footer>
     </div>
 
@@ -175,7 +175,8 @@
         }
 
         function renderAttacks(items) {
-            document.getElementById('listSubhead').textContent = `${items.length} attack${items.length === 1 ? '' : 's'}, sorted by probe volume`;
+            document.getElementById('listSubhead').textContent =
+                `${items.length} source${items.length === 1 ? '' : 's'}, busiest first`;
             document.getElementById('attacks').innerHTML = items.length
                 ? items.map(attackCard).join('')
                 : '<div class="stat-card">No attacks recorded.</div>';

@@ -24,7 +24,7 @@ const PAGES = {
   route_coverage: '/api/routes',
   library_security: '/api/libraries',
   cve_impact: '/api/cves',
-  attack_map: '/api/attacks',
+  attack_activity: '/api/attacks',
   compliance_mttr: '/api/compliance',
   poc_generator: '/api/vulnerability',
   smartfix_guide: '/api/vulnerability',

@@ -16,7 +16,7 @@ const BASE = `http://127.0.0.1:${PORT}`;
 const SKIP_UI = process.argv.includes('--no-ui');
 
 const LIVE_PAGES = ['vulnerability_dashboard', 'route_coverage', 'library_security', 'cve_impact',
-                    'attack_map', 'compliance_mttr', 'poc_generator', 'smartfix_guide', 'tool_explorer'];
+                    'attack_activity', 'compliance_mttr', 'poc_generator', 'smartfix_guide', 'tool_explorer'];
 
 let passed = 0;
 const failures = [];

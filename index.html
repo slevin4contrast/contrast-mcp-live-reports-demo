@@ -264,12 +264,12 @@
             </div>
 
             <div class="report-card">
-                <div class="report-icon">🗺️</div>
+                <div class="report-icon">🚨</div>
                 <h3>Attack Activity <span class="badge" style="background: #00c878; color: #0a0e27;">LIVE</span></h3>
                 <p>
-                    ADR attack detection across the Cargo Cats infrastructure. Shows each attack source,
-                    the techniques it attempted, how many probes it sent, and which applications were
-                    exploited rather than merely probed.
+                    What is being attempted against these applications right now, as Contrast ADR sees it.
+                    Each source, every technique it tried, how hard it pushed, and which applications it
+                    actually got into rather than merely probed.
                 </p>
                 <div class="report-meta">
                     <span class="meta-item">📊 5 Attacks</span>
@@ -280,7 +280,7 @@
                 <p style="font-size: 0.9em; margin-bottom: 15px;">
                     <strong>Top Techniques:</strong> Command Injection, SQL Injection, Path Traversal
                 </p>
-                <a href="attack_map.html" class="report-link">View Attack Map →</a>
+                <a href="attack_activity.html" class="report-link">View Attack Activity →</a>
             </div>
 
             <div class="report-card">
@@ -536,7 +536,7 @@
 
             // Pages with a frozen copy to fall back to. tool_explorer has none, because
             // a list of tools nobody can run is not worth freezing; it shows its own notice.
-            const SNAPSHOTS = ['attack_map', 'compliance_mttr', 'cve_impact', 'library_security',
+            const SNAPSHOTS = ['attack_activity', 'compliance_mttr', 'cve_impact', 'library_security',
                                'poc_generator', 'route_coverage', 'smartfix_guide', 'vulnerability_dashboard'];
 
             document.querySelectorAll('a.report-link').forEach((a) => {
