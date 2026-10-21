@@ -578,17 +578,32 @@
             </div>`;
         }
 
+        // A large organization can carry thousands of CVE-bearing libraries, and
+        // drawing a card for each produces a page too heavy to scroll. Show the
+        // worst offenders first and let the reader ask for more.
+        const PAGE_SIZE = 100;
+        let shownCount = PAGE_SIZE;
+
         function renderLibraries() {
             const risky = DATA.items.filter((l) => l.total > 0);
             const list = risky.filter(matches);
             const host = document.getElementById('libraries');
-            document.getElementById('riskSubhead').textContent =
-                `Showing ${list.length} of ${risky.length} libraries that carry at least one CVE, sorted by critical then high severity`;
+            const shown = list.slice(0, shownCount);
+            document.getElementById('riskSubhead').textContent = list.length > shown.length
+                ? `Showing the ${shown.length} worst of ${list.length} matching libraries, of ${risky.length} carrying at least one CVE`
+                : `Showing ${list.length} of ${risky.length} libraries that carry at least one CVE, sorted by critical then high severity`;
             if (!list.length) {
                 host.innerHTML = '<div class="empty-note">No libraries match this filter.</div>';
                 return;
             }
-            host.innerHTML = list.map(libCard).join('');
+            const more = list.length > shown.length
+                ? `<div style="text-align:center;margin:24px 0;">
+                     <button class="filter-btn" id="showMore">Show ${Math.min(PAGE_SIZE, list.length - shown.length)} more of ${list.length - shown.length} remaining</button>
+                   </div>`
+                : '';
+            host.innerHTML = shown.map(libCard).join('') + more;
+            const moreBtn = document.getElementById('showMore');
+            if (moreBtn) moreBtn.addEventListener('click', () => { shownCount += PAGE_SIZE; renderLibraries(); });
             host.querySelectorAll('.cve-toggle').forEach((btn) => {
                 btn.addEventListener('click', () => {
                     const box = document.getElementById('cves-' + btn.dataset.i);
@@ -605,6 +620,7 @@
             document.querySelectorAll('.filter-btn').forEach((b) => b.classList.remove('active'));
             btn.classList.add('active');
             FILTER = btn.dataset.filter;
+            shownCount = PAGE_SIZE;
             renderLibraries();
         });
 

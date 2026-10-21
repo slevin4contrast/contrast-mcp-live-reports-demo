@@ -218,8 +218,13 @@ Route coverage and library security cover every application, fetching six at a t
 `CONTRAST_CONCURRENCY`. On eight applications they take under two seconds. On several hundred
 expect tens of seconds, and the page counts the wait out loud so it does not look hung.
 
-Pages render every row they receive, so an organization with thousands of CVE-carrying libraries
-will produce a very long page. The filters help, but this has not been tested at that size.
+Pages that could draw thousands of cards show the worst offenders first with a "show more"
+button: 100 libraries and 50 applications at a time. The filters narrow it further.
+
+`npm run test:scale` checks this. It generates a synthetic organization of 2,000 libraries,
+5,000 findings and 200 applications, serves it through mock mode, and fails if any page draws
+more DOM than its budget. Uncapped, library security drew 27,000 elements and 3 MB; it now draws
+about 7,000 and under 1 MB.
 
 ## Notes
 

@@ -13,7 +13,8 @@
     "test": "node test/unit.js && node test/smoke.js",
     "fixtures": "node scripts/fixtures.js",
     "snapshot": "node scripts/snapshot.js",
-    "test:unit": "node test/unit.js"
+    "test:unit": "node test/unit.js",
+    "test:scale": "node test/scale.js"
   },
   "engines": {
     "node": ">=18"

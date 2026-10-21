@@ -495,9 +495,26 @@
             </div>`;
         }
 
+        // One card per application, each listing its routes. A few hundred
+        // applications would draw tens of thousands of nodes, so show the
+        // largest first and let the reader ask for the rest.
+        const APP_PAGE = 50;
+        let appsShown = APP_PAGE;
+        let allApps = [];
+
         function renderApps(apps) {
+            allApps = apps.slice().sort((a, b) => b.totalRoutes - a.totalRoutes);
             const grid = document.getElementById('appGrid');
-            grid.innerHTML = apps.slice().sort((a, b) => b.totalRoutes - a.totalRoutes).map(appCard).join('');
+            const shown = allApps.slice(0, appsShown);
+            const remaining = allApps.length - shown.length;
+            const more = remaining > 0
+                ? `<div style="grid-column:1/-1;text-align:center;margin:10px 0;">
+                     <button class="route-toggle" id="moreApps">Show ${Math.min(APP_PAGE, remaining)} more of ${remaining} remaining applications</button>
+                   </div>`
+                : '';
+            grid.innerHTML = shown.map(appCard).join('') + more;
+            const moreBtn = document.getElementById('moreApps');
+            if (moreBtn) moreBtn.addEventListener('click', () => { appsShown += APP_PAGE; renderApps(allApps); });
             grid.querySelectorAll('.route-toggle').forEach((btn) => {
                 btn.addEventListener('click', () => {
                     const list = document.getElementById('routes-' + btn.dataset.app);
