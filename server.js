@@ -32,14 +32,20 @@ function summarize(items) {
 
 const routes = {
   '/api/vulnerabilities': async () => {
-    const items = MOCK ? contrast.loadFixture('vulnerabilities') : await contrast.listVulnerabilities();
-    return { source: MOCK ? 'mock' : 'live', generatedAt: new Date().toISOString(), ...summarize(items), items };
+    const got = MOCK ? { items: contrast.loadFixture('vulnerabilities'), truncated: false } : await contrast.listVulnerabilities();
+    const items = got.items;
+    return {
+      source: MOCK ? 'mock' : 'live', generatedAt: new Date().toISOString(),
+      truncated: got.truncated || false, limit: got.limit || null,
+      ...summarize(items), items,
+    };
   },
   // Remediation SLA in days per severity. This is an assumed policy, not a
   // value Contrast stores, and the page states it so the numbers can be checked.
   '/api/compliance': async () => {
     const SLA = { Critical: 7, High: 30, Medium: 90, Low: 180, Note: 180 };
-    const items = MOCK ? contrast.loadFixture('vulnerabilities') : await contrast.listVulnerabilities({ allStatuses: true });
+    const got = MOCK ? { items: contrast.loadFixture('vulnerabilities'), truncated: false } : await contrast.listVulnerabilities({ allStatuses: true });
+    const items = got.items;
     const now = Date.now();
     const DAY = 86400000;
     const open = [];
@@ -88,6 +94,7 @@ const routes = {
     return {
       source: MOCK ? 'mock' : 'live',
       generatedAt: new Date().toISOString(),
+      truncated: got.truncated || false, limit: got.limit || null,
       sla: SLA,
       totals: {
         total: items.length,

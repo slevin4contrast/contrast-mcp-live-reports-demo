@@ -15,7 +15,7 @@ const contrast = require('../lib/mcp');
 const OUT = path.join(__dirname, '..', 'fixtures');
 
 const SETS = {
-  vulnerabilities: () => contrast.listVulnerabilities({ allStatuses: true }),
+  vulnerabilities: async () => (await contrast.listVulnerabilities({ allStatuses: true })).items,
   routes: () => contrast.listRouteCoverage(),
   attacks: () => contrast.listAttacks(),
   cves: () => contrast.cveReport(),

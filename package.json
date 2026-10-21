@@ -10,9 +10,10 @@
     "mock": "MOCK=1 node server.js",
     "setup": "node scripts/register-client.js",
     "login": "node scripts/login.js",
-    "test": "node test/smoke.js",
+    "test": "node test/unit.js && node test/smoke.js",
     "fixtures": "node scripts/fixtures.js",
-    "snapshot": "node scripts/snapshot.js"
+    "snapshot": "node scripts/snapshot.js",
+    "test:unit": "node test/unit.js"
   },
   "engines": {
     "node": ">=18"
