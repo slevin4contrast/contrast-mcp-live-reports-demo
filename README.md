@@ -1,100 +1,43 @@
-# Contrast MCP Demo Reports
+# Contrast MCP Live Reports
 
-Security reports generated from the Contrast MCP server. Some pages are static snapshots.
-Others are live and fetch data when you open them.
+An MCP server is a set of tools an AI assistant can call on your behalf. The Contrast MCP server
+exposes 27 of them, covering vulnerabilities, third-party libraries, CVE exposure, live attacks,
+route coverage and application inventory.
+
+These pages make that concrete. Each one is an ordinary web page that calls those same tools
+directly and draws the answer, and each shows which tools it called to get there.
+
+**No AI tokens are spent viewing these pages.** MCP is a protocol, not a model. The pages talk to
+Contrast over HTTPS and no model runs, so refreshing a dashboard costs nothing in Claude usage.
 
 ## Quick start
 
 ```bash
-npm start        # or: node server.js
+npm start
 ```
 
-Then open http://localhost:3000.
+Then open http://localhost:3000. There is no API key to configure.
 
-That is the whole setup. There is no API key to configure.
-
-## How the live pages work
-
-The live pages call a small local server, which calls the Contrast MCP server at
-`https://eval.contrastsecurity.com/mcp` using the same tools Claude Code calls, such as
-`search_vulnerabilities` and `get_route_coverage`. There is no second API client and no
-separate set of credentials to manage.
-
-Authentication reuses the OAuth token Claude Code already stored in the macOS keychain when
-you connected the MCP server. The server reads that token per request, so a refreshed token is
-picked up automatically. The token never reaches the browser.
-
-### Making it refresh itself (recommended for demos)
-
-By default the server borrows the OAuth token Claude Code holds, and that token lasts about 15
-minutes. Renewing it means running something in Claude Code, which is fine while you are working
-but a nuisance during a long demo.
-
-Run this once and the problem goes away:
-
-```bash
-npm run setup
-```
-
-That registers this server as its own OAuth client on your Contrast tenant and saves the
-credentials to `.contrast-client.json`, which is gitignored and written chmod 600. From then on
-the server mints its own access tokens and renews them a minute before they lapse, so nothing
-expires mid-demo and Claude Code is never involved.
-
-It is deliberately safe in both directions. The server never touches Claude Code's refresh token,
-so it cannot break your MCP connection, and Claude Code cannot invalidate the server's
-credentials. To undo it, delete `.contrast-client.json` and revoke the client in Contrast; the
-server falls back to borrowing Claude Code's token.
-
-Setup reads Claude Code's current access token once to authorize the registration, so the MCP
-server needs to be connected and the token valid when you run it. If it reports a 401, run any
-Contrast command in Claude Code and try again.
-
-**This may not be available to you.** On the eval tenant the registration endpoint answers 403
-`insufficient_scope`, because user tokens carry only `openid profile` and the authorization
-server advertises no scope that permits dynamic registration. That is tenant policy, not
-something to fix locally. If you hit it, either ask a Contrast admin to pre-create an OAuth
-client and write `.contrast-client.json` by hand as
-`{ clientId, clientSecret, tokenEndpoint, serverUrl }`, or stay on the default and accept the
-15-minute token.
-
-### When a page says the session expired
-
-Access tokens last about 15 minutes, and this server deliberately does not refresh them (see
-below). When one lapses, every live page says so and tells you to refresh it from Claude Code.
-The server is still running at that point; it just has no valid token. Running any Contrast
-command in Claude Code renews the token in the keychain, and the next Refresh picks it up. No
-restart needed.
-
-Access tokens last about 15 minutes. Claude Code refreshes them whenever it uses the MCP
-server, and this server re-reads the keychain on every request, so the token stays current as
-long as you are also using the MCP in Claude Code, which is usually the case during a demo. If
-the token has expired, the page shows a message telling you to run `/mcp` in Claude Code to
-reauthorize. If no token is found at all, the server starts in mock mode and serves sample data
-from `fixtures/`, clearly labeled on the page.
-
-This server deliberately does not refresh the token itself. The authorization server rotates
-refresh tokens, so refreshing from here would invalidate the one Claude Code holds and break
-its MCP connection until you reconnect.
-
-Every live page carries a badge reading either LIVE or MOCK DATA, a last-refreshed timestamp,
-and a Refresh button, so a demo never silently shows stale numbers. Set `MOCK=1` to force
-sample data even when a token is available.
+With no Contrast session the server runs in mock mode and serves sample data from `fixtures/`,
+labelled on the page with the date it was captured.
 
 ## Start here
 
-`tool_explorer.html` lists every tool the MCP server exposes, read from the server itself via
-`tools/list` rather than written by hand, and lets you run the read-only ones against your own
-organization. If you want to understand what an MCP server could do for you, open that first.
+`tool_explorer.html` lists every tool the server exposes, read from the server itself through
+`tools/list` rather than written by hand, grouped by the question you are trying to answer. The
+read-only ones can be run against your own organization so you can see the shape of the answer.
 
-Every report page also carries a collapsible panel showing the tool calls behind it: which tools
-ran, with what arguments, how long each took and how many rows came back. No model runs, so
-refreshing a page costs nothing in AI usage.
+## Seeing the MCP calls
+
+Every report page carries a collapsible panel showing the calls behind it: which tools ran, with
+what arguments, how long each took and how many rows came back. Opening the CVE page shows four
+calls in about two seconds, starting with `search_cves` returning 25 rows.
 
 ## Live pages
 
 | Page | Endpoint | MCP tools |
 |---|---|---|
+| `tool_explorer.html` | `/api/tools`, `/api/tool` | `tools/list`, plus any read-only tool you run |
 | `vulnerability_dashboard.html` | `/api/vulnerabilities` | `search_vulnerabilities` |
 | `route_coverage.html` | `/api/routes` | `search_applications`, `get_route_coverage` |
 | `library_security.html` | `/api/libraries` | `search_applications`, `list_application_libraries` |
@@ -103,82 +46,127 @@ refreshing a page costs nothing in AI usage.
 | `compliance_mttr.html` | `/api/compliance` | `search_vulnerabilities` (all statuses) |
 | `poc_generator.html` | `/api/vulnerability` | `search_vulnerabilities`, `get_vulnerability` |
 | `smartfix_guide.html` | `/api/vulnerability` | `search_vulnerabilities`, `get_vulnerability` |
-| `tool_explorer.html` | `/api/tools`, `/api/tool` | `tools/list`, plus any read-only tool you run |
 
-`/api/vulnerability` takes an optional `?id=` and `?appId=`, since `get_vulnerability` needs
-both. With no id it opens on the most severe finding. The PoC page turns the captured request
-into a runnable curl command; Contrast redacts sensitive values first, so placeholders appear
-where real data was sent.
-
-`/api/cves` takes an optional `?id=CVE-YYYY-NNNN`. With no id it picks the highest-scoring CVE
-that agents have actually seen exploited. The page drives that through a dropdown and a
-clickable table.
+`/api/cves` takes an optional `?id=CVE-YYYY-NNNN`, and `/api/vulnerability` takes `?id=` and
+`?appId=`. With no id each opens on the most significant finding.
 
 `compliance_mttr.html` is only partly live. Its KPIs, SLA table and finding ages come from the
-org, but the NIST, PCI-DSS, OWASP and SOC 2 sections below them are sample content. Contrast
-does not store control mappings, and this org has no remediation history, so MTTR is reported
-as not available rather than invented. A banner on the page marks where the live data stops.
+org, but the NIST, PCI-DSS, OWASP and SOC 2 sections below them are sample content. Contrast does
+not store control mappings, and the demo org has no remediation history, so MTTR is reported as
+not available rather than invented. A banner marks where the live data stops.
 
-### Viewing it on GitHub Pages
+## Keeping it signed in
 
-The repo is also published as a static site. GitHub Pages cannot reach a Contrast organization,
-so the hosted copy serves the `_static` snapshots instead and says so on every page. The index
-rewrites its own links and relabels the badges when it detects it is not running on localhost.
-To see the reports pull live data, clone the repo and run it locally.
+The MCP endpoint only accepts OAuth bearer tokens. By default the server borrows the one Claude
+Code holds, which lasts about 15 minutes, so a long demo needs a Claude Code command now and then
+to renew it.
 
-Each live page has a frozen copy beside it, named with a `_static` suffix. These are not
-hand-written: `npm run snapshot` takes the real page, freezes a real API response into it, and
-the shared module serves that instead of fetching. They open with no server and no network, and
-label themselves with their capture date, which makes them a safe fallback and an honest one.
-
-Regenerate both kinds of captured data when the org changes:
+Run this once and that goes away:
 
 ```bash
-npm run fixtures    # sample data for MOCK mode
-npm run snapshot    # frozen _static pages (server must be running live)
+npm run login
 ```
 
-## Static pages
+It registers an OAuth client of its own, opens a browser for you to sign in, and keeps the
+resulting refresh token in `.contrast-client.json` (gitignored, chmod 600). After that the server
+renews its own access tokens indefinitely on a token chain separate from Claude Code's, so
+neither can disturb the other.
 
-`poc_generator.html`, `smartfix_guide.html`, `pr_security_gate.html`, `attack_response_playbook.html` and
-`developer_training.html` are snapshots. `prompts.html` documents the prompts behind each report.
+To undo it, delete `.contrast-client.json` and revoke the `contrast-reports-local` client in
+Contrast. The server falls back to borrowing Claude Code's token.
+
+`npm run setup` is an alternative that registers a client with the `client_credentials` grant and
+needs no browser. It requires a tenant that permits dynamic client registration; on the eval
+tenant it answers 403 `insufficient_scope`, so use `npm run login` there.
+
+## When something fails
+
+Each page says what actually broke rather than guessing:
+
+- **Contrast session expired.** The server is running, it just has no valid token. Renew it, or
+  run `npm run login` so it stops happening.
+- **Cannot reach the local server.** Start it with `npm start`.
+- **Something else is on port 3000.** The API returned a web page instead of data.
+- **Hosted copy, so no live data.** You are on GitHub Pages, which cannot reach Contrast.
+
+## Tests
+
+```bash
+npm test              # 74 checks, about 17 seconds
+npm test -- --no-ui   # skip the browser checks, about 5 seconds
+```
+
+No dependencies. Runs in mock mode, so it needs no Contrast session and works offline. It covers
+every endpoint's shape, the file server's refusal to serve anything but pages, inline script
+syntax, that no credentials are committed, that each snapshot carries real captured data, and
+that every page renders to a terminal state in headless Chrome.
+
+The suite exists because mock mode was silently broken for hours: `loadFixture` had been dropped
+in a refactor and every endpoint returned 502. The first run caught it.
+
+## Captured data
+
+Two kinds, both regenerable, both dated so they cannot quietly drift:
+
+```bash
+npm run fixtures    # sample data for mock mode
+npm run snapshot    # frozen _static pages, server must be running live
+```
+
+A `_static` page is the real page with a real API response frozen into it. The shared module
+notices the frozen payload, serves it instead of fetching, and labels the page with its capture
+date. They open with no server and no network.
+
+### On GitHub Pages
+
+The repo publishes as a static site. Pages cannot reach Contrast, so the hosted copy serves the
+`_static` snapshots and says so. The index rewrites its own links and relabels the badges when it
+detects it is not on localhost.
+
+## Still static
+
+`pr_security_gate.html`, `attack_response_playbook.html` and `developer_training.html` are
+unconverted snapshots, mostly written guidance rather than data. `prompts.html` documents the
+prompts behind each report.
 
 ## Layout
 
 ```
-server.js                 Local server and API routes, no dependencies
-lib/mcp.js                Contrast MCP client, the only file that talks to the server
-scripts/register-client.js  One-time setup for self-refreshing credentials
-fixtures/                 Sample data used when no token is available
-*_static.html             Frozen snapshots of pages that are now live
+server.js               Local server and API routes, no dependencies
+lib/mcp.js              Contrast MCP client, the only file that talks to the server
+assets/reports.js       Shared page behaviour: fetching, badges, errors, the MCP panel
+scripts/login.js        One-time browser sign-in for self-renewing credentials
+scripts/register-client.js  Alternative sign-in where the tenant allows client registration
+scripts/fixtures.js     Regenerates fixtures/ from a live org
+scripts/snapshot.js     Regenerates the _static pages from live data
+test/smoke.js           The suite npm test runs
+fixtures/               Sample data for mock mode
+*_static.html           Frozen captures of the live pages
 ```
 
 ## Adding another live page
 
-Add a function to `lib/mcp.js` that calls the MCP tool you need through `callTool`, add a route
-to the `routes` map in `server.js`, then have the page fetch it. The tool names and response
-shapes are the ones the MCP server returns in chat, so you can try a tool there first and build
-against exactly what you see.
+Add a function to `lib/mcp.js` that calls the tool you need through `callTool`, add a route to the
+`routes` map in `server.js`, then have the page fetch it. Load `assets/reports.js` and the badge,
+timestamp, error handling, MCP panel and frozen-snapshot support come with it.
 
-Two quirks worth knowing. `get_route_coverage` and `list_applications_by_cve` nest their
-payload under a `data` key, while the other tools return their fields at the top level. And
-since the pages build HTML in template literals, syntax-check a page's inline script before
-trusting a render, because a parse error leaves the page silently stuck on Loading with no
-error in the banner:
-
-```bash
-sed -n '/^    <script>$/,/^    <\/script>$/p' page.html | sed '1d;$d' | node --check /dev/stdin
-```
+Two quirks worth knowing. `get_route_coverage` and `list_applications_by_cve` nest their payload
+under a `data` key, while the other tools return fields at the top level. And since pages build
+HTML in template literals, a syntax error leaves the page silently stuck on "Loading"; `npm test`
+catches that.
 
 ## Notes
 
-This runs on localhost and relies on a token tied to your own Contrast account, so it shows
-whatever your account can see. Before running it anywhere other than a local machine, get IT
-and security approval.
+This runs on localhost against a session tied to your own Contrast account, so it shows whatever
+that account can see. Before running it anywhere other than a local machine, get IT and security
+approval.
+
+`fixtures/` holds real data from the demo org. If you point this at a different organization,
+consider whether its exported findings, routes and library inventory belong in a public repo.
 
 ## Origin
 
 Started from [Contrast-Security-OSS/contrast-generated-reports](https://github.com/Contrast-Security-OSS/contrast-generated-reports),
-where every page was a static snapshot. This version adds the local server and converts six of
-those pages to pull live data through the Contrast MCP server. The original snapshots are kept
-beside each live page with a `_static` suffix.
+where every page was a static snapshot with hand-written numbers. Converting them to live data
+showed how far those had drifted: 24 findings against an actual 27, 60.77% route coverage against
+46%, 127 libraries against 420.
