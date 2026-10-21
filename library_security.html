@@ -480,12 +480,12 @@
         <div class="grade-distribution" id="grades"></div>
 
         <div class="section-header">
-            <h2>⚠️ Libraries With Known CVEs</h2>
+            <h2>⚠️ Library Risk</h2>
             <p id="riskSubhead">Sorted by critical, then high severity</p>
         </div>
 
         <div class="filter-buttons" id="filters">
-            <button class="filter-btn active" data-filter="all">All With CVEs</button>
+            <button class="filter-btn active" data-filter="all">Carrying CVEs</button>
             <button class="filter-btn" data-filter="critical">Critical Only</button>
             <button class="filter-btn" data-filter="outdated">30+ Months Old</button>
             <button class="filter-btn" data-filter="f-grade">F Grade</button>
@@ -527,12 +527,19 @@
             document.getElementById('grades').innerHTML = cards.join('');
         }
 
-        function matches(l) {
-            if (FILTER === 'critical') return l.critical > 0;
-            if (FILTER === 'outdated') return l.monthsOutdated >= 30;
-            if (FILTER === 'f-grade') return l.grade === 'F';
-            if (FILTER === 'unused') return !l.classesUsed;
-            return true;
+        // Each filter picks from every library, not just the ones carrying CVEs.
+        // Filtering within that subset meant the stat panel could say 132 F-grade
+        // libraries while the F Grade button showed 56, with no way to the rest.
+        const VIEWS = {
+            all:      { pick: (l) => l.total > 0,            label: (n, t) => `${n} libraries carrying at least one CVE, of ${t} in total` },
+            critical: { pick: (l) => l.critical > 0,         label: (n, t) => `${n} libraries with a critical CVE, of ${t} in total` },
+            outdated: { pick: (l) => l.monthsOutdated >= 30, label: (n, t) => `${n} libraries at least 30 months behind the latest release, of ${t} in total` },
+            'f-grade':{ pick: (l) => l.grade === 'F',        label: (n, t) => `${n} libraries graded F, of ${t} in total` },
+            unused:   { pick: (l) => !l.classesUsed,         label: (n, t) => `${n} libraries with no classes loaded at runtime, of ${t} in total` },
+        };
+
+        function currentView() {
+            return VIEWS[FILTER] || VIEWS.all;
         }
 
         function sevBadges(l) {
@@ -591,13 +598,14 @@
                     ['Has an application been exercised since the agent was installed?']);
                 return;
             }
-            const risky = DATA.items.filter((l) => l.total > 0);
-            const list = risky.filter(matches);
+            const view = currentView();
+            const list = DATA.items.filter(view.pick);
             const host = document.getElementById('libraries');
             const shown = list.slice(0, shownCount);
+            const scope = view.label(list.length, DATA.items.length);
             document.getElementById('riskSubhead').textContent = list.length > shown.length
-                ? `Showing the ${shown.length} worst of ${list.length} matching libraries, of ${risky.length} carrying at least one CVE`
-                : `Showing ${list.length} of ${risky.length} libraries that carry at least one CVE, sorted by critical then high severity`;
+                ? `Showing the first ${shown.length} of ${scope}, worst first`
+                : `Showing all ${scope}, worst first`;
             if (!list.length) {
                 host.innerHTML = '<div class="empty-note">No libraries match this filter.</div>';
                 return;
