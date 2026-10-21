@@ -9,7 +9,8 @@
     "start": "node server.js",
     "mock": "MOCK=1 node server.js",
     "setup": "node scripts/register-client.js",
-    "login": "node scripts/login.js"
+    "login": "node scripts/login.js",
+    "test": "node test/smoke.js"
   },
   "engines": {
     "node": ">=18"
