@@ -45,11 +45,27 @@ async function checkAsync(name, fn) {
 
 const chrome = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 
-function renderBadge(page) {
-  const dom = execFileSync(chrome, ['--headless=new', '--disable-gpu', '--virtual-time-budget=15000',
-    '--dump-dom', `${BASE}/${page}.html`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+// Headless Chrome occasionally fails to launch when several run back to back.
+// Retry once, because a test that fails at random teaches people to ignore it.
+function renderBadge(page, attempt = 0) {
+  let dom;
+  try {
+    dom = execFileSync(chrome, ['--headless=new', '--disable-gpu', '--virtual-time-budget=15000',
+      '--dump-dom', `${BASE}/${page}.html`], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+  } catch (err) {
+    if (attempt === 0) return renderBadge(page, 1);
+    throw new Error(`Chrome failed twice for ${page}: ${err.message.split('\n')[0]}`);
+  }
   const m = dom.match(/id="sourceBadge"[^>]*>([^<]*)/);
   return { badge: m ? m[1].trim() : null, dom };
+}
+
+// Each page is rendered twice today, once for the badge and once for the panel.
+// Cache it so a run does half the browser launches and is half as flaky.
+const renderCache = new Map();
+function render(page) {
+  if (!renderCache.has(page)) renderCache.set(page, renderBadge(page));
+  return renderCache.get(page);
 }
 
 async function main() {
@@ -177,11 +193,11 @@ async function main() {
     if (!SKIP_UI && fs.existsSync(chrome)) {
       for (const page of LIVE_PAGES) {
         await checkAsync(`${page} shows the MCP panel`, async () => {
-          const { dom } = renderBadge(page);
+          const { dom } = render(page);
           return dom.includes('id="mcpPanel"') ? null : 'no MCP call panel rendered';
         });
         await checkAsync(`${page} reaches a terminal state`, async () => {
-          const { badge } = renderBadge(page);
+          const { badge } = render(page);
           if (!badge) return 'no source badge found';
           if (badge === 'Loading') return 'stuck on Loading, the script probably threw';
           if (!['MOCK DATA', 'LIVE', 'SNAPSHOT'].includes(badge)) return `unexpected badge "${badge}"`;
