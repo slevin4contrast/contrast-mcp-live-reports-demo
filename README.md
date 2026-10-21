@@ -93,10 +93,16 @@ already stored, so it can register an OAuth client of its own. After that the se
 itself and Claude Code is never consulted again, which you can verify by disconnecting it.
 
 Contrast's hosted MCP server also works with Codex CLI, GitHub Copilot CLI, opencode and Claude
-Desktop. Those store their credentials elsewhere, so `npm run login` cannot bootstrap from them
-yet. Until it can, either run the sign-in once on a machine with Claude Code, or have a Contrast
-admin create an OAuth client and write `.contrast-client.json` by hand as
-`{ clientId, clientSecret, tokenEndpoint, serverUrl }`.
+Desktop. Those store credentials elsewhere, so supply a token from whichever you use:
+
+```bash
+export CONTRAST_MCP_URL=https://<your-contrast-host>/mcp
+export CONTRAST_ACCESS_TOKEN=<an access token>
+npm run login
+```
+
+Credentials are looked for in that order: these variables, then the macOS keychain, then Claude
+Code's credentials file, which is where it keeps them on Linux and Windows.
 
 ## Keeping it signed in
 
@@ -135,11 +141,15 @@ Each page says what actually broke rather than guessing:
 ## Tests
 
 ```bash
-npm test              # 74 checks, about 17 seconds
-npm test -- --no-ui   # skip the browser checks, about 5 seconds
+npm test              # unit tests, then 94 browser and API checks
+npm run test:unit     # just the unit tests, under a second
+npm test -- --no-ui   # skip the browser checks
 ```
 
-No dependencies. Runs in mock mode, so it needs no Contrast session and works offline. It covers
+No dependencies. The smoke suite runs in mock mode, so it needs no Contrast session and works
+offline. The unit tests stub the MCP client to simulate organizations no demo tenant can provide:
+60,000 findings, 40 applications, and an application whose licence does not cover route
+coverage. It covers
 every endpoint's shape, the file server's refusal to serve anything but pages, inline script
 syntax, that no credentials are committed, that each snapshot carries real captured data, and
 that every page renders to a terminal state in headless Chrome.
@@ -198,18 +208,18 @@ under a `data` key, while the other tools return fields at the top level. And si
 HTML in template literals, a syntax error leaves the page silently stuck on "Loading"; `npm test`
 catches that.
 
-## Known limits
+## On a large organization
 
-Worth understanding before pointing this at a large organization:
+Paging runs until the source is exhausted, with a ceiling of 25,000 items per endpoint. If an
+organization exceeds that the page says so, rather than quietly showing a partial count. Raise it
+with `CONTRAST_MAX_ITEMS`.
 
-- **Large result sets are truncated.** `/api/vulnerabilities` stops after 20 pages, so an org with
-  more than 1,000 findings silently shows 1,000. `/api/attacks` stops at 2,000. This is being
-  fixed; until it is, treat the totals on a big org as a floor rather than a count.
-- **Per-application endpoints fan out sequentially.** Route coverage makes one call per
-  application and library security makes several, one after another. On the eight-application demo
-  org that is 4 and 6 seconds. On two hundred applications it would be minutes.
-- **macOS only for sign-in.** `npm run login` reads the macOS keychain. The server itself is
-  cross-platform once `.contrast-client.json` exists.
+Route coverage and library security cover every application, fetching six at a time; tune with
+`CONTRAST_CONCURRENCY`. On eight applications they take under two seconds. On several hundred
+expect tens of seconds, and the page counts the wait out loud so it does not look hung.
+
+Pages render every row they receive, so an organization with thousands of CVE-carrying libraries
+will produce a very long page. The filters help, but this has not been tested at that size.
 
 ## Notes
 
