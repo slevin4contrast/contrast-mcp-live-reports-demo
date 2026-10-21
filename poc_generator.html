@@ -327,6 +327,9 @@
         <div class="picker">
             <label for="vulnSelect">Vulnerability</label>
             <select id="vulnSelect"></select>
+            <input id="vulnFilter" type="search" placeholder="Filter by title, app or rule"
+                   style="background:#1a1f3a;color:#fff;border:2px solid rgba(102,126,234,0.5);border-radius:8px;padding:10px 14px;font-size:1em;min-width:260px;">
+            <span id="vulnCount" style="opacity:.7;font-size:.9em;"></span>
         </div>
 
         <div id="detail"></div>
@@ -362,10 +365,27 @@
             return parts.join(' \\\n');
         }
 
-        function renderPicker(list, chosen) {
-            document.getElementById('vulnSelect').innerHTML = list.map((v) =>
+        // A large organization can have thousands of findings, and no one picks
+        // one by scrolling a dropdown that long. Narrow it first.
+        let PICKER_LIST = [];
+
+        function applyPickerFilter(chosen) {
+            const q = (document.getElementById('vulnFilter').value || '').toLowerCase();
+            const list = q
+                ? PICKER_LIST.filter((v) => (v.title + ' ' + v.app + ' ' + v.type).toLowerCase().includes(q))
+                : PICKER_LIST;
+            const capped = list.slice(0, 500);
+            document.getElementById('vulnCount').textContent = list.length === PICKER_LIST.length
+                ? `${PICKER_LIST.length} findings`
+                : `${list.length} of ${PICKER_LIST.length} match`;
+            document.getElementById('vulnSelect').innerHTML = capped.map((v) =>
                 `<option value="${esc(v.id)}" data-app="${esc(v.appId)}"${v.id === chosen ? ' selected' : ''}>` +
                 `${esc(v.severity)} — ${esc(v.title).slice(0, 80)} (${esc(shortApp(v.app))})</option>`).join('');
+        }
+
+        function renderPicker(list, chosen) {
+            PICKER_LIST = list;
+            applyPickerFilter(chosen);
         }
 
         function renderDetail(d) {
@@ -473,6 +493,7 @@
             const opt = e.target.selectedOptions[0];
             load(e.target.value, opt && opt.dataset.app);
         });
+        document.getElementById('vulnFilter').addEventListener('input', () => applyPickerFilter(null));
         document.getElementById('refreshBtn').addEventListener('click', () => {
             const sel = document.getElementById('vulnSelect');
             const opt = sel.selectedOptions[0];

@@ -248,8 +248,18 @@ Route coverage and library security cover every application, fetching six at a t
 `CONTRAST_CONCURRENCY`. On eight applications they take under two seconds. On several hundred
 expect tens of seconds, and the page counts the wait out loud so it does not look hung.
 
-Pages that could draw thousands of cards show the worst offenders first with a "show more"
-button: 100 libraries and 50 applications at a time. The filters narrow it further.
+Every long list is paged rather than drawn in full, and everything is reachable:
+
+| List | Shows first | Then |
+|---|---|---|
+| Libraries with CVEs | 100 | Show more, plus filters |
+| Applications in route coverage | 50 | Show more |
+| Findings per severity | 50 critical and high, 24 medium, 12 low and note | Show more per section |
+| CVEs | the 25 highest scoring | Show more |
+| Oldest open findings | 15 | heading says how many are open |
+| Finding pickers | 500 options | type to filter by title, app or rule |
+
+Changing a filter resets the window, so a stale page of results cannot leak through.
 
 `npm run test:scale` checks this. It generates a synthetic organization of 2,000 libraries,
 5,000 findings and 200 applications, serves it through mock mode, and fails if any page draws

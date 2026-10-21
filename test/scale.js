@@ -22,6 +22,8 @@ const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 // Generous ceilings: comfortably above what a capped page produces, well below
 // what an uncapped one does.
 const BUDGET = {
+  poc_generator: 4000,
+  smartfix_guide: 4000,
   library_security: 9000,
   vulnerability_dashboard: 9000,
   compliance_mttr: 4000,
@@ -63,6 +65,18 @@ function synthesise(dir) {
   }));
   fs.writeFileSync(path.join(dir, 'vulnerabilities.json'), JSON.stringify(vulns));
 
+  // The PoC and SmartFix pages put every finding into one <select>.
+  fs.writeFileSync(path.join(dir, 'vulnerability.json'), JSON.stringify({
+    list: vulns,
+    detail: {
+      id: 'V-0', appId: 'a', app: 'app-1', title: 'Synthetic finding 0', type: 'sql-injection',
+      severity: 'Critical', status: 'Reported', environments: ['PRODUCTION'],
+      firstSeenAt: '2026-08-01T00:00:00+00:00', lastSeenAt: '2026-10-01T00:00:00+00:00',
+      httpRequest: 'GET /x HTTP/1.1\nHost: example\n\n', howToFix: 'Synthetic.',
+      remediationHint: 'Synthetic.', stackTrace: [], vulnerableLibraries: [],
+    },
+  }));
+
   const routes = Array.from({ length: 200 }, (_, i) => ({
     name: `app-${i}`, appId: `id-${i}`, language: 'Java', status: 'online',
     totalRoutes: 40, exercised: 18, discovered: 22, coveragePercent: 45,
@@ -72,7 +86,7 @@ function synthesise(dir) {
   fs.writeFileSync(path.join(dir, 'routes.json'), JSON.stringify(routes));
 
   // These are small regardless of org size; copy the real ones through.
-  for (const f of ['attacks.json', 'cves.json', 'vulnerability.json', 'tools.json', 'captured.json']) {
+  for (const f of ['attacks.json', 'cves.json', 'tools.json', 'captured.json']) {
     const src = path.join(ROOT, 'fixtures', f);
     if (fs.existsSync(src)) fs.copyFileSync(src, path.join(dir, f));
   }

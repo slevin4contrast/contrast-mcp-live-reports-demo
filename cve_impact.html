@@ -361,10 +361,20 @@
             }).join('');
         }
 
+        // The organization can carry hundreds of CVEs. Show the highest scoring
+        // first and let the reader ask for the rest, rather than drawing them all.
+        const CVE_PAGE = 25;
+        let cvesShown = CVE_PAGE;
+
         function renderList(list, chosen) {
             const legendHost = document.getElementById('listLegend');
             if (legendHost) legendHost.innerHTML = shieldLegend();
-            document.getElementById('cveRows').innerHTML = list.map((c) => `
+            const shown = list.slice(0, cvesShown);
+            const remaining = list.length - shown.length;
+            document.getElementById('listSubhead').textContent = remaining > 0
+                ? `Showing the ${shown.length} highest scoring of ${list.length}. Click a row to load its detail.`
+                : `All ${list.length}, sorted by CVSS. Click a row to load its detail.`;
+            document.getElementById('cveRows').innerHTML = shown.map((c) => `
                 <tr class="${c.cveId === chosen ? 'selected' : ''}">
                     <td class="cve-link" data-cve="${esc(c.cveId)}">${esc(c.cveId)}</td>
                     <td>${c.maxScore}</td>
@@ -372,7 +382,14 @@
                     <td>${c.knownExploited ? 'Yes' : 'No'}</td>
                     <td>${c.numApplications}</td>
                     <td>${shieldBadge(c.highestShieldStatus)}</td>
-                </tr>`).join('');
+                </tr>`).join('')
+                + (remaining > 0
+                    ? `<tr><td colspan="6" style="text-align:center;padding:16px;">
+                         <button class="refresh-btn" id="moreCves">Show ${Math.min(CVE_PAGE, remaining)} more of ${remaining} remaining</button>
+                       </td></tr>`
+                    : '');
+            const moreBtn = document.getElementById('moreCves');
+            if (moreBtn) moreBtn.addEventListener('click', () => { cvesShown += CVE_PAGE; renderList(list, chosen); });
             document.querySelectorAll('.cve-link').forEach((td) => {
                 td.addEventListener('click', () => load(td.dataset.cve));
             });

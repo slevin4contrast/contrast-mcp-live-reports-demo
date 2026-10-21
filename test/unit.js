@@ -104,6 +104,26 @@ async function main() {
     }
   });
 
+  await test('CVE search follows the cursor to the end', async () => {
+    // search_cves pages by cursor, not page number. Fetching one page meant an
+    // org with 177 CVEs showed 25 and hid the rest with no way through.
+    const TOTAL = 177;
+    const { mcp, calls } = loadWithStub(async (name, args) => {
+      if (name !== 'search_cves') return { data: {} };
+      const start = args.cursor ? Number(args.cursor) : 0;
+      const size = args.pageSize || 25;
+      const items = [];
+      for (let i = start; i < Math.min(start + size, TOTAL); i++) {
+        items.push({ cveId: `CVE-2024-${1000 + i}`, maxScore: 9, highestShieldStatus: 'NOT_SEEN', numApplications: 1 });
+      }
+      const next = start + size;
+      return { items, totalItems: TOTAL, hasMore: next < TOTAL, nextCursor: next < TOTAL ? String(next) : null };
+    });
+    const out = await mcp.searchAllCves();
+    assert.strictEqual(out.items.length, TOTAL, `got ${out.items.length} of ${TOTAL}`);
+    assert.ok(calls.length > 1, 'should have followed the cursor');
+  });
+
   // ---- fan-out ----
   await test('route coverage runs applications concurrently', async () => {
     let inFlight = 0;

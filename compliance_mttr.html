@@ -1333,6 +1333,12 @@
                            `<td class="${r.breached ? 'breach' : 'ok'}">${r.breached}</td></tr>`;
                 }).join('') + '</tbody>';
 
+            const oc = document.getElementById('oldestCount');
+            if (oc) {
+                oc.textContent = d.oldest.length < t.open
+                    ? `the ${d.oldest.length} oldest of ${t.open} open`
+                    : `all ${t.open} open`;
+            }
             document.getElementById('oldestTable').innerHTML =
                 '<thead><tr><th>Finding</th><th>Application</th><th>Severity</th><th>Status</th><th>Age</th><th>SLA</th></tr></thead><tbody>' +
                 d.oldest.map((v) => `<tr><td>${esc(v.title).slice(0, 80)}</td><td>${esc(shortApp(v.app))}</td>` +
