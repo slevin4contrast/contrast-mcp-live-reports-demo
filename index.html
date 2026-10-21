@@ -502,8 +502,8 @@
         (function () {
             if (['localhost', '127.0.0.1', ''].includes(location.hostname)) return;
 
-            const SNAPSHOTS = ['attack_map', 'compliance_mttr', 'cve_impact',
-                               'library_security', 'route_coverage', 'vulnerability_dashboard'];
+            const SNAPSHOTS = ['attack_map', 'compliance_mttr', 'cve_impact', 'library_security',
+                               'poc_generator', 'route_coverage', 'smartfix_guide', 'vulnerability_dashboard'];
 
             document.querySelectorAll('a.report-link').forEach((a) => {
                 const page = (a.getAttribute('href') || '').replace(/\.html$/, '');
