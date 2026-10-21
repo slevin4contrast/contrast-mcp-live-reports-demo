@@ -115,13 +115,22 @@ async function main() {
     // ---- the file server must never expose anything but pages ----
     const mustNotServe = ['.contrast-client.json', '.env', 'package.json', 'server.js',
                           'lib/mcp.js', 'scripts/login.js', 'fixtures/routes.json',
-                          '.git/config', '../server.js'];
+                          '.git/config', '../server.js',
+                          // the assets allowlist must not become a way out of the directory
+                          'assets/../server.js', 'assets/../.contrast-client.json'];
     for (const p of mustNotServe) {
       await checkAsync(`refuses /${p}`, async () => {
         const res = await fetch(`${BASE}/${p}`);
         return res.status === 404 ? null : `served with HTTP ${res.status}`;
       });
     }
+
+    await checkAsync('serves the shared asset', async () => {
+      const res = await fetch(`${BASE}/assets/reports.js`);
+      if (!res.ok) return `HTTP ${res.status}`;
+      const ct = res.headers.get('content-type') || '';
+      return ct.includes('javascript') ? null : `wrong content-type: ${ct}`;
+    });
 
     await checkAsync('serves index', async () => {
       const res = await fetch(BASE + '/');

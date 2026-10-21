@@ -205,12 +205,16 @@ http.createServer(async (req, res) => {
   // secret inside it, because adding a new secret file does not update a list of
   // forbidden names. This cannot leak a file type nobody thought to exclude.
   const name = pathname === '/' ? 'index.html' : pathname.slice(1);
-  if (!/^[A-Za-z0-9._-]+\.html$/.test(name) || name.startsWith('.')) {
+  const isPage = /^[A-Za-z0-9._-]+\.html$/.test(name) && !name.startsWith('.');
+  const isAsset = /^assets\/[A-Za-z0-9._-]+\.(js|css)$/.test(name);
+  if (!isPage && !isAsset) {
     res.writeHead(404); return res.end('Not found');
   }
   fs.readFile(path.join(__dirname, name), (err, data) => {
     if (err) { res.writeHead(404); return res.end('Not found'); }
-    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.writeHead(200, {
+      'Content-Type': isPage ? 'text/html' : name.endsWith('.css') ? 'text/css' : 'text/javascript',
+    });
     res.end(data);
   });
 }).listen(PORT, '127.0.0.1', () => {
