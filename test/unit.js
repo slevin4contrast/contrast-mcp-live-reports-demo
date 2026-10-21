@@ -133,6 +133,56 @@ async function main() {
     assert.strictEqual(libs[0].apps.length, 20, 'should record every app using it');
   });
 
+  // ---- credential sources, the part that decides whether Windows works ----
+  await test('an explicit token is used without touching the keychain', async () => {
+    const cp = require('child_process');
+    const realExec = cp.execFileSync;
+    cp.execFileSync = (cmd, ...rest) => {
+      if (cmd === 'security') throw new Error('keychain must not be consulted');
+      return realExec(cmd, ...rest);
+    };
+    process.env.CONTRAST_MCP_URL = 'https://example.contrastsecurity.com/mcp';
+    process.env.CONTRAST_ACCESS_TOKEN = 'token-from-anywhere';
+    try {
+      delete require.cache[require.resolve(LIB)];
+      const mcp = require(LIB);
+      assert.strictEqual(mcp.configured(), true, 'should be configured from env alone');
+      const src = mcp.credentialSource();
+      assert.strictEqual(src.kind, 'env', `used ${src.kind}`);
+      assert.strictEqual(src.serverUrl, 'https://example.contrastsecurity.com/mcp');
+    } finally {
+      cp.execFileSync = realExec;
+      delete process.env.CONTRAST_MCP_URL;
+      delete process.env.CONTRAST_ACCESS_TOKEN;
+      delete require.cache[require.resolve(LIB)];
+    }
+  });
+
+  await test('with no source at all, the error explains every option', async () => {
+    const cp = require('child_process');
+    const realExec = cp.execFileSync;
+    cp.execFileSync = (cmd, ...rest) => {
+      if (cmd === 'security') throw new Error('not found');
+      return realExec(cmd, ...rest);
+    };
+    const realHome = process.env.HOME;
+    process.env.HOME = '/nonexistent-home-for-tests';
+    try {
+      delete require.cache[require.resolve(LIB)];
+      const mcp = require(LIB);
+      // configured() is deliberately not asserted here: a machine that has
+      // already run npm run login is configured regardless of borrowed tokens.
+      let msg = '';
+      try { mcp.credentialSource(); } catch (e) { msg = e.message; }
+      assert.ok(/claude mcp add/.test(msg), 'should name the setup command');
+      assert.ok(/CONTRAST_ACCESS_TOKEN/.test(msg), 'should mention the token escape hatch');
+    } finally {
+      cp.execFileSync = realExec;
+      process.env.HOME = realHome;
+      delete require.cache[require.resolve(LIB)];
+    }
+  });
+
   console.log(`\n\n${passed} passed, ${failures.length} failed`);
   if (failures.length) { failures.forEach((f) => console.error('  FAIL ' + f)); process.exit(1); }
 }

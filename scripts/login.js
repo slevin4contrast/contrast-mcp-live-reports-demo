@@ -35,16 +35,12 @@ const basic = (id, secret) => 'Basic ' + Buffer.from(`${id}:${secret}`).toString
 const save = (cfg) => fs.writeFileSync(OUT, JSON.stringify(cfg, null, 2), { mode: 0o600 });
 const load = () => { try { return JSON.parse(fs.readFileSync(OUT, 'utf8')); } catch { return null; } };
 
-function keychainEntry() {
-  const raw = execFileSync('security', ['find-generic-password', '-s', 'Claude Code-credentials', '-w'], { encoding: 'utf8' });
-  const entry = Object.values(JSON.parse(raw).mcpOAuth || {}).find((e) => e.serverName === SERVER_NAME);
-  if (!entry) {
-    throw new Error(`No stored credentials for "${SERVER_NAME}". Connect the MCP server first:\n`
-      + `  claude mcp add --transport http ${SERVER_NAME} https://<your-contrast-host>/mcp\n`
-      + 'then run a Contrast command so it signs in. Set CONTRAST_MCP_NAME if you used another name.');
-  }
-  return entry;
+// Reuse the library's credential chain so this works wherever that does:
+// macOS keychain, the Claude Code credentials file, or an explicit token.
+function borrowedCredentials() {
+  return require('../lib/mcp').credentialSource();
 }
+
 
 // Registration is protected, so it borrows Claude Code's current access token
 // once. It reads that token and never rotates it.
@@ -70,6 +66,15 @@ async function registerClient(issuer, accessToken) {
   const c = JSON.parse(text);
   if (!c.client_id || !c.client_secret) throw new Error('Registration returned no usable credentials.');
   return c;
+}
+
+// macOS, Windows and Linux each open a browser differently, and if none works
+// the URL is printed above anyway.
+function openBrowser(url) {
+  const cmd = process.platform === 'darwin' ? ['open', [url]]
+    : process.platform === 'win32' ? ['cmd', ['/c', 'start', '', url]]
+      : ['xdg-open', [url]];
+  try { execFileSync(cmd[0], cmd[1], { stdio: 'ignore' }); } catch { /* use the printed link */ }
 }
 
 function waitForCode(expectedState) {
@@ -115,7 +120,7 @@ async function main() {
     return;
   }
 
-  const entry = keychainEntry();
+  const entry = borrowedCredentials();
   const issuer = entry.issuer || new URL(entry.serverUrl).origin;
   const meta = await (await fetch(`${issuer}/.well-known/oauth-authorization-server`)).json();
 
@@ -150,7 +155,7 @@ async function main() {
   console.log(`If it does not open, visit:\n${authUrl}\n`);
 
   const codePromise = waitForCode(state);
-  try { execFileSync('open', [authUrl]); } catch { /* the printed link still works */ }
+  openBrowser(authUrl);
   const code = await codePromise;
 
   const tokRes = await fetch(meta.token_endpoint, {

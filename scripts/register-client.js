@@ -22,16 +22,12 @@ const { execFileSync } = require('child_process');
 const SERVER_NAME = process.env.CONTRAST_MCP_NAME || 'contrast-hosted-mcp';
 const OUT = path.join(__dirname, '..', '.contrast-client.json');
 
-function keychainEntry() {
-  const raw = execFileSync('security', ['find-generic-password', '-s', 'Claude Code-credentials', '-w'], { encoding: 'utf8' });
-  const entry = Object.values(JSON.parse(raw).mcpOAuth || {}).find((e) => e.serverName === SERVER_NAME);
-  if (!entry) {
-    throw new Error(`No stored credentials for "${SERVER_NAME}". Connect the MCP server first:\n`
-      + `  claude mcp add --transport http ${SERVER_NAME} https://<your-contrast-host>/mcp\n`
-      + 'then run a Contrast command so it signs in. Set CONTRAST_MCP_NAME if you used another name.');
-  }
-  return entry;
+// Reuse the library's credential chain so this works wherever that does:
+// macOS keychain, the Claude Code credentials file, or an explicit token.
+function borrowedCredentials() {
+  return require('../lib/mcp').credentialSource();
 }
+
 
 async function main() {
   if (fs.existsSync(OUT)) {
@@ -40,7 +36,7 @@ async function main() {
     return;
   }
 
-  const entry = keychainEntry();
+  const entry = borrowedCredentials();
   const issuer = entry.issuer || new URL(entry.serverUrl).origin;
 
   const meta = await (await fetch(`${issuer}/.well-known/oauth-authorization-server`)).json();
